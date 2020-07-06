@@ -26,36 +26,59 @@ from app import app, indicator, millify
 
 
 
-import main
 import studentGroupedPerformance
 import studentGroupedPerformanceTheory
 import studentGroupedGeneral
 
 
-#---------------------------------
-# school selection
+#--------------------- school selection START ----------------------
 GroupSelector_options = studentGroupedGeneral.GroupSelector_options 
+#--------------------- school selection END ----------------------
 
 
 
-def generate_control_card():
+#--------------------------------- DataBase get data START ---------------------------
+dfStudentDetails = studentGroupedGeneral.dfStudentDetails
+dfStudentDetails = dfStudentDetails.drop_duplicates(subset=['StudentId'], keep='first')
+
+
+dfPracticeTaskDetails = studentGroupedPerformance.dfPracticeTaskDetails
+dfTheoryTaskDetails   = studentGroupedPerformanceTheory.dfTheoryTaskDetails
+
+
+dfGroupedPractice                       = studentGroupedPerformance.dfGrouped
+dfGroupedOriginal                       = studentGroupedPerformance.dfGroupedOriginal
+dfPlayerStrategyPractice                = studentGroupedPerformance.dfPlayerStrategyPractice  
+dfGroupedPracticeTaskWise               = studentGroupedPerformance.dfGroupedPracticeTaskWise
+dfGroupedPracticeDB  = studentGroupedPerformance.dfPractice.groupby(  [studentGroupedPerformance.dfPractice['GroupId']] )
+
+
+
+dfPlayerStrategyTheory = pd.concat([studentGroupedPerformanceTheory.dfPlayerStrategyNN, studentGroupedPerformanceTheory.dfPlayerStrategyN], ignore_index=True, sort =False)
+dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrategyTheory['GroupId']] )
+
+#--------------------------------- DataBase get data END ---------------------------
+
+
+
+def generateControlCard():
     """
     :return: A Div containing controls for graphs.
     """
     return html.Div(
         id="Control-Card-Overview",
         children=[
-            html.P("Select Group"),
-            dcc.Dropdown(
-                id = "GroupSelector-Dropdown-Overview",
-                options = GroupSelector_options,
-            ),
-            html.Br(),
-            html.Br(),
-            html.Br(),
+#            html.P("Select Group"),
+#            dcc.Dropdown(
+#                id = "group-selector-main-overview",
+#                options = GroupSelector_options,
+#            ),
+#            html.Br(),
+#            html.Br(),
+#            html.Br(),
             html.P("Select Group for Comparision"),
             dcc.Dropdown(
-                id="GroupSelector-Dropdown-Overview-Comparision",
+                id="group-selector-comparision-overview",
                 options = GroupSelector_options,
 #                value = GroupSelector_options[:],
                 multi = True,
@@ -67,7 +90,6 @@ def generate_control_card():
                         dbc.Button( "Reset", id="reset-btn", 
                            outline=True, color="primary", className="mr-1", n_clicks=0
                         ),
-#                html.Button(id="reset-btn", children="Reset", n_clicks=0),
             ),
         ],
     )
@@ -80,12 +102,12 @@ layout = [
             dbc.Col(
                 # Left column
                 html.Div(
-                    id="row-control-main",
+                    id="row-control-main-overview",
                     className="",
-                    children=[ generate_control_card() ]
+                    children=[ generateControlCard() ]
                     + [
                         html.Div(
-                            ["initial child"], id="row-control-main-output-clientside", style={"display": "none"}
+                            ["initial child"], id="row-control-main-output-clientside-overview", style={"display": "none"}
                         )
                     ],
                 ),
@@ -211,7 +233,7 @@ layout = [
                                 
 @app.callback(
     [ 
-         Output("GroupSelector-Dropdown-Overview-Comparision", "value"), 
+         Output("group-selector-comparision-overview", "value"), 
     ],
     [
         Input("reset-btn", "n_clicks")
@@ -228,3 +250,19 @@ def on_reset(reset_click):
             
 #    return [GroupSelector_options[0]['value']]
     return [""]
+
+
+
+# Update bar plot
+@app.callback(
+    Output("row-control-main-output-clientside-overview", "figure"),
+    [
+        Input("group-selector-main-index", "value"),
+        Input("group-selector-comparision-overview", "value"),
+    ],
+)
+def update_bar(groupMain, groupComparision ):
+    print('anil')
+    print(groupMain)
+    print(groupComparision)
+    

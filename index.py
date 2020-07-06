@@ -26,19 +26,57 @@ from apps import overview, groupDetails
 from sidebar import sidebar
 
 
-# the styles for the main content position it to the right of the sidebar and
-# add some padding.
-CONTENT_STYLE = {
-    "marginLeft": "18rem",
-    "marginRight": "2rem",
-    "padding": "2rem 1rem",
-}
+import constants
+
+import studentGroupedGeneral
+
+
+
+#--------------------- school selection START ----------------------
+GroupSelector_options = studentGroupedGeneral.GroupSelector_options 
+#--------------------- school selection END ----------------------
+
+
+
+
+def generateControlCard():
+    """
+    :return: A Div containing controls for graphs.
+    """
+    return html.Div(
+        id="control-card-index",
+        children=[
+            html.P("Select Group"),
+            dcc.Dropdown(
+                id = "group-selector-main-index",
+                options = GroupSelector_options,
+            ),
+        ],
+    )
+
 
 content = html.Div(
         children=[
         
-#    dbc.Navbar(
-#        children = [
+    dbc.Navbar(
+        children = [
+                dbc.Row([
+                        dbc.Col(
+                            # Left column
+                            html.Div(
+                                id="row-control-main-index",
+                                className="",
+                                children=[ generateControlCard() ]
+                                + [
+                                    html.Div(
+                                        ["initial child"], id="row-control-main-output-clientside-index", style={"display": "none"}
+                                    )
+                                ],
+                            ),
+                    ),
+                ],
+                    className = "row w-100" ),
+                
 #                dbc.Row(
 #                    [
 #                        dbc.Col(  html.Div([
@@ -51,22 +89,22 @@ content = html.Div(
 #                        ),
 #                    ],
 #                    className = "row w-100" )
-#        ],
-#        id="page-topbar", 
-#        sticky          = "top" ,
-#        light           = True ,
-#        style           = {
-#                 'background-color' : '#3aaab2',
-#                 'font-size' : 'initial',
-#                 'color'  : 'white'  }
-#    ),
+        ],
+        id="page-topbar", 
+        sticky          = "top" ,
+        light           = True ,
+        style           = {
+                 'background-color' : '#3aaab2',
+                 'font-size' : 'initial',
+                 'color'  : 'white'  }
+    ),
 
     # Page content
     html.Div(id="page-content", className="", style={"marginTop": "5rem"}),
     
     ],
         
-    id="page-main", style=CONTENT_STYLE)
+    id="page-main", style =  constants.CONTENT_STYLE )
 
 
 app.layout = html.Div([dcc.Location(id="url"), sidebar, content])

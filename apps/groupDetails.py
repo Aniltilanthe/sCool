@@ -31,7 +31,6 @@ from app import app
 
 
 
-import main
 import studentGroupedPerformance
 import studentGroupedPerformanceTheory
 import studentGroupedGeneral
@@ -55,6 +54,7 @@ StudentResultExplanation = '        (*has student completed this task in any run
 colorError = 'rgb(255,127,80)'
 colorSuccess = 'rgb(0,128,0)'       #'rgb(76, 114, 176)'
 
+#--------------------------- helper functions -----------------------
 def getGroupedData(df):
 #    return df.groupby(  [df['CreatedAt'].dt.date] )
     return df.groupby(  [df['GroupId']] )
@@ -150,13 +150,9 @@ def getTheoryDescription(dfTheory) :
     dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('StudentId')) + '</b>: ' + dfTheory['StudentId'].astype(str)
     return dfTheory[featureDescription]
 
+#--------------------------- helper functions  END -----------------------
 
-
-dfStudentDetails = studentGroupedGeneral.dfStudentDetails
-dfStudentDetails = dfStudentDetails.drop_duplicates(subset=['StudentId'], keep='first')
-
-
-
+#--------------------------------- Const values START ----------------------------
 countStudentCompletingTaskFeature = "No. of Students Completing Task"
 countTaskCompletedByStudentFeature = "No. of Tasks Completed"
 featurePracticeTaskDesc             = "PracticeTaskDesc"
@@ -167,10 +163,6 @@ featureDescription                  = "Description"
 
 TaskTypePractice                    = "Practice"
 TaskTypeTheory                      = "Theory "
-
-
-dfPracticeTaskDetails = studentGroupedPerformance.dfPracticeTaskDetails
-dfTheoryTaskDetails   = studentGroupedPerformanceTheory.dfTheoryTaskDetails
 
 feature2UserNamesDict = studentGroupedPerformance.feature2UserNamesDict
 feature2UserNamesDict[featurePracticeTaskDesc] = "Practice Task"
@@ -183,7 +175,6 @@ feature2UserNamesDict["itemsCollectedCount"] = "Items Collected Count"
 feature2UserNamesDict["robotCollisionsBoxCount"] = "Robot box collision Count"
 feature2UserNamesDict["Result"] = "Result"
 feature2UserNamesDict["ConceptsUsedDetailsStr"] = "Concepts used details"
-
 
 
 
@@ -203,6 +194,18 @@ featurePairsToPlotTheory = [
         , ['SessionDuration', 'Name']  
         , ['Attempts', 'Name']  
         ]
+#--------------------------------- Const values END ----------------------------
+
+
+#--------------------------------- DataBase get data START ---------------------------
+
+dfStudentDetails = studentGroupedGeneral.dfStudentDetails
+dfStudentDetails = dfStudentDetails.drop_duplicates(subset=['StudentId'], keep='first')
+
+
+dfPracticeTaskDetails = studentGroupedPerformance.dfPracticeTaskDetails
+dfTheoryTaskDetails   = studentGroupedPerformanceTheory.dfTheoryTaskDetails
+
 
 dfGroupedPractice                       = studentGroupedPerformance.dfGrouped
 dfGroupedOriginal                       = studentGroupedPerformance.dfGroupedOriginal
@@ -217,10 +220,8 @@ dfPlayerStrategyTheory = pd.concat([studentGroupedPerformanceTheory.dfPlayerStra
 #dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrategyTheory['CreatedAt'].dt.date] )
 dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrategyTheory['GroupId']] )
 
+#--------------------------------- DataBase get data END ---------------------------
 
-
-
-dfTESTING = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv')
 
 #---------------------------------
 # school selection
@@ -259,88 +260,9 @@ def plotSingleClass( titleTextAdd, school ):
                                children = [], 
                     style = {'padding' : '20px',
                              'padding-top' : '100px',
-                             'font-size' : 'initial'}))
-        graphIndex = graphIndex + 1
-        
-    #            CHECKED            
-    #            1. Task wise result - success or others
-#        rows = []
-#        columns = []
-##        
-#        pieDataTaskWisePractice = groupOriginal.groupby(['PracticeTaskId', 'StudentId'], as_index=False).sum()
-#        pieDataTaskWisePractice.loc[pieDataTaskWisePractice['Result'] > 0, 'Result'] = 1   
-#        pieDataTaskWisePracticeGrouped = pieDataTaskWisePractice.groupby(['PracticeTaskId'])
-#                
-#        for groupKeyTaskId, groupTask in pieDataTaskWisePracticeGrouped:
-#            
-#            pieFig = getSuccessPieFig(groupTask, groupKeyTaskId, dfPracticeTaskDetails, 'PracticeTaskId', 'Practice')
-#            
-#            columns.append(dbc.Col(
-#                        dcc.Graph(
-#                            figure= pieFig
-#                    ) , align="center")
-#            )
-#                
-#        try :        
-#            pieDataTaskWiseTheory = groupOriginalTheory.groupby(['TheoryTaskId', 'StudentId'], as_index=False).sum()
-#            pieDataTaskWiseTheory.loc[pieDataTaskWiseTheory['Result'] > 0, 'Result'] = 1   
-#            pieDataTaskWiseTheoryGrouped = pieDataTaskWiseTheory.groupby(['TheoryTaskId'])
-#        
-#            for groupKeyTaskId, groupTask in pieDataTaskWiseTheoryGrouped:
-#                
-#                pieFig = getSuccessPieFig(groupTask, groupKeyTaskId,  dfTheoryTaskDetails, 'TheoryTaskId', 'Theory')
-#                
-#                columns.append(dbc.Col(
-#                            dcc.Graph(
-#                                figure= pieFig
-#                        ) , align="center")
-#                )
-#        except Exception as e: 
-#                print(e)
-#            
-#    
-#        i = 0
-#        j = 0
-#        colSize = 2
-#        while i < len(columns) :
-#            if (i  % colSize )== 0:
-#                rowCols = columns[ j : (j + colSize) ]
-#                rows.append( dbc.Row( rowCols ) )
-#                j = j + colSize
-#            
-#            i = i + 1
-#        
-#       
-#        graphs.append(  html.Div([
-#                dbc.Button(
-#                    "Task results",
-#                    id          = "collapse-task-button",
-#                    className   = "mb-3",
-#                    color       = "primary",
-#                    style       = { 'font-size' : 'initial'  }
-#                ),
-#                dbc.Tooltip(
-#                    "Click to View/Hide",
-#                    target      = "collapse-task-button",
-#                    style       = { 'font-size' : 'initial'  }
-#                ),
-#                dbc.Collapse(
-#                    html.Div(  rows  ) ,
-#                    id = "collapse-task",
-#                    is_open = True
-#                ),
-#        ] ,
-#                    style = {'padding' : '50px' , 
-#                             'font-size' : 'initial'  }))
-#        graphs.append(
-#                html.Div(  rows  )
-#                )
-#        graphIndex = graphIndex + 1   
-#        
-        
-        
-        
-#        Datatable task wise success fail
+                             'font-size' : 'initial'}))        
+
+#---------------------------        Datatable task wise success fail    ---------------------------
         dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', 'Success', 'Others', 'Type', 'TaskId'])
         
         

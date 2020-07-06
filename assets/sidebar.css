@@ -1,0 +1,43 @@
+html {
+  scroll-behavior: smooth;
+}
+
+.open {
+	font-family: sans-serif;
+}
+
+.highlight {
+	color: aliceblue;
+    background-color: #0069d9;
+    border-color: #0062cc;
+    font-weight: bold;
+}
+.highlight:focus {
+    color: aliceblue;
+    background-color: #0069d9;
+    border-color: #0062cc;
+    box-shadow: 0 0 0 0.2rem rgba(38,143,255,.5);
+}
+
+
+.p-left_xx-large {
+	padding-left: 100px;
+}
+.p-left_x-large {
+	padding-left: 70px;
+}
+.p-left_large {
+	padding-left: 50px;
+}
+.p-left_medium {
+	padding-left: 30px;
+}
+.p-left_small {
+	padding-left: 20px;
+}
+.p-left_xx-small {
+	padding-left: 10px;
+}
+.p-left_xxx-small {
+	padding-left: 5px;
+}

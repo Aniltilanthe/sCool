@@ -31,9 +31,8 @@ from app import app
 
 
 
-import studentGroupedPerformance
-import studentGroupedPerformanceTheory
-import studentGroupedGeneral
+import studentGrouped
+import constants
 
 
 
@@ -41,144 +40,24 @@ import studentGroupedGeneral
 
 #fig = studentGroupedPerformance.figBar
 
-graphHeight = 800
-graphWidth =  1300
-
-graphTemplete = 'seaborn'
-
-successPieFigClassSuccess = "Successfully completed a task"
-successPieFigClassOthers = "Others"
-
-StudentResultExplanation = '        (*has student completed this task in any runs)'
-
-colorError = 'rgb(255,127,80)'
-colorSuccess = 'rgb(0,128,0)'       #'rgb(76, 114, 176)'
-
-#--------------------------- helper functions -----------------------
-def getGroupedData(df):
-#    return df.groupby(  [df['CreatedAt'].dt.date] )
-    return df.groupby(  [df['GroupId']] )
-
-def getTaskWiseSuccessFail(groupData, taskId, dfTaskDetails, featureTaskId, typeOfTask):
-    
-    groupData = groupData.sort_values(['StudentId','Result'], ascending=False)
-    
-    taskTitle = ' missing '
-    
-    try :
-        taskTitle = dfTaskDetails[ dfTaskDetails[featureTaskId] == int(taskId) ]['Title'].values[0]
-    except Exception as e: 
-        print(e)   
-        
-    return  [str(taskTitle)] + [groupData[groupData['Result'] == 1].count()[0], 
-                                  groupData[groupData['Result'] == 0].count()[0]] + [  str(typeOfTask) ] + [ taskId ]
-    
-
-def getSuccessPieFig(groupData, taskId, dfTaskDetails, featureTaskId, typeOfTask):
-    
-    groupData = groupData.sort_values(['StudentId','Result'], ascending=False)
-
-    taskTitle = ' missing '
-    
-    try :
-        taskTitle =  dfTaskDetails[ dfTaskDetails[featureTaskId] == int(taskId) ]['Title'].values[0]
-    except Exception as e: 
-        print(e)
-    
-    pieFig = go.Figure(go.Pie(
-                        values = [groupData[groupData['Result'] == 1].count()[0], 
-                                  groupData[groupData['Result'] == 0].count()[0]],
-                        labels = [successPieFigClassSuccess, successPieFigClassOthers],
-                        text = ["Success", "Others"],
-                        marker_colors =  [ colorSuccess, colorError ]
-                    ))
-    pieFig.update_layout(
-            autosize =  False,
-            title_text =  str(typeOfTask) + ' Task ' + ": " + str(taskTitle) + " (Id: " + str(taskId) + ")"
-    )
-    
-    return pieFig
-
-def convert_list_column_tostr_NL(val) :
-    separator = ',<br>'
-    return separator.join(val)
-
-def getStudentsOfSchool(schoolSelected):
-    
-    print(schoolSelected)
-
-    studentWiseData = dfGroupedOriginal.get_group(schoolSelected)
-    students = studentWiseData['StudentId'].unique()
-    students = list(students)
-    
-    
-    try :
-        groupOriginalTheory = dfGroupedPlayerStrategyTheory.get_group(schoolSelected)
-        studentsTheory = groupOriginalTheory['StudentId'].unique()
-        studentsTheory = list(studentsTheory)
-        
-        students = students + studentsTheory        
-    except Exception as e: 
-        print(e)
-        
-    students = list(set(students))
-    
-    return students
-
-
-def getPracticeDescription(dfPractice) :
-    dfPractice[featureDescription] = '<b>' + dfPractice['Name'].astype(str) + '</b>' + '<br>'
-    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('SessionDuration')) + '</b>: ' + dfPractice['SessionDuration'].astype(str)
-    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Points')) + '</b>:' + dfPractice['Points'].astype(str)
-    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('CollectedCoins')) + '</b>: ' + dfPractice['CollectedCoins'].astype(str)
-    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Result')) + '</b>: ' + dfPractice['Result'].astype(str)
-    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Attempts')) + '</b>: ' + dfPractice['Attempts'].astype(str)
-    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('ConceptsUsedDetailsStr')) + '</b>: ' + dfPractice['ConceptsUsedDetailsStr'].astype(str)
-    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('lineOfCodeCount')) + '</b>: ' + dfPractice['lineOfCodeCount'].astype(str)
-    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('robotCollisionsBoxCount')) + '</b>: ' + dfPractice['robotCollisionsBoxCount'].astype(str)
-    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('StudentId')) + '</b>: ' + dfPractice['StudentId'].astype(str)
-    return dfPractice[featureDescription]
-
-def getTheoryDescription(dfTheory) :    
-    dfTheory[featureDescription] = '<b>' + dfTheory['Name'].astype(str) + '</b>' + '<br>'
-    dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('SessionDuration')) + '</b>: ' + dfTheory['SessionDuration'].astype(str)
-    dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Points')) + '</b>: ' + dfTheory['Points'].astype(str)
-    dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Result')) + '</b>: ' + dfTheory['Result'].astype(str)
-    dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Attempts')) + '</b>: ' + dfTheory['Attempts'].astype(str)
-    dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('itemsCollectedCount')) + '</b>: ' + dfTheory['itemsCollectedCount'].astype(str)
-    dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('playerShootEndEnemyHitCount')) + '</b>: ' + dfTheory['playerShootEndEnemyHitCount'].astype(str)
-    dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('StudentId')) + '</b>: ' + dfTheory['StudentId'].astype(str)
-    return dfTheory[featureDescription]
-
-#--------------------------- helper functions  END -----------------------
 
 #--------------------------------- Const values START ----------------------------
-countStudentCompletingTaskFeature = "No. of Students Completing Task"
-countTaskCompletedByStudentFeature = "No. of Tasks Completed"
-featurePracticeTaskDesc             = "PracticeTaskDesc"
-featureTheoryTaskDesc               = "TheoryTaskDesc"
-featureTaskDesc                     = "TaskDesc"
-featureTaskType                     = "TaskType"
-featureDescription                  = "Description"
-
-TaskTypePractice                    = "Practice"
-TaskTypeTheory                      = "Theory "
-
-feature2UserNamesDict = studentGroupedPerformance.feature2UserNamesDict
-feature2UserNamesDict[featurePracticeTaskDesc] = "Practice Task"
-feature2UserNamesDict[featureTheoryTaskDesc] = "Theory Task"
-feature2UserNamesDict[featureTaskDesc] = "Task"
-feature2UserNamesDict[featureTaskType] = "Task Type"
-feature2UserNamesDict["SessionDuration"] = "Session Duration"
-feature2UserNamesDict["playerShootEndEnemyHitCount"] = "Player Shoot Enemy Hit Count"
-feature2UserNamesDict["itemsCollectedCount"] = "Items Collected Count"
-feature2UserNamesDict["robotCollisionsBoxCount"] = "Robot box collision Count"
-feature2UserNamesDict["Result"] = "Result"
-feature2UserNamesDict["ConceptsUsedDetailsStr"] = "Concepts used details"
 
 
+feature2UserNamesDict               = constants.feature2UserNamesDict
+countStudentCompletingTaskFeature   = constants.countStudentCompletingTaskFeature
+countTaskCompletedByStudentFeature  = constants.countTaskCompletedByStudentFeature
+featurePracticeTaskDesc             = constants.featurePracticeTaskDesc
+featureTheoryTaskDesc               = constants.featureTheoryTaskDesc
+featureTaskDesc                     = constants.featureTaskDesc
+featureTaskType                     = constants.featureTaskType
+featureDescription                  = constants.featureDescription
 
-hasFeatures =  studentGroupedPerformance.hasFeatures
+TaskTypePractice                    = constants.TaskTypePractice
+TaskTypeTheory                      = constants.TaskTypeTheory
+
+
+hasFeatures =  studentGrouped.hasFeatures
 
 #    [  X ,  Y   ]
 featurePairsToPlotSingle = [
@@ -199,38 +78,79 @@ featurePairsToPlotTheory = [
 
 #--------------------------------- DataBase get data START ---------------------------
 
-dfStudentDetails = studentGroupedGeneral.dfStudentDetails
-dfStudentDetails = dfStudentDetails.drop_duplicates(subset=['StudentId'], keep='first')
+dfStudentDetails                        = studentGrouped.dfStudentDetails
 
 
-dfPracticeTaskDetails = studentGroupedPerformance.dfPracticeTaskDetails
-dfTheoryTaskDetails   = studentGroupedPerformanceTheory.dfTheoryTaskDetails
+dfPracticeTaskDetails                   = studentGrouped.dfPracticeTaskDetails
+dfTheoryTaskDetails                     = studentGrouped.dfTheoryTaskDetails
 
 
-dfGroupedPractice                       = studentGroupedPerformance.dfGrouped
-dfGroupedOriginal                       = studentGroupedPerformance.dfGroupedOriginal
-dfPlayerStrategyPractice                = studentGroupedPerformance.dfPlayerStrategyPractice  
-dfGroupedPracticeTaskWise               = studentGroupedPerformance.dfGroupedPracticeTaskWise
-#dfGroupedPracticeDB  = studentGroupedPerformance.dfPractice.groupby(  [studentGroupedPerformance.dfPractice['CreatedAt'].dt.date] )
-dfGroupedPracticeDB  = studentGroupedPerformance.dfPractice.groupby(  [studentGroupedPerformance.dfPractice['GroupId']] )
+dfGroupedPractice                       = studentGrouped.dfGroupedPractice
+dfGroupedOriginal                       = studentGrouped.dfGroupedOriginal
+dfPlayerStrategyPractice                = studentGrouped.dfPlayerStrategyPractice  
+dfGroupedPracticeTaskWise               = studentGrouped.dfGroupedPracticeTaskWise
+dfGroupedPracticeDB                     = studentGrouped.dfGroupedPracticeDB
+dfRuns                                  = studentGrouped.dfRuns
 
 
-
-dfPlayerStrategyTheory = pd.concat([studentGroupedPerformanceTheory.dfPlayerStrategyNN, studentGroupedPerformanceTheory.dfPlayerStrategyN], ignore_index=True, sort =False)
-#dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrategyTheory['CreatedAt'].dt.date] )
-dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrategyTheory['GroupId']] )
+dfPlayerStrategyTheory                  = studentGrouped.dfPlayerStrategyTheory
+dfGroupedPlayerStrategyTheory           = studentGrouped.dfGroupedPlayerStrategyTheory
 
 #--------------------------------- DataBase get data END ---------------------------
 
 
 #---------------------------------
 # school selection
-SchoolSelector_options = studentGroupedGeneral.GroupSelector_options 
+SchoolSelector_options                  = studentGrouped.GroupSelector_options 
 
 StudentSelector_students = list()
 
 #-----------------------------------
 
+
+#--------------------------- helper functions -----------------------    
+getTaskWiseSuccessFail                  =  studentGrouped.getTaskWiseSuccessFail
+getStudentsOfSchool                     =  studentGrouped.getStudentsOfSchool
+
+
+getPracticeDescription                  =  studentGrouped.getPracticeDescription
+getTheoryDescription                     =  studentGrouped.getTheoryDescription
+
+
+
+def getSuccessPieFig(groupData, taskId, dfTaskDetails, featureTaskId, typeOfTask):
+    
+    groupData = groupData.sort_values(['StudentId','Result'], ascending=False)
+
+    taskTitle = ' missing '
+    
+    try :
+        taskTitle =  dfTaskDetails[ dfTaskDetails[featureTaskId] == int(taskId) ]['Title'].values[0]
+    except Exception as e: 
+        print(e)
+    
+    pieFig = go.Figure(go.Pie(
+                        values = [groupData[groupData['Result'] == 1].count()[0], 
+                                  groupData[groupData['Result'] == 0].count()[0]],
+                        labels = [constants.successPieFigClassSuccess, constants.successPieFigClassOthers],
+                        text = ["Success", "Others"],
+                        marker_colors =  [ constants.colorSuccess, constants.colorError ]
+                    ))
+    pieFig.update_layout(
+            autosize =  False,
+            title_text =  str(typeOfTask) + ' Task ' + ": " + str(taskTitle) + " (Id: " + str(taskId) + ")"
+    )
+    
+    return pieFig
+
+def convert_list_column_tostr_NL(val) :
+    separator = ',<br>'
+    return separator.join(val)
+
+
+
+
+#--------------------------- helper functions  END -----------------------
 
 
 #------------------------------------
@@ -359,7 +279,7 @@ def plotSingleClass( titleTextAdd, school ):
                             , title  = "(Practice)" +  ' No. of students completing a Task '
                             ,  labels= feature2UserNamesDict # customize axis label
 #                            , height       = graphHeight
-                            , template     = graphTemplete
+                            , template     = constants.graphTemplete
                             , hover_data = ['Title']                             
                             , orientation   = 'h'
         )
@@ -377,7 +297,7 @@ def plotSingleClass( titleTextAdd, school ):
                             , title  = "(Theory)" + ' No. of students completing a Task '
                             ,  labels= feature2UserNamesDict # customize axis label
 #                            , height       = graphHeight
-                            , template     = graphTemplete
+                            , template     = constants.graphTemplete
                             , hover_data = ['Title']                             
                             , orientation   = 'h'
         )
@@ -427,8 +347,8 @@ def plotSingleClass( titleTextAdd, school ):
                                 , y             =  'Name'
                                 , title         = 'Count of tasks completed by students '
                                 , labels        = feature2UserNamesDict # customize axis label
-                                , height        = graphHeight
-                                , template      = graphTemplete                              
+                                , height        = constants.graphHeight
+                                , template      = constants.graphTemplete                              
                                 , orientation   = 'h'
                                 , hover_data    = [featureTaskDesc]
                                 , color         = 'TaskType'
@@ -448,8 +368,8 @@ def plotSingleClass( titleTextAdd, school ):
                                 , y             = 'Name'
                                 , title         = '(Practice) Count of tasks completed by students '
                                 , labels        = feature2UserNamesDict # customize axis label
-                                , height        = graphHeight
-                                , template      = graphTemplete                              
+                                , height        = constants.graphHeight
+                                , template      = constants.graphTemplete                              
                                 , orientation   = 'h'
                                 , hover_data    = [featureTaskDesc]
             )
@@ -520,8 +440,8 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                             , x             =   studentWiseDataConcepts[featureX]
                             , y             =   studentWiseDataConcepts[featureY]
                             , orientation   =  'h'
-                            , height        =   graphHeight - 100
-                            , template      =   graphTemplete   
+                            , height        =   constants.graphHeight - 100
+                            , template      =   constants.graphTemplete   
                             , title         =   "(Practice) Concepts used by students of this class (no. of times students used a concept in code)"
                             , labels        =   feature2UserNamesDict # customize axis label
             )
@@ -563,8 +483,8 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                 , x             =   studentWiseDataConceptsTask[featureX]
                                 , y             =   studentWiseDataConceptsTask[featureY]
                                 , orientation   =  'h'
-                                , height        =   graphHeight - 100
-                                , template      =   graphTemplete   
+                                , height        =   constants.graphHeight - 100
+                                , template      =   constants.graphTemplete   
                                 , title         =   "(Practice) Concepts used by students in task " + str(taskTitle)  +   " (no. of times students used a concept in code)"
                                 , labels        =   feature2UserNamesDict # customize axis label
                 )
@@ -662,7 +582,7 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                         showscale = False
                             ))
                             fig.update_layout(
-                                        height          =   graphHeight, 
+                                        height          =   constants.graphHeight, 
                                         title_text      = 'Details of students ' + titleFirst
                                              , yaxis = dict(
                                                 title = featuresPractice[second],
@@ -693,10 +613,10 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                  , labels  =  feature2UserNamesDict # customize axis label
                                  , hover_name  =  "Name"
                                  , hover_data  =  ["CollectedCoins", "Result", "SessionDuration", "Attempts", "robotCollisionsBoxCount", "Points", "ConceptsUsedDetailsStr", "lineOfCodeCount", 'StudentId']
-                                 , height       = graphHeight
+                                 , height       = constants.graphHeight
 #                                 , color        = "StudentId" 
 #                                 , color_continuous_scale=px.colors.sequential.Rainbow
-                                 , template     = graphTemplete
+                                 , template     = constants.graphTemplete
                                 )
                             figStudents.update_traces(marker=dict(size = 16
                                                         , showscale    = False
@@ -729,10 +649,10 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                          , labels       =  feature2UserNamesDict # customize axis label
                                          , hover_name   =  "Name"
                                          , hover_data   =  ["Points", "Result", "SessionDuration", "Attempts", "Points", "itemsCollectedCount", "playerShootEndEnemyHitCount", 'StudentId']
-                                         , height       = graphHeight
+                                         , height       = constants.graphHeight
 #                                         , color        = "StudentId" 
 #                                         , color_continuous_scale   = px.colors.sequential.Rainbow
-                                         , template     = graphTemplete
+                                         , template     = constants.graphTemplete
                                         )
                     figStudents.update_traces(marker=dict(size = 16
                                                         , showscale    = False
@@ -763,17 +683,15 @@ def plotStudent(StudentId, schoolKey):
     graphIndex = 1
     
 
-    dfGroupedOriginal = studentGroupedPerformance.getGroupedDataStudent(studentGroupedPerformance.dfPlayerStrategyPracticeOriginal)
-    
     school              = dfGroupedOriginal.get_group(schoolKey)
     school              = school[school['StudentId'] == StudentId]
     school['Start']     = school['CreatedAt']
     school['Finish']    = school['CreatedAt'] + pd.to_timedelta(school['SessionDuration'], unit='s')
     
     
-    codes = studentGroupedPerformance.dfRuns[studentGroupedPerformance.dfRuns['StudentId'].isin(school['StudentId']) & studentGroupedPerformance.dfRuns['PracticeStatisticsId'].isin(school['PracticeStatisticsId']) ]
+    codes = dfRuns[dfRuns['StudentId'].isin(school['StudentId']) & dfRuns['PracticeStatisticsId'].isin(school['PracticeStatisticsId']) ]
         
-    codes = codes.merge(right= studentGroupedPerformance.dfPracticeTaskDetails
+    codes = codes.merge(right= dfPracticeTaskDetails
                                       , left_on='PracticeTaskId', right_on='PracticeTaskId'
                                         , left_index=False, right_index=False
                                         , how='inner')
@@ -843,7 +761,7 @@ def plotStudent(StudentId, schoolKey):
 #        schoolTheoryStudent['Finish'] = np.where(   schoolTheoryStudent['Difference'] == 0  , ( schoolTheoryStudent['Finish'] + pd.to_timedelta(10, unit='s') )  ,   schoolTheoryStudent['Finish']  )
         
         
-        schoolTheoryStudent = schoolTheoryStudent.merge(right= studentGroupedPerformanceTheory.dfTheoryTaskDetails[ ['TheoryTaskId', 'Title', 'Description' ] ]
+        schoolTheoryStudent = schoolTheoryStudent.merge(right= dfTheoryTaskDetails[ ['TheoryTaskId', 'Title', 'Description' ] ]
                                           , left_on='TheoryTaskId', right_on='TheoryTaskId'
                                             , left_index=False, right_index=False
                                             , how='inner')
@@ -866,8 +784,8 @@ def plotStudent(StudentId, schoolKey):
     studentData                     = studentData.sort_values(by='Start')
     studentData['StartStr']         = '@' + studentData['Start'].astype(str) + '-' + studentData['IndexCol'].astype(str)
     
-    studentData['color']                                            =   colorError
-    studentData.loc[studentData['Result']  == 1, 'color']           =   colorSuccess
+    studentData['color']                                            =   constants.colorError
+    studentData.loc[studentData['Result']  == 1, 'color']           =   constants.colorSuccess
     studentData.loc[studentData['RunsError']  == False, 'color']    =   'rgb(51, 204, 255)'
     
     
@@ -1005,7 +923,7 @@ def plotClassOverview(schoolKey):
         values      = [1] * len(labels),
     ))
     fig2.update_layout(
-            height =  graphHeight + 300
+            height =  constants.graphHeight + 300
     )
     
     
@@ -1032,18 +950,20 @@ layout = [
                 
                 
                          
-    html.Div([
-            dcc.Dropdown(
-                    id='SchoolSelector-Dropdown',                    
-                    options =  SchoolSelector_options,
-#                    value  =   '2018-03-01' 
-                    )
-          ], 
-                    style = {'padding' : '20px',
-                             'font-size' : 'initial'}
-    )
+#    html.Div([
+#            dcc.Dropdown(
+#                    id='SchoolSelector-Dropdown',                    
+#                    options =  SchoolSelector_options,
+##                    value  =   '2018-03-01' 
+#                    )
+#          ], 
+#                    style = {'padding' : '20px',
+#                             'font-size' : 'initial'}
+#    )
+#    
+#    , 
     
-    , html.Div(id='Class-Overview-Container')
+    html.Div(id='Class-Overview-Container')
     
     
     , html.Div(id='Class-Container')
@@ -1087,7 +1007,7 @@ layout = [
 #-----------------------------------------
 # callback functions---------------------
 #        ---------------------------------
-@app.callback(Output('Class-Container', 'children'), [Input('SchoolSelector-Dropdown', 'value')])
+@app.callback(Output('Class-Container', 'children'), [Input('group-selector-main', 'value')])
 def display_graphs(schoolSelected):
     graphs = []
     
@@ -1100,7 +1020,7 @@ def display_graphs(schoolSelected):
     return html.Div(graphs)
 
 
-@app.callback(Output('Class-Container-General', 'children'), [Input('SchoolSelector-Dropdown', 'value')])
+@app.callback(Output('Class-Container-General', 'children'), [Input('group-selector-main', 'value')])
 def display_class_general(schoolSelected):
     graphs = []
     
@@ -1114,7 +1034,7 @@ def display_class_general(schoolSelected):
 #----------------------------------------
 
 
-@app.callback(Output('StudentSelector-Dropdown', 'options'), [Input('SchoolSelector-Dropdown', 'value')])
+@app.callback(Output('StudentSelector-Dropdown', 'options'), [Input('group-selector-main', 'value')])
 def setStudentOptions(schoolSelected):
         
     if schoolSelected is None or not int(schoolSelected) >= 0:
@@ -1126,7 +1046,7 @@ def setStudentOptions(schoolSelected):
 
 
 
-@app.callback(Output('Class-Overview-Container', 'children'), [Input('SchoolSelector-Dropdown', 'value')])
+@app.callback(Output('Class-Overview-Container', 'children'), [Input('group-selector-main', 'value')])
 def setClassOverview(schoolSelected):
     graphs = []
 
@@ -1140,7 +1060,7 @@ def setClassOverview(schoolSelected):
     
 
 
-@app.callback(Output('Student-Container', 'children'), [Input('StudentSelector-Dropdown', 'value')  , Input("SchoolSelector-Dropdown", "value")   ])
+@app.callback(Output('Student-Container', 'children'), [Input('StudentSelector-Dropdown', 'value')  , Input("group-selector-main", "value")   ])
 def display_graphs_student(studentSelected, schoolSelected):
     graphs = []
     

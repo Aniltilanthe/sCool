@@ -41,3 +41,16 @@ html {
 .p-left_xxx-small {
 	padding-left: 5px;
 }
+
+
+.theme-cyan .navbar-main, 
+.theme-cyan .selector-main-row {
+	background-color: #3aaab2;
+    font-size: initial;
+    color: white;
+}
+
+.theme-cyan  .dropdown-main {
+	color : black;
+}
+

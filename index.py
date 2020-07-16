@@ -28,13 +28,14 @@ from sidebar import sidebar
 
 import constants
 
-import studentGroupedGeneral
+import studentGrouped
 
 
 
 #--------------------- school selection START ----------------------
-GroupSelector_options = studentGroupedGeneral.GroupSelector_options 
+GroupSelector_options = studentGrouped.GroupSelector_options 
 #--------------------- school selection END ----------------------
+
 
 
 
@@ -48,10 +49,11 @@ def generateControlCard():
         children=[
             html.P("Select Group"),
             dcc.Dropdown(
-                id = "group-selector-main-index",
+                id = "group-selector-main",
                 options = GroupSelector_options,
+                className = "dropdown-main",
             ),
-        ],
+        ]
     )
 
 
@@ -75,28 +77,13 @@ content = html.Div(
                             ),
                     ),
                 ],
-                    className = "row w-100" ),
-                
-#                dbc.Row(
-#                    [
-#                        dbc.Col(  html.Div([
-#                            html.H1("sCool Data Analysis")
-#                            ,  html.Div('Student perfomance in sCool.')
-#                        ]),  
-#                            width = { "size" : 12} ,
-#                            style = {'background-color' : '#3aaab2',
-#                                     'font-size' : 'initial'   }
-#                        ),
-#                    ],
-#                    className = "row w-100" )
+                    className = "row w-100  selector-main-row"
+                ),                
         ],
         id="page-topbar", 
         sticky          = "top" ,
-        light           = True ,
-        style           = {
-                 'background-color' : '#3aaab2',
-                 'font-size' : 'initial',
-                 'color'  : 'white'  }
+        light           = False ,
+        className       = "navbar-main",
     ),
 
     # Page content
@@ -104,8 +91,10 @@ content = html.Div(
     
     ],
         
-    id="page-main", style =  constants.CONTENT_STYLE )
-
+    id="page-main", 
+    style =  constants.CONTENT_STYLE,
+    className = "theme-cyan "
+)
 
 app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
 

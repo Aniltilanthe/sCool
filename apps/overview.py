@@ -26,38 +26,132 @@ from app import app, indicator, millify
 
 
 
-import studentGroupedPerformance
-import studentGroupedPerformanceTheory
-import studentGroupedGeneral
-
+import studentGrouped
+import constants
 
 #--------------------- school selection START ----------------------
-GroupSelector_options = studentGroupedGeneral.GroupSelector_options 
+GroupSelector_options = studentGrouped.GroupSelector_options 
 #--------------------- school selection END ----------------------
 
 
 
 #--------------------------------- DataBase get data START ---------------------------
-dfStudentDetails = studentGroupedGeneral.dfStudentDetails
-dfStudentDetails = dfStudentDetails.drop_duplicates(subset=['StudentId'], keep='first')
+dfStudentDetails                        = studentGrouped.dfStudentDetails
 
 
-dfPracticeTaskDetails = studentGroupedPerformance.dfPracticeTaskDetails
-dfTheoryTaskDetails   = studentGroupedPerformanceTheory.dfTheoryTaskDetails
+dfPracticeTaskDetails                   = studentGrouped.dfPracticeTaskDetails
+dfTheoryTaskDetails                     = studentGrouped.dfTheoryTaskDetails
 
 
-dfGroupedPractice                       = studentGroupedPerformance.dfGrouped
-dfGroupedOriginal                       = studentGroupedPerformance.dfGroupedOriginal
-dfPlayerStrategyPractice                = studentGroupedPerformance.dfPlayerStrategyPractice  
-dfGroupedPracticeTaskWise               = studentGroupedPerformance.dfGroupedPracticeTaskWise
-dfGroupedPracticeDB  = studentGroupedPerformance.dfPractice.groupby(  [studentGroupedPerformance.dfPractice['GroupId']] )
+dfGroupedPractice                       = studentGrouped.dfGroupedPractice
+dfGroupedOriginal                       = studentGrouped.dfGroupedOriginal
+dfPlayerStrategyPractice                = studentGrouped.dfPlayerStrategyPractice  
+dfGroupedPracticeTaskWise               = studentGrouped.dfGroupedPracticeTaskWise
+dfGroupedPracticeDB                     = studentGrouped.dfGroupedPracticeDB
+dfRuns                                  = studentGrouped.dfRuns
 
 
-
-dfPlayerStrategyTheory = pd.concat([studentGroupedPerformanceTheory.dfPlayerStrategyNN, studentGroupedPerformanceTheory.dfPlayerStrategyN], ignore_index=True, sort =False)
-dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrategyTheory['GroupId']] )
+dfPlayerStrategyTheory                  = studentGrouped.dfPlayerStrategyTheory
+dfGroupedPlayerStrategyTheory           = studentGrouped.dfGroupedPlayerStrategyTheory
 
 #--------------------------------- DataBase get data END ---------------------------
+
+#--------------------------- helper functions START -----------------------    
+getTaskWiseSuccessFail                  =  studentGrouped.getTaskWiseSuccessFail
+getStudentsOfSchool                     =  studentGrouped.getStudentsOfSchool
+
+#--------------------------- helper functions END -----------------------  
+
+
+
+#-----------------------------------Functions START ----------------------------------------
+
+#Student Interaction with Game - TIMELINE
+def plotClassOverview(schoolKey):
+    
+    
+    colors = ['mediumturquoise', 'gold', 'darkorange', 'lightgreen']
+    graphs = []
+    rows = []
+    columns = []
+    
+    students = getStudentsOfSchool(schoolKey)
+    
+    
+    
+    try :
+        schoolPractice = dfGroupedPracticeDB.get_group(schoolKey)
+        schoolPractice['TaskId'] = 'Theory' + schoolPractice['PracticeTaskId']
+        studentData = schoolPractice
+    except Exception as e:
+        print(e)
+
+    try :
+        schoolTheory = dfGroupedPlayerStrategyTheory.get_group(schoolKey)
+        schoolTheory['TaskId'] = 'Theory' + schoolTheory['TheoryTaskId']
+        studentData = schoolTheory
+    except Exception as e:
+        print(e)
+
+    try :
+        if schoolTheory.empty == False :
+            studentData = pd.concat([schoolPractice, schoolTheory], ignore_index=True)
+    except Exception as e:
+        print(e)
+    
+    
+#    fig1 = go.Figure(data=[go.Pie(labels=['No. of Students'],
+#                                 values=[  len(students)   ])])
+#    fig1.update_traces(hoverinfo='label+percent', textinfo='label+value', textfont_size=20,
+#                      marker=dict(colors=colors, line=dict(color='#000000', width=2)))
+#    
+#    fig1.update_layout(
+#            height =  500
+#    )
+#    
+#    columns.append(dbc.Col(
+#                dcc.Graph(
+#                    figure= fig1
+#            ) , align="center")
+#    )
+    
+#    ---------------------------------------------
+    parentsText = "<b>" + str(schoolKey) + "<br>No. of Students: " + str(len(students)) + "</b>"
+    
+    labels = [parentsText]
+    labels = labels + dfStudentDetails[dfStudentDetails['StudentId'].isin( students)]['Name'].tolist()
+    labels = [str(i) for i in labels]
+    
+    parents = [parentsText] * len(labels)
+    parents[0] = ""
+    
+    fig2 = go.Figure(go.Sunburst(
+        labels      =  labels,
+        parents     =  parents,
+        values      = [1] * len(labels),
+    ))
+    fig2.update_layout(
+            height =  constants.graphHeight + 300
+    )
+    
+    
+    columns.append(dbc.Col(
+                dcc.Graph(
+                    figure= fig2
+            ) , align="center")
+    )
+        
+    rows.append( dbc.Row( columns ) )
+    
+    graphs.append(html.Div(  rows  ))
+    
+    return graphs
+
+
+
+
+#----------------------------------Functions END --------------------------------------------
+
 
 
 
@@ -198,35 +292,7 @@ layout = [
         ],
         className="row",
     ),
-    # charts row div
-    html.Div(
-        [
-            html.Div(
-                [
-                    html.P("Converted Opportunities count"),
-                    dcc.Graph(
-                        id="converted_count",
-                        style={"height": "90%", "width": "98%"},
-                        config=dict(displayModeBar=False),
-                    ),
-                ],
-                className="four columns chart_div",
-            ),
-            html.Div(
-                [
-                    html.P("Probabilty heatmap per Stage and Type"),
-                    dcc.Graph(
-                        id="heatmap",
-                        style={"height": "90%", "width": "98%"},
-                        config=dict(displayModeBar=False),
-                    ),
-                ],
-                className="eight columns chart_div",
-            ),
-        ],
-        className="row",
-        style={"marginTop": "5px"},
-    ),
+    
 ]
                 
                 
@@ -257,7 +323,7 @@ def on_reset(reset_click):
 @app.callback(
     Output("row-control-main-output-clientside-overview", "figure"),
     [
-        Input("group-selector-main-index", "value"),
+        Input("group-selector-main", "value"),
         Input("group-selector-comparision-overview", "value"),
     ],
 )

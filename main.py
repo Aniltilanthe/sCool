@@ -29,6 +29,8 @@ import sklearn.impute as impu
 #from sklearn.impute import SimpleImputer 
 
 
+import constants
+
 
 #https://datatofish.com/how-to-connect-python-to-sql-server-using-pyodbc/
 
@@ -624,6 +626,22 @@ def getStudentDetails():
     return dfStudentDetails
 
 
+
+#------------------------------------ General Dataframe functions ----------------------------
+
+GROUPBY_FEATURE     = constants.GROUPBY_FEATURE
+
+def getGroupedDataStudent(df):
+    #plot for these - grouped with Year, Month !!!
+    #return df.groupby(  [df['CreatedAt'].dt.year, df['CreatedAt'].dt.month]  )
+    #other option - grouped by date
+#    return df.groupby(  [ df['CreatedAt'].dt.date ] )
+    return df.groupby(  [df[GROUPBY_FEATURE]] )
+
+
+def getGroupedData(df):
+#    return df.groupby(  [df['CreatedAt'].dt.date] )
+    return df.groupby(  [df[GROUPBY_FEATURE]] )
   
 #---------------------------------- Code Parser ----------------------------------------------
 

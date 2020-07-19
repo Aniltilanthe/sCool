@@ -66,82 +66,54 @@ getStudentsOfSchool                     =  studentGrouped.getStudentsOfSchool
 
 #-----------------------------------Functions START ----------------------------------------
 
+featuresOverview = [constants.GROUPBY_FEATURE,'SessionDuration', 'Points', 'Attempts', 'itemsCollectedCount', constants.COUNT_STUDENT_FEATURE]
+
 #Student Interaction with Game - TIMELINE
-def plotClassOverview(schoolKey):
+def plotClassOverview(schoolKey, schoolKeys2Compare):
     
     
     colors = ['mediumturquoise', 'gold', 'darkorange', 'lightgreen']
     graphs = []
     rows = []
-    columns = []
+    
+    if (None == schoolKey) :
+        return html.Div()
+    
+    if (None == schoolKeys2Compare) :
+        schoolKeys2Compare = []
     
     students = getStudentsOfSchool(schoolKey)
-    
-    
-    
-    try :
-        schoolPractice = dfGroupedPracticeDB.get_group(schoolKey)
-        schoolPractice['TaskId'] = 'Theory' + schoolPractice['PracticeTaskId']
-        studentData = schoolPractice
-    except Exception as e:
-        print(e)
-
-    try :
-        schoolTheory = dfGroupedPlayerStrategyTheory.get_group(schoolKey)
-        schoolTheory['TaskId'] = 'Theory' + schoolTheory['TheoryTaskId']
-        studentData = schoolTheory
-    except Exception as e:
-        print(e)
-
-    try :
-        if schoolTheory.empty == False :
-            studentData = pd.concat([schoolPractice, schoolTheory], ignore_index=True)
-    except Exception as e:
-        print(e)
-    
-    
-#    fig1 = go.Figure(data=[go.Pie(labels=['No. of Students'],
-#                                 values=[  len(students)   ])])
-#    fig1.update_traces(hoverinfo='label+percent', textinfo='label+value', textfont_size=20,
-#                      marker=dict(colors=colors, line=dict(color='#000000', width=2)))
-#    
-#    fig1.update_layout(
-#            height =  500
-#    )
-#    
-#    columns.append(dbc.Col(
-#                dcc.Graph(
-#                    figure= fig1
-#            ) , align="center")
-#    )
-    
-#    ---------------------------------------------
-    parentsText = "<b>" + str(schoolKey) + "<br>No. of Students: " + str(len(students)) + "</b>"
-    
-    labels = [parentsText]
-    labels = labels + dfStudentDetails[dfStudentDetails['StudentId'].isin( students)]['Name'].tolist()
-    labels = [str(i) for i in labels]
-    
-    parents = [parentsText] * len(labels)
-    parents[0] = ""
-    
-    fig2 = go.Figure(go.Sunburst(
-        labels      =  labels,
-        parents     =  parents,
-        values      = [1] * len(labels),
-    ))
-    fig2.update_layout(
-            height =  constants.graphHeight + 300
-    )
-    
-    
-    columns.append(dbc.Col(
-                dcc.Graph(
-                    figure= fig2
-            ) , align="center")
-    )
         
-    rows.append( dbc.Row( columns ) )
+    studentDataDf = studentGrouped.getStudentsOfSchoolDF(schoolKey)
+    
+    for sckoolKey2Com in schoolKeys2Compare:
+        studentDataDf2Com = studentGrouped.getStudentsOfSchoolDF(sckoolKey2Com)
+        studentDataDf = pd.concat([studentDataDf, studentDataDf2Com], ignore_index=True, sort=False)    
+
+
+#   Sum of features
+    studentDataDfSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.COUNT_STUDENT_FEATURE], as_index=False).sum()
+    
+    tableSum = dbc.Table.from_dataframe(studentDataDfSum[featuresOverview], striped=True, bordered=True, hover=True, className = "table-comparision")
+    
+    print(studentDataDf.columns)
+        
+    columns1 = []
+    columns1.append(dbc.Col(
+               html.Div( tableSum ) , align="center")
+    )
+    rows.append( dbc.Row( html.Div('Total') ) )
+    rows.append( dbc.Row( columns1 ) )
+    
+#   Mean of comparision features    
+    studentDataDfMean = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index=False).mean()
+    
+    tableMean = dbc.Table.from_dataframe(studentDataDfMean[featuresOverview].round(decimals=2), striped=True, bordered=True, hover=True, className = "table-comparision")
+    columns2 = []
+    columns2.append(dbc.Col(tableMean , align="center"))
+
+    rows.append( dbc.Row( html.Div('Average') ) )
+    rows.append( dbc.Row( columns2 ) )
     
     graphs.append(html.Div(  rows  ))
     
@@ -162,36 +134,28 @@ def generateControlCard():
     return html.Div(
         id="Control-Card-Overview",
         children=[
-#            html.P("Select Group"),
-#            dcc.Dropdown(
-#                id = "group-selector-main-overview",
-#                options = GroupSelector_options,
-#            ),
-#            html.Br(),
-#            html.Br(),
-#            html.Br(),
+
             html.P("Select Group for Comparision"),
             dcc.Dropdown(
-                id="group-selector-comparision-overview",
+                id      ="group-selector-comparision-overview",
                 options = GroupSelector_options,
-#                value = GroupSelector_options[:],
-                multi = True,
+                multi   = True,
             ),
-            html.Br(),
             html.Div(
                 id="reset-btn-outer",
-                children=  
+                children =  
                         dbc.Button( "Reset", id="reset-btn", 
                            outline=True, color="primary", className="mr-1", n_clicks=0
                         ),
             ),
+            html.Br(),
         ],
     )
 
 
 
 layout = [
-        
+
     dbc.Row([
             dbc.Col(
                 # Left column
@@ -208,7 +172,7 @@ layout = [
         ),
     ]),
 
-        
+
     # top controls
     dbc.Row(
         [
@@ -292,6 +256,10 @@ layout = [
         ],
         className="row",
     ),
+
+
+    html.Div(id='group-comparision-container', className = "row group-comparision-container" )
+    
     
 ]
                 
@@ -321,7 +289,7 @@ def on_reset(reset_click):
 
 # Update bar plot
 @app.callback(
-    Output("row-control-main-output-clientside-overview", "figure"),
+    Output("group-comparision-container", "children"),
     [
         Input("group-selector-main", "value"),
         Input("group-selector-comparision-overview", "value"),
@@ -331,4 +299,13 @@ def update_bar(groupMain, groupComparision ):
     print('anil')
     print(groupMain)
     print(groupComparision)
+    
+    graphs = []
+
+    if groupMain is None or not int(groupMain) >= 0:
+        return html.Div(graphs)
+ 
+    graphs = plotClassOverview( int(groupMain), groupComparision )    
+
+    return  html.Div(graphs)
     

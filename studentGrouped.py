@@ -121,19 +121,24 @@ GroupSelector_options = BuildOptions(dfStudentDetails[constants.GROUPBY_FEATURE]
 
 
 
-#-------------------------------------
-# get students of School
-def getStudentsOfSchool(schoolSelected):
+#--------------------------------------------------------------------------------------------
+#--------------------- get students of School  START ---------------------------------------
+#get List of Students for a group
+def getStudentsOfSchool(groupSelected):
     
-    print(schoolSelected)
+    print(groupSelected)
+    
+    students = list()
 
-    studentWiseData = dfGroupedOriginal.get_group(schoolSelected)
-    students = studentWiseData['StudentId'].unique()
-    students = list(students)
-    
+    try :
+        studentWiseData = dfGroupedOriginal.get_group(groupSelected)
+        students = studentWiseData['StudentId'].unique()
+        students = list(students)   
+    except Exception as e: 
+        print(e)
     
     try :
-        groupOriginalTheory = dfGroupedPlayerStrategyTheory.get_group(schoolSelected)
+        groupOriginalTheory = dfGroupedPlayerStrategyTheory.get_group(groupSelected)
         studentsTheory = groupOriginalTheory['StudentId'].unique()
         studentsTheory = list(studentsTheory)
         
@@ -145,3 +150,50 @@ def getStudentsOfSchool(schoolSelected):
     
     return students
 
+#get students DataFrame a group
+def getStudentsOfSchoolDF(groupSelected):
+    
+    if groupSelected in dfGroupedPracticeDB.groups.keys():
+        schoolPractice = dfGroupedPracticeDB.get_group(groupSelected)
+        schoolPractice['TaskId']        = 'Practice' + schoolPractice['PracticeTaskId'].astype(str)
+        schoolPractice['TaskType']      = 'Practice'
+        
+    
+        schoolPractice = schoolPractice.loc[:,~schoolPractice.columns.duplicated()]     
+                
+        studentDF = schoolPractice
+        print('1 studentDF in studentGrouped')  
+        print(studentDF)  
+
+    
+    if groupSelected in dfGroupedPlayerStrategyTheory.groups.keys():
+        schoolTheory = dfGroupedPlayerStrategyTheory.get_group(groupSelected)
+        schoolTheory['TaskId']      = 'Theory' + schoolTheory['TheoryTaskId'].astype(str)
+        schoolTheory['TaskType']    = 'Theory' 
+        print('2 schoolTheory in studentGrouped')  
+        print(schoolTheory)   
+        schoolTheory = schoolTheory.loc[:,~schoolTheory.columns.duplicated()]  
+        
+#        if defined, else
+        try:
+            studentDF = pd.concat([studentDF, schoolTheory], ignore_index=True, sort=False)    
+            print(studentDF)
+        except NameError:
+            print("studentDF WASN'T defined after all!")
+        else:
+            studentDF = schoolTheory
+        
+
+
+    print('3 new studentDF new after adding all in studentGrouped')  
+    print(studentDF)
+    
+    groupStudents = getStudentsOfSchool(groupSelected)
+
+    studentDF[constants.GROUPBY_FEATURE]    =     groupSelected 
+    studentDF[constants.COUNT_STUDENT_FEATURE]      =     len(groupStudents) 
+        
+    return studentDF
+#--------------------- get students of School  END ---------------------------------------
+#--------------------------------------------------------------------------------------------
+    

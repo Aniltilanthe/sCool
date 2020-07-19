@@ -21,7 +21,7 @@ from plotly import graph_objs as go
 import math
 
 from app import app
-from apps import overview, groupDetails
+from apps import overview, groupDetails, custom
 
 from sidebar import sidebar
 
@@ -105,8 +105,8 @@ def render_page_content(pathname):
         return overview.layout
     elif pathname == "/Details":
         return groupDetails.layout
-    elif pathname == "/page-2/1":
-        return html.P("Oh cool, this is page 2.1!")
+    elif pathname == "/Custom":
+        return custom.layout
     elif pathname == "/page-2/2":
         return html.P("No way! This is page 2.2!")
     # If the user tries to reach a different page, return a 404 message

@@ -20,6 +20,7 @@ CONTENT_STYLE = {
 
 
 GROUPBY_FEATURE  =  'GroupId'
+COUNT_STUDENT_FEATURE  =  'CountOfStudents'
 
 
 #------------------- feature related START -----------------------------------------------

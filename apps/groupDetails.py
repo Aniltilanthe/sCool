@@ -867,45 +867,26 @@ def plotClassOverview(schoolKey):
     rows = []
     columns = []
     
+    
     students = getStudentsOfSchool(schoolKey)
+        
+    studentData = studentGrouped.getStudentsOfSchoolDF(schoolKey)
     
     
+    fig1 = go.Figure(data=[go.Pie(labels=['No. of Students'],
+                                 values=[  len(students)   ])])
+    fig1.update_traces(hoverinfo='label+percent', textinfo='label+value', textfont_size=20,
+                      marker=dict(colors=colors, line=dict(color='#000000', width=2)))
     
-    try :
-        schoolPractice = dfGroupedPracticeDB.get_group(schoolKey)
-        schoolPractice['TaskId'] = 'Theory' + schoolPractice['PracticeTaskId']
-        studentData = schoolPractice
-    except Exception as e:
-        print(e)
-
-    try :
-        schoolTheory = dfGroupedPlayerStrategyTheory.get_group(schoolKey)
-        schoolTheory['TaskId'] = 'Theory' + schoolTheory['TheoryTaskId']
-        studentData = schoolTheory
-    except Exception as e:
-        print(e)
-
-    try :
-        if schoolTheory.empty == False :
-            studentData = pd.concat([schoolPractice, schoolTheory], ignore_index=True)
-    except Exception as e:
-        print(e)
+    fig1.update_layout(
+            height =  500
+    )
     
-    
-#    fig1 = go.Figure(data=[go.Pie(labels=['No. of Students'],
-#                                 values=[  len(students)   ])])
-#    fig1.update_traces(hoverinfo='label+percent', textinfo='label+value', textfont_size=20,
-#                      marker=dict(colors=colors, line=dict(color='#000000', width=2)))
-#    
-#    fig1.update_layout(
-#            height =  500
-#    )
-#    
-#    columns.append(dbc.Col(
-#                dcc.Graph(
-#                    figure= fig1
-#            ) , align="center")
-#    )
+    columns.append(dbc.Col(
+                dcc.Graph(
+                    figure= fig1
+            ) , align="center")
+    )
     
 #    ---------------------------------------------
     parentsText = "<b>" + str(schoolKey) + "<br>No. of Students: " + str(len(students)) + "</b>"

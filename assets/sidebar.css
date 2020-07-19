@@ -45,7 +45,7 @@ html {
 
 .theme-cyan .navbar-main, 
 .theme-cyan .selector-main-row {
-	background-color: #3aaab2;
+	background-color: #3aaab2 !important;
     font-size: initial;
     color: white;
 }
@@ -54,3 +54,6 @@ html {
 	color : black;
 }
 
+.table-comparision td:nth-child(1) {  
+  font-weight: bold;
+}

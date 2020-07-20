@@ -123,6 +123,10 @@ GroupSelector_options = BuildOptions(dfStudentDetails[constants.GROUPBY_FEATURE]
 
 #--------------------------------------------------------------------------------------------
 #--------------------- get students of School  START ---------------------------------------
+
+def get_merge_list(values):
+    return list(set([a for b in values.tolist() for a in b]))
+
 #get List of Students for a group
 def getStudentsOfSchool(groupSelected):
     
@@ -153,8 +157,8 @@ def getStudentsOfSchool(groupSelected):
 #get students DataFrame a group
 def getStudentsOfSchoolDF(groupSelected):
     
-    if groupSelected in dfGroupedPracticeDB.groups.keys():
-        schoolPractice = dfGroupedPracticeDB.get_group(groupSelected)
+    if groupSelected in dfGroupedPractice.groups.keys():
+        schoolPractice = dfGroupedPractice.get_group(groupSelected)
         schoolPractice['TaskId']        = 'Practice' + schoolPractice['PracticeTaskId'].astype(str)
         schoolPractice['TaskType']      = 'Practice'
         
@@ -164,6 +168,12 @@ def getStudentsOfSchoolDF(groupSelected):
         studentDF = schoolPractice
         print('1 studentDF in studentGrouped')  
         print(studentDF)  
+        print(studentDF.ConceptsUsed.agg(get_merge_list))  
+        print(studentDF.ConceptsUsedDetails.agg(get_merge_list))  
+        
+        studentDF['ConceptsUsedGroup'] =  [ studentDF.ConceptsUsed.agg(get_merge_list) ] * studentDF.shape[0]
+        studentDF['ConceptsUsedDetailsGroup'] = [  studentDF.ConceptsUsedDetails.agg(get_merge_list) ] * studentDF.shape[0]
+
 
     
     if groupSelected in dfGroupedPlayerStrategyTheory.groups.keys():
@@ -176,24 +186,32 @@ def getStudentsOfSchoolDF(groupSelected):
         
 #        if defined, else
         try:
-            studentDF = pd.concat([studentDF, schoolTheory], ignore_index=True, sort=False)    
+            studentDF = pd.concat([studentDF, schoolTheory], ignore_index=True, sort=False)
             print(studentDF)
+            print('in try part concated both')
         except NameError:
             print("studentDF WASN'T defined after all!")
-        else:
             studentDF = schoolTheory
-        
-
-
-    print('3 new studentDF new after adding all in studentGrouped')  
-    print(studentDF)
+    
     
     groupStudents = getStudentsOfSchool(groupSelected)
-
-    studentDF[constants.GROUPBY_FEATURE]    =     groupSelected 
-    studentDF[constants.COUNT_STUDENT_FEATURE]      =     len(groupStudents) 
+    
+    
+    if 'studentDF' in locals():
+        print('Students of group')
+        print(groupStudents)
+        print('studentDF.columns')
+        print(studentDF.columns)
         
-    return studentDF
+        if len(groupStudents) > 0:
+            studentDF[constants.GROUPBY_FEATURE]    =     groupSelected 
+            studentDF[constants.COUNT_STUDENT_FEATURE]      =     len(groupStudents) 
+            
+            if 'ConceptsUsedGroup' in studentDF.columns :
+                studentDF['ConceptsUsed'] =  [ studentDF['ConceptsUsedGroup'][0] ] * studentDF.shape[0]
+                studentDF['ConceptsUsedDetails'] =  [ studentDF['ConceptsUsedDetailsGroup'][0] ] * studentDF.shape[0]
+            
+            return studentDF
 #--------------------- get students of School  END ---------------------------------------
 #--------------------------------------------------------------------------------------------
     

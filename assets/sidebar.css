@@ -57,3 +57,7 @@ html {
 .table-comparision td:nth-child(1) {  
   font-weight: bold;
 }
+
+.theme-cyan .navbar-main {
+	z-index : 5;
+}

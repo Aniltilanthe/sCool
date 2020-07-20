@@ -7,6 +7,7 @@ Created on Thu Jun 11 18:16:48 2020
 import math
 import json
 import datetime
+import numpy as np
 from datetime import date
 from datetime import datetime as dt
 import dateutil.parser
@@ -66,7 +67,18 @@ getStudentsOfSchool                     =  studentGrouped.getStudentsOfSchool
 
 #-----------------------------------Functions START ----------------------------------------
 
-featuresOverview = [constants.GROUPBY_FEATURE,'SessionDuration', 'Points', 'Attempts', 'itemsCollectedCount', constants.COUNT_STUDENT_FEATURE]
+featureAdderAvg = '(Avg.)'
+featuresOverview = [constants.GROUPBY_FEATURE,'SessionDuration', 'Points', 'Attempts', 'itemsCollectedCount', constants.COUNT_STUDENT_FEATURE ]
+featuresOverviewAvg = [constants.GROUPBY_FEATURE, 'SessionDuration' + featureAdderAvg, 'Points' + featureAdderAvg
+                       , 'Attempts' + featureAdderAvg, 'itemsCollectedCount' + featureAdderAvg ]
+featuresOverviewAvgNames = {'SessionDuration': 'SessionDuration'+ featureAdderAvg,
+                                      'Points': 'Points' + featureAdderAvg,
+                                      'Attempts' : 'Attempts' + featureAdderAvg,
+                                      'itemsCollectedCount' : 'itemsCollectedCount' + featureAdderAvg }
+featuresOverviewGeneralNames = {'CountOfStudents': 'No. of Students'}
+
+def get_merge_list(values):
+    return list(set([a for b in values.tolist() for a in b]))
 
 #Student Interaction with Game - TIMELINE
 def plotClassOverview(schoolKey, schoolKeys2Compare):
@@ -82,47 +94,84 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
     if (None == schoolKeys2Compare) :
         schoolKeys2Compare = []
     
-    students = getStudentsOfSchool(schoolKey)
-        
     studentDataDf = studentGrouped.getStudentsOfSchoolDF(schoolKey)
     
     for sckoolKey2Com in schoolKeys2Compare:
         studentDataDf2Com = studentGrouped.getStudentsOfSchoolDF(sckoolKey2Com)
-        studentDataDf = pd.concat([studentDataDf, studentDataDf2Com], ignore_index=True, sort=False)    
-
-
-#   Sum of features
-    studentDataDfSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.COUNT_STUDENT_FEATURE], as_index=False).sum()
-    
-    tableSum = dbc.Table.from_dataframe(studentDataDfSum[featuresOverview], striped=True, bordered=True, hover=True, className = "table-comparision")
-    
-    print(studentDataDf.columns)
         
-    columns1 = []
-    columns1.append(dbc.Col(
-               html.Div( tableSum ) , align="center")
-    )
-    rows.append( dbc.Row( html.Div('Total') ) )
-    rows.append( dbc.Row( columns1 ) )
-    
-#   Mean of comparision features    
-    studentDataDfMean = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index=False).mean()
-    
-    tableMean = dbc.Table.from_dataframe(studentDataDfMean[featuresOverview].round(decimals=2), striped=True, bordered=True, hover=True, className = "table-comparision")
-    columns2 = []
-    columns2.append(dbc.Col(tableMean , align="center"))
+        if 'studentDataDf2Com' in locals():
+            studentDataDf = pd.concat([studentDataDf, studentDataDf2Com], ignore_index=True, sort=False)    
 
-    rows.append( dbc.Row( html.Div('Average') ) )
-    rows.append( dbc.Row( columns2 ) )
+
+    if 'studentDataDf' in locals():
+        print('Initial List of Columns after adding all DF')
+        print(studentDataDf.columns)
+        
+    #   Sum of features
+        studentDataDfSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.COUNT_STUDENT_FEATURE], as_index=False).sum()
+        
+    #    get the Mean DF and merge both DF
+        studentDataDfMean = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index=False).mean()
+        studentDataDfMean.rename(columns = featuresOverviewAvgNames, inplace=True)
+        
+        studentDataDfOverview = pd.merge(studentDataDfSum[featuresOverview], studentDataDfMean[featuresOverviewAvg].round(decimals=2), 
+                                         how='inner', on = constants.GROUPBY_FEATURE, left_index=False, right_index=False )
+        
+    #    tableSum = dbc.Table.from_dataframe(studentDataDfOverview, striped=True, bordered=True, hover=True, className = "table-comparision")
+    #
+    #    columns1 = []
+    #    columns1.append(dbc.Col(
+    #               html.Div( tableSum ) , align="center")
+    #    )
+    #    rows.append( dbc.Row( html.Div('Overview') ) )
+    #    rows.append( dbc.Row( columns1 ) )
+    #
+    #    tableSum = dbc.Table.from_dataframe(studentDataDfSum[featuresOverview], striped=True, bordered=True, hover=True, className = "table-comparision")
+    #    
+    #    columns1 = []
+    #    columns1.append(dbc.Col(
+    #               html.Div( tableSum ) , align="center")
+    #    )
+    #    rows.append( dbc.Row( html.Div('Total') ) )
+    #    rows.append( dbc.Row( columns1 ) )
+        
+    #   Mean of comparision features    
+        studentDataDfMean = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index = False).mean()
+        
+        studentDataDfGrouped = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index = False)
+        
+        studentDataDfMeanFinal = studentDataDfMean
+        
+        ConceptsUsedGroupList = []
+        ConceptsUsedDetailsGroupList = []
+        for groupKey, group in studentDataDfGrouped :
+            if 'ConceptsUsed' in group.columns and  group[ group['ConceptsUsed'].notnull() ].shape[0] > 0 :
+                ConceptsUsedGroupList.append( ', '.join( group[ group['ConceptsUsed'].notnull() ].iloc[0]['ConceptsUsed'] )   )
+                ConceptsUsedDetailsGroupList.append( ', '.join( group[ group['ConceptsUsedDetails'].notnull() ].iloc[0]['ConceptsUsedDetails']   ) )
+            else :
+                ConceptsUsedGroupList.append(' ')
+                ConceptsUsedDetailsGroupList.append(' ')
+                
+        
     
-    graphs.append(html.Div(  rows  ))
+        studentDataDfMean['ConceptsUsed'] = ConceptsUsedGroupList
+        studentDataDfMean['ConceptsUsedDetails'] = ConceptsUsedDetailsGroupList
+        
+        studentDataDfMeanToPlot = studentDataDfMean[featuresOverview + ['ConceptsUsed', 'ConceptsUsedDetails']].round(decimals=2)
+        studentDataDfMeanToPlot.rename(columns = featuresOverviewAvgNames, inplace=True)
+        studentDataDfMeanToPlot.rename(columns = featuresOverviewGeneralNames, inplace=True)
+        
+        tableMean = dbc.Table.from_dataframe(studentDataDfMeanToPlot, 
+                                             striped=True, bordered=True, hover=True, className = "table-comparision")
+        columns2 = []
+        columns2.append(dbc.Col(tableMean , align="center"))
     
+        rows.append( dbc.Row( html.Div('Overview') ) )
+        rows.append( dbc.Row( columns2 ) )
+        
+        graphs.append(html.Div(  rows  ))
+        
     return graphs
-
-
-
-
-#----------------------------------Functions END --------------------------------------------
 
 
 
@@ -153,6 +202,12 @@ def generateControlCard():
     )
 
 
+#----------------------------------Functions END --------------------------------------------
+
+
+
+
+
 
 layout = [
 
@@ -172,90 +227,17 @@ layout = [
         ),
     ]),
 
-
-    # top controls
-    dbc.Row(
-        [
-            dbc.Col(  html.Div(
-                dcc.Dropdown(
-                    id="converted_opportunities_dropdown",
-                    options=[
-                        {"label": "By day", "value": "D"},
-                        {"label": "By week", "value": "W-MON"},
-                        {"label": "By month", "value": "M"},
-                    ],
-                    value="D",
-                    clearable=False,
-                ), 
-                
-                
-#                dcc.Dropdown(
-#                    id='SchoolSelector-Dropdown',                    
-#                    options =  SchoolSelector_options,
-#                    value  =   '2018-03-01' )
-                
-            ),
-                width = { "size" : 2} 
-            ),
-            dbc.Col(  html.Div(
-                dcc.Dropdown(
-                    id="heatmap_dropdown",
-                    options=[
-                        {"label": "All stages", "value": "all_s"},
-                        {"label": "Cold stages", "value": "cold"},
-                        {"label": "Warm stages", "value": "warm"},
-                        {"label": "Hot stages", "value": "hot"},
-                    ],
-                    value="all_s",
-                    clearable=False,
-                ),
-            ),
-                width = { "size" : 2} 
-            ),
-            dbc.Col(  html.Div(
-                dcc.Dropdown(
-                    id="source_dropdown",
-                    options=[
-                        {"label": "All sources", "value": "all_s"},
-                        {"label": "Web", "value": "Web"},
-                        {"label": "Word of Mouth", "value": "Word of mouth"},
-                        {"label": "Phone Inquiry", "value": "Phone Inquiry"},
-                        {"label": "Partner Referral", "value": "Partner Referral"},
-                        {"label": "Purchased List", "value": "Purchased List"},
-                        {"label": "Other", "value": "Other"},
-                    ],
-                    value="all_s",
-                    clearable=False,
-                ),
-            ),
-                width = { "size" : 2} 
-            ),
-            # add button
-            
-            dbc.Col(  html.Div(
-                html.Span(
-                    "Add new",
-                    id="new_opportunity",
-                    n_clicks=0,
-                    className="button button--primary add",
-                ),
-            ),
-                width = { "size" : 2} 
-            ),
-        ],
-        style={"marginBottom": "10"},
-    ),
     # indicators row
-    html.Div(
-        [
-            indicator("#00cc96", "Won opportunities", "left_opportunities_indicator"),
-            indicator(
-                "#119DFF", "Open opportunities", "middle_opportunities_indicator"
-            ),
-            indicator("#EF553B", "Lost opportunities", "right_opportunities_indicator"),
-        ],
-        className="row",
-    ),
+#    html.Div(
+#        [
+#            indicator("#00cc96", "Won opportunities", "left_opportunities_indicator"),
+#            indicator(
+#                "#119DFF", "Open opportunities", "middle_opportunities_indicator"
+#            ),
+#            indicator("#EF553B", "Lost opportunities", "right_opportunities_indicator"),
+#        ],
+#        className="row",
+#    ),
 
 
     html.Div(id='group-comparision-container', className = "row group-comparision-container" )

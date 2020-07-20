@@ -21,6 +21,7 @@ import dash_html_components as html
 
 #main library
 import main
+import constants
 #from main import PythonParser
 
 
@@ -393,70 +394,6 @@ dfPlayerStrategyPractice[featuresToInt] = dfPlayerStrategyPractice[featuresToInt
 
 
 
-#User understandable Column names
-feature2UserNamesDict = {
-		"Attempts" : "Attempts (total)"
-		,"PracticeTaskId" : "Practice Task Id"
-		,"Points" : "Points"
-		,"ConceptsUsed" : 'Concept Used'
-		,"studentTaskCount" : "No. of Tasks performed"
-		,"studentAttemptsTotal" : "Attempts (total)"
-		,"robotCollisionsBoxCount" : "Robot Collision Box (No. of times)"
-		,"CollectedCoins" :  "Coins Collected"
-		,"coinCollectedCount" : "Coins Collected"
-		,"keyboardKeyPressedCount" : "Keyboard Key Pressed (No. of times)"
-		,"deletedCodesCount" : "Deleted Codes (No. of times)"
-		,"tabsSwitchedCodeCount" : "Switched Tabs (No. of times)"
-		,"tabsSwitchedDescriptionCount" : "Switched to read Description (No. of times)"
-		,"tabsSwitchedCount" : "Switched tabs (No. of times)"
-		,"draggedCount" : "Dragged (No. of times)"
-		,"NumberOfBoxes" : "No. of Boxes"
-		,"NumberOfCoins" : "No. of Coins"
-		,"NumberOfHidden" : "No. of Hidden items"
-		,"lineOfCodeCount" : "Count of Lines of Code"
-		,"runsLineOfCodeCountAvg" : "Avg. Count of Lines of Code"   
-        ,"ConceptsUsedDetailsStr" : "Concepts used details"
-        ,"StudentId" : "StudentId"
-        
-		,"runsErrorAttribiteCount" : "Attribute Errors in Code (No. of times)"
-		,"runsErrorTypeCount" : "Type Errors in Code (No. of times)"
-		,"runsErrorNameCount" : "Name Errors in Code (No. of times)"
-		,"runsErrorSyntaxCount" : "Syntax Errors in Code (No. of times)"
-		,"runsSuccessCount" : "Successful code (No. of times)"
-		,"runsErrorCount" : "Errors in Code (No. of times)"
-		,"runsCount" : "Code executed (No. of times)"
-		,"runsHasVariableCount" : "Used Variables in Code"
-		,"runsHasConditionCount" : "Used Conditions in Code"
-		,"runsHasNestedLoopCount" : "Used Nested Loop in Code"
-		,"runsHasLoopCount" : "Used Loop in Code"
-		,"runsHasExpressionsCount" : "Used Expressions in Code (no. of time in all code runs)"
-		,"runsHasAsyncOrAwaitCount" : "Used Async in Code (no. of time in all code runs)"
-		,"runsHasFunctionClassCount" : "Used Function or Class in Code (no. of time in all code runs)"
-		,"runsHasControlFlowCount" : "Used Control Flows in Code (no. of time in all code runs)"
-		,"runsHasImportsCount" : "Used Imports in Code (no. of time in all code runs)"
-		,"runsHasStatementsCount" : "Used Statements in Code (no. of time in all code runs)"
-		,"runsHasComprehensionsCount" : "Used Comprehensions in Code (no. of time in all code runs)"
-		,"runsHasSubscriptingCount" : "Used Subscription in Code (no. of time in all code runs)"
-
-		,"hasLoop" : "Used Loop in Code"
-		,"hasNestedLoop" : "Used Nested Loop in Code"
-		,"hasCondition" : "Used Condition in Code"
-		,"hasVariable" : "Used Variable in Code"
-		,"hasExpressions" : "Used Expressions in Code"
-		,"hasAsyncOrAwait" : "Used Async in Code"
-		,"hasFunctionClass" : "Used Function or Class in Code"
-		,"hasControlFlow" : "Used Control Flows in Code"
-		,"hasImports" : "Used Imports in Code"
-		,"hasStatements" : "Used Statements in Code"
-		,"hasComprehensions" : "Used Comprehensions in Code"
-		,"hasSubscripting" : "Used Subscription in Code"
-	}
-
-
-
-
-
-
 #*****************************************************************************
 #STEP 0 : group data . by date or courseId, group of students of same school
 #*****************************************************************************
@@ -479,7 +416,8 @@ dfPlayerStrategyPractice = dfPlayerStrategyPracticeCode.drop_duplicates(subset=[
                                                 
 #Concepts used in the Code - using ast parser
 dfPlayerStrategyPractice['ConceptsUsed']    = dfPlayerStrategyPractice['Code'].apply(main.getAllNodeTypesUsefull)
-dfPlayerStrategyPractice["ConceptsUsed"] = dfPlayerStrategyPractice["ConceptsUsed"].astype(str)
+#dfPlayerStrategyPractice["ConceptsUsed"] = dfPlayerStrategyPractice["ConceptsUsed"].astype(str)
+dfPlayerStrategyPractice["ConceptsUsed"] = dfPlayerStrategyPractice["ConceptsUsed"]
 dfPlayerStrategyPractice["ConceptsUsedDetails"] = dfPlayerStrategyPractice['ConceptsUsed'].replace(
         main.ProgramConceptsUsefull2UserNames, regex=True)
 
@@ -509,7 +447,8 @@ dfPlayerStrategyPracticeTask = dfPlayerStrategyPracticeTask.drop_duplicates(subs
                                                 
 #Concepts used in the Code - using ast parser
 dfPlayerStrategyPracticeTask['ConceptsUsed']    = dfPlayerStrategyPracticeTask['Code'].apply(main.getAllNodeTypesUsefull)
-dfPlayerStrategyPracticeTask["ConceptsUsed"] = dfPlayerStrategyPracticeTask["ConceptsUsed"].astype(str)
+#dfPlayerStrategyPracticeTask["ConceptsUsed"] = dfPlayerStrategyPracticeTask["ConceptsUsed"].astype(str)
+dfPlayerStrategyPracticeTask["ConceptsUsed"] = dfPlayerStrategyPracticeTask["ConceptsUsed"]
 dfPlayerStrategyPracticeTask["ConceptsUsedDetails"] = dfPlayerStrategyPracticeTask['ConceptsUsed'].replace(
         main.ProgramConceptsUsefull2UserNames, regex=True)
 
@@ -526,7 +465,7 @@ def getGroupedData(df):
     #plot for these - grouped with Year, Month !!!
     #return df.groupby(  [df['CreatedAt'].dt.year, df['CreatedAt'].dt.month]  )
     #other option - grouped by date
-    return df.groupby(  [df['GroupId']] )
+    return df.groupby(  [df[constants.GROUPBY_FEATURE]] )
 #    return df.groupby(  [ df['CreatedAt'].dt.date ] )
 
 
@@ -586,7 +525,7 @@ for groupKey, group in dfGrouped:
 #How many students used loops/certain concept in a certain task?
 #---------------------------------------------------------------
 def getGroupedDataSchoolTask(df):
-    return df.groupby(  [df['GroupId'], df['PracticeTaskId']] )
+    return df.groupby(  [df[ constants.GROUPBY_FEATURE ], df['PracticeTaskId']] )
 #    return df.groupby(  [df['CreatedAt'].dt.date, df['PracticeTaskId']] )
 
 
@@ -610,12 +549,4 @@ dfGroupedByTask = getGroupedDataTask(dfPractice)
 #----------------------------------------------------------------------
 #---------------------- creteing student gantt chart data
 
-def getGroupedDataStudent(df):
-    #plot for these - grouped with Year, Month !!!
-    #return df.groupby(  [df['CreatedAt'].dt.year, df['CreatedAt'].dt.month]  )
-    #other option - grouped by date
-#    return df.groupby(  [ df['CreatedAt'].dt.date ] )
-    return df.groupby(  [df['GroupId']] )
-
-
-dfGroupedOriginal = getGroupedDataStudent(dfPlayerStrategyPracticeOriginal)
+dfGroupedOriginal = main.getGroupedDataStudent(dfPlayerStrategyPracticeOriginal)

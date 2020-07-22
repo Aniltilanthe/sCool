@@ -1,0 +1,12 @@
+pip install numpy
+pip install panda
+pip install pyodbc 
+pip install Flask
+pip install dash
+pip install plotly
+pip install dash_html_components
+pip install dash_core_components
+pip install sklearn
+pip install seaborn
+pip install scipy
+pip install statsmodels

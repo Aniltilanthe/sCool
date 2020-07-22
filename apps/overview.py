@@ -169,6 +169,16 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         rows.append( dbc.Row( html.Div('Overview') ) )
         rows.append( dbc.Row( columns2 ) )
         
+        
+        
+#        standard deviation and for each group
+        
+#        df.std(axis = 0, skipna = True) 
+        
+        
+        
+        
+        
         graphs.append(html.Div(  rows  ))
         
     return graphs

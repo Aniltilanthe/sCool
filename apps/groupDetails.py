@@ -224,12 +224,7 @@ def plotSingleClass( titleTextAdd, school ):
                 editable=True,
                 filter_action="native",
                 sort_action="native",
-                sort_mode="multi",
-                column_selectable="single",
-#                row_selectable="multi",
-                row_deletable=True,
-                selected_columns=[],
-                selected_rows=[],
+                sort_mode="multi"
             )
             
         graphs.append(  

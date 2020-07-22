@@ -61,3 +61,13 @@ html {
 .theme-cyan .navbar-main {
 	z-index : 5;
 }
+
+
+.group-comparision-container .dash-table-container {
+	font-size : 15px;
+}
+
+
+.group-comparision-container  .dash-table-container td:nth-child(1) {  
+  font-weight: bold;
+}

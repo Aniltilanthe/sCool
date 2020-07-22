@@ -15,6 +15,20 @@ CONTENT_STYLE = {
     "marginRight": "2rem",
     "padding": "2rem 1rem",
 }
+
+THEME = "theme-cyan"
+
+THEME_COLOR_MAP = {
+        "theme-cyan": '#3aaab2'
+}
+THEME_CYAN_COLOR = ''
+if THEME in THEME_COLOR_MAP.keys():    
+    THEME_CYAN_COLOR = THEME_COLOR_MAP.get(THEME)
+else :
+    THEME_CYAN_COLOR = "white"
+
+
+ERROR_COLOR = "#FF4136"
 #-------------------------------- STYLES END -----------------------------------
 #--------------------------------------------------------------------------------
 

@@ -16,6 +16,7 @@ import pandas as pd
 import flask
 import dash
 from dash.dependencies import Input, Output, State
+import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -67,14 +68,16 @@ getStudentsOfSchool                     =  studentGrouped.getStudentsOfSchool
 
 #-----------------------------------Functions START ----------------------------------------
 
-featureAdderAvg = '(Avg.)'
+featureAdderAvg = ' Avg.'
 featuresOverview = [constants.GROUPBY_FEATURE,'SessionDuration', 'Points', 'Attempts', 'itemsCollectedCount', constants.COUNT_STUDENT_FEATURE ]
-featuresOverviewAvg = [constants.GROUPBY_FEATURE, 'SessionDuration' + featureAdderAvg, 'Points' + featureAdderAvg
-                       , 'Attempts' + featureAdderAvg, 'itemsCollectedCount' + featureAdderAvg ]
-featuresOverviewAvgNames = {'SessionDuration': 'SessionDuration'+ featureAdderAvg,
+featuresOverviewAvg = [constants.GROUPBY_FEATURE, 'SessionDuration'+ featureAdderAvg, 'Points'+ featureAdderAvg
+                       , 'Attempts'+ featureAdderAvg, 'itemsCollectedCount'+ featureAdderAvg ]
+featuresOverviewAvgNames = {
+        'SessionDuration': 'SessionDuration'+ featureAdderAvg,
                                       'Points': 'Points' + featureAdderAvg,
                                       'Attempts' : 'Attempts' + featureAdderAvg,
-                                      'itemsCollectedCount' : 'itemsCollectedCount' + featureAdderAvg }
+                                      'itemsCollectedCount' : 'itemsCollectedCount' + featureAdderAvg
+                                      }
 featuresOverviewGeneralNames = {'CountOfStudents': 'No. of Students'}
 
 def get_merge_list(values):
@@ -99,11 +102,11 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
     for sckoolKey2Com in schoolKeys2Compare:
         studentDataDf2Com = studentGrouped.getStudentsOfSchoolDF(sckoolKey2Com)
         
-        if 'studentDataDf2Com' in locals():
+        if 'studentDataDf2Com' in locals()    and    studentDataDf2Com is not None :
             studentDataDf = pd.concat([studentDataDf, studentDataDf2Com], ignore_index=True, sort=False)    
 
 
-    if 'studentDataDf' in locals():
+    if 'studentDataDf' in locals()     and    studentDataDf is not None  :
         print('Initial List of Columns after adding all DF')
         print(studentDataDf.columns)
         
@@ -117,23 +120,6 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         studentDataDfOverview = pd.merge(studentDataDfSum[featuresOverview], studentDataDfMean[featuresOverviewAvg].round(decimals=2), 
                                          how='inner', on = constants.GROUPBY_FEATURE, left_index=False, right_index=False )
         
-    #    tableSum = dbc.Table.from_dataframe(studentDataDfOverview, striped=True, bordered=True, hover=True, className = "table-comparision")
-    #
-    #    columns1 = []
-    #    columns1.append(dbc.Col(
-    #               html.Div( tableSum ) , align="center")
-    #    )
-    #    rows.append( dbc.Row( html.Div('Overview') ) )
-    #    rows.append( dbc.Row( columns1 ) )
-    #
-    #    tableSum = dbc.Table.from_dataframe(studentDataDfSum[featuresOverview], striped=True, bordered=True, hover=True, className = "table-comparision")
-    #    
-    #    columns1 = []
-    #    columns1.append(dbc.Col(
-    #               html.Div( tableSum ) , align="center")
-    #    )
-    #    rows.append( dbc.Row( html.Div('Total') ) )
-    #    rows.append( dbc.Row( columns1 ) )
         
     #   Mean of comparision features    
         studentDataDfMean = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index = False).mean()
@@ -147,26 +133,116 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         for groupKey, group in studentDataDfGrouped :
             if 'ConceptsUsed' in group.columns and  group[ group['ConceptsUsed'].notnull() ].shape[0] > 0 :
                 ConceptsUsedGroupList.append( ', '.join( group[ group['ConceptsUsed'].notnull() ].iloc[0]['ConceptsUsed'] )   )
-                ConceptsUsedDetailsGroupList.append( ', '.join( group[ group['ConceptsUsedDetails'].notnull() ].iloc[0]['ConceptsUsedDetails']   ) )
+#                ConceptsUsedDetailsGroupList.append( ', '.join( group[ group['ConceptsUsedDetails'].notnull() ].iloc[0]['ConceptsUsedDetails']   ) )
             else :
                 ConceptsUsedGroupList.append(' ')
-                ConceptsUsedDetailsGroupList.append(' ')
+#                ConceptsUsedDetailsGroupList.append(' ')
                 
         
     
         studentDataDfMean['ConceptsUsed'] = ConceptsUsedGroupList
-        studentDataDfMean['ConceptsUsedDetails'] = ConceptsUsedDetailsGroupList
+#        studentDataDfMean['ConceptsUsedDetails'] = ConceptsUsedDetailsGroupList
         
-        studentDataDfMeanToPlot = studentDataDfMean[featuresOverview + ['ConceptsUsed', 'ConceptsUsedDetails']].round(decimals=2)
+        studentDataDfMeanToPlot = studentDataDfMean[featuresOverview + ['ConceptsUsed'
+#                                                                        , 'ConceptsUsedDetails'
+                                                                        ]].round(decimals=2)
         studentDataDfMeanToPlot.rename(columns = featuresOverviewAvgNames, inplace=True)
         studentDataDfMeanToPlot.rename(columns = featuresOverviewGeneralNames, inplace=True)
+                
+        tableMean = dash_table.DataTable(
+            columns=[
+                {"name": i, "id": i, "deletable": True, "selectable": True} for i in studentDataDfMeanToPlot.columns
+            ],
+            data            = studentDataDfMeanToPlot.to_dict('records'),
+            editable        = True,
+            filter_action       = "native",
+            sort_action             = "native",
+            sort_mode           = "multi",
+            style_data_conditional=([
+                {
+                    'if': {'row_index': 'odd'},
+                    'backgroundColor': 'rgb(248, 248, 248)'
+                },
+             ] +  
+            [
+                {
+                    'if': {
+                        'filter_query'  : '{{SessionDuration Avg.}} = {}'.format(i),
+                        'column_id'     : 'SessionDuration Avg.',
+                    },
+                    'backgroundColor': constants.ERROR_COLOR,
+                    'color': 'white'
+                }
+                for i in studentDataDfMeanToPlot['SessionDuration Avg.'].nsmallest(1)        
+            ] + 
+            [
+                {
+                    'if': {
+                        'filter_query'  : '{{Points Avg.}} = {}'.format(i),
+                        'column_id'     : 'Points Avg.',
+                    },
+                    'backgroundColor': constants.ERROR_COLOR,
+                    'color': 'white'
+                }
+                for i in studentDataDfMeanToPlot['Points Avg.'].nsmallest(1)        
+            ] + 
+            [
+                {
+                    'if': {
+                        'filter_query'  : '{{Attempts Avg.}} = {}'.format(i),
+                        'column_id'     : 'Attempts Avg.',
+                    },
+                    'backgroundColor': constants.ERROR_COLOR,
+                    'color': 'white'
+                }
+                for i in studentDataDfMeanToPlot['Attempts Avg.'].nsmallest(1)        
+            ] + 
+            [
+                {
+                    'if': {
+                        'filter_query'  : '{{itemsCollectedCount Avg.}} = {}'.format(i),
+                        'column_id'     : 'itemsCollectedCount Avg.',
+                    },
+                    'backgroundColor': constants.ERROR_COLOR,
+                    'color': 'white'
+                }
+                for i in studentDataDfMeanToPlot['itemsCollectedCount Avg.'].nsmallest(1)        
+            ] + 
+#            [
+#                {
+#                    'if': {
+#                        'filter_query'  : '{{'+ constants.COUNT_STUDENT_FEATURE +'}} = {}'.format(i),
+#                        'column_id'     : constants.COUNT_STUDENT_FEATURE,
+#                    },
+#                    'backgroundColor': constants.ERROR_COLOR,
+#                    'color': 'white'
+#                }
+#                for i in studentDataDfMeanToPlot[constants.COUNT_STUDENT_FEATURE].nsmallest(1)        
+#            ] + 
+            [
+                {
+                    'if': {
+                        'filter_query': '{{GroupId}} = {}'.format(i),
+                    },
+                    'backgroundColor': constants.THEME_CYAN_COLOR,
+                    'color': 'white'
+                }
+                for i in [ schoolKey ]        
+            ]
+            ),
+            style_header={
+                'backgroundColor': 'rgb(230, 230, 230)',
+                'fontWeight': 'bold'
+            }
+        ),
         
-        tableMean = dbc.Table.from_dataframe(studentDataDfMeanToPlot, 
-                                             striped=True, bordered=True, hover=True, className = "table-comparision")
+        
+#        tableMean = dbc.Table.from_dataframe(studentDataDfMeanToPlot, 
+#                                             striped=True, bordered=True, hover=True, className = "table-comparision")
         columns2 = []
         columns2.append(dbc.Col(tableMean , align="center"))
     
-        rows.append( dbc.Row( html.Div('Overview') ) )
+        rows.append( dbc.Row( html.Div('Overview  - all numeric values in Average') ) )
         rows.append( dbc.Row( columns2 ) )
         
         
@@ -175,8 +251,15 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         
 #        df.std(axis = 0, skipna = True) 
         
-        
-        
+        studentDataDfMeanStd = studentDataDfMeanToPlot.std(axis = 0, skipna = True) 
+        studentDataDfMeanStdToPlot = pd.concat([studentDataDfMeanStd], axis=1)
+        tableMean = dbc.Table.from_dataframe(studentDataDfMeanStdToPlot, 
+                                             striped=True, bordered=True, hover=True, className = "table-comparision")
+        columns3 = []
+        columns3.append(dbc.Col(tableMean , align="center"))
+    
+        rows.append( dbc.Row( html.Div('Overview') ) )
+        rows.append( dbc.Row( columns3 ) )
         
         
         graphs.append(html.Div(  rows  ))

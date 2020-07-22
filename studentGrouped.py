@@ -197,7 +197,7 @@ def getStudentsOfSchoolDF(groupSelected):
     groupStudents = getStudentsOfSchool(groupSelected)
     
     
-    if 'studentDF' in locals():
+    if 'studentDF' in locals()     and    studentDF is not None :
         print('Students of group')
         print(groupStudents)
         print('studentDF.columns')

@@ -93,7 +93,7 @@ content = html.Div(
         
     id="page-main", 
     style =  constants.CONTENT_STYLE,
-    className = "theme-cyan "
+    className = constants.THEME
 )
 
 app.layout = html.Div([dcc.Location(id="url"), sidebar, content])

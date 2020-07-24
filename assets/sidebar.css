@@ -62,6 +62,14 @@ html {
 	z-index : 5;
 }
 
+.theme-cyan h2 {
+	margin-top: 2.5rem;
+}
+
+.theme-cyan h3 {
+	margin-top: 2rem;
+}
+
 
 .group-comparision-container .dash-table-container {
 	font-size : 15px;
@@ -70,4 +78,8 @@ html {
 
 .group-comparision-container  .dash-table-container td:nth-child(1) {  
   font-weight: bold;
+}
+
+.width-100 {
+	width: 100%;
 }

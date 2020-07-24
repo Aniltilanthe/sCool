@@ -30,11 +30,19 @@ else :
 
 ERROR_COLOR = "#FF4136"
 #-------------------------------- STYLES END -----------------------------------
+THEME_CYAN_EXPRESS_LAYOUT = {
+    "plot_bgcolor"      : 'rgb(243, 243, 243)',
+    "paper_bgcolor"     : 'rgb(243, 243, 243)',
+}
+
+
+#---------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------
 
 
 GROUPBY_FEATURE  =  'GroupId'
 COUNT_STUDENT_FEATURE  =  'CountOfStudents'
+STUDENT_ID_FEATURE  =  'StudentId'
 
 
 #------------------- feature related START -----------------------------------------------
@@ -45,6 +53,12 @@ featureTheoryTaskDesc               = "TheoryTaskDesc"
 featureTaskDesc                     = "TaskDesc"
 featureTaskType                     = "TaskType"
 featureDescription                  = "Description"
+featureConceptsUsedDetails          = "ConceptsUsedDetails"
+featureConceptsUsedDetailsStr       = "ConceptsUsedDetailsStr"
+featureItemsCollectedCount          = "itemsCollectedCount"
+featurePlayerShootEndEnemyHitCount  = "playerShootEndEnemyHitCount"
+featureRobotCollisionsBoxCount      = "robotCollisionsBoxCount"
+featureLineOfCodeCount              = "lineOfCodeCount"
 
 TaskTypePractice                    = "Practice"
 TaskTypeTheory                      = "Theory "
@@ -62,7 +76,7 @@ feature2UserNamesDict = {
 		,"ConceptsUsed" : 'Concept Used'
 		,"studentTaskCount" : "No. of Tasks performed"
 		,"studentAttemptsTotal" : "Attempts (total)"
-		,"robotCollisionsBoxCount" : "Robot Collision Box (No. of times)"
+		,featureRobotCollisionsBoxCount : "Robot Collision Box (No. of times)"
 		,"CollectedCoins" :  "Coins Collected"
 		,"coinCollectedCount" : "Coins Collected"
 		,"keyboardKeyPressedCount" : "Keyboard Key Pressed (No. of times)"
@@ -74,9 +88,9 @@ feature2UserNamesDict = {
 		,"NumberOfBoxes" : "No. of Boxes"
 		,"NumberOfCoins" : "No. of Coins"
 		,"NumberOfHidden" : "No. of Hidden items"
-		,"lineOfCodeCount" : "Count of Lines of Code"
+		,featureLineOfCodeCount : "Count of Lines of Code"
 		,"runsLineOfCodeCountAvg" : "Avg. Count of Lines of Code"   
-        ,"ConceptsUsedDetailsStr" : "Concepts used details"
+        ,featureConceptsUsedDetailsStr : "Concepts used details"
         ,"StudentId" : "StudentId"
         
 		,"runsErrorAttribiteCount" : "Attribute Errors in Code (No. of times)"
@@ -119,10 +133,10 @@ feature2UserNamesDict[featureTaskDesc] = "Task"
 feature2UserNamesDict[featureTaskType] = "Task Type"
 feature2UserNamesDict["SessionDuration"] = "Session Duration"
 feature2UserNamesDict["playerShootEndEnemyHitCount"] = "Player Shoot Enemy Hit Count"
-feature2UserNamesDict["itemsCollectedCount"] = "Items Collected Count"
-feature2UserNamesDict["robotCollisionsBoxCount"] = "Robot box collision Count"
+feature2UserNamesDict[featureItemsCollectedCount] = "Items Collected Count"
+feature2UserNamesDict[featureRobotCollisionsBoxCount] = "Robot box collision Count"
 feature2UserNamesDict["Result"] = "Result"
-feature2UserNamesDict["ConceptsUsedDetailsStr"] = "Concepts used details"
+feature2UserNamesDict[featureConceptsUsedDetailsStr] = "Concepts used details"
 
 
 #------------------- feature related END -----------------------------------------------

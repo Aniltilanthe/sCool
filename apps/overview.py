@@ -11,6 +11,7 @@ import numpy as np
 from datetime import date
 from datetime import datetime as dt
 import dateutil.parser
+import plotly.express as px
 
 import pandas as pd
 import flask
@@ -61,6 +62,8 @@ dfGroupedPlayerStrategyTheory           = studentGrouped.dfGroupedPlayerStrategy
 #--------------------------- helper functions START -----------------------    
 getTaskWiseSuccessFail                  =  studentGrouped.getTaskWiseSuccessFail
 getStudentsOfSchool                     =  studentGrouped.getStudentsOfSchool
+getPracticeConceptsUsedDetails          =  studentGrouped.getPracticeConceptsUsedDetails
+getStudentWiseData                      =  studentGrouped.getStudentWiseData
 
 #--------------------------- helper functions END -----------------------  
 
@@ -103,12 +106,17 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         studentDataDf2Com = studentGrouped.getStudentsOfSchoolDF(sckoolKey2Com)
         
         if 'studentDataDf2Com' in locals()    and    studentDataDf2Com is not None :
-            studentDataDf = pd.concat([studentDataDf, studentDataDf2Com], ignore_index=True, sort=False)    
-
+            studentDataDf = pd.concat([studentDataDf, studentDataDf2Com], ignore_index=True, sort=False)
+    
 
     if 'studentDataDf' in locals()     and    studentDataDf is not None  :
-        print('Initial List of Columns after adding all DF')
-        print(studentDataDf.columns)
+        
+        studentDataDf[constants.GROUPBY_FEATURE]    = studentDataDf[constants.GROUPBY_FEATURE].apply(str)
+        studentDataDf[constants.GROUPBY_FEATURE]    = 'Group-' + studentDataDf[constants.GROUPBY_FEATURE]
+        studentDataDf[constants.featureConceptsUsedDetailsStr]     = getPracticeConceptsUsedDetails(studentDataDf)
+                
+        studentDataDfGrouped = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index = False)
+
         
     #   Sum of features
         studentDataDfSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.COUNT_STUDENT_FEATURE], as_index=False).sum()
@@ -117,14 +125,13 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         studentDataDfMean = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index=False).mean()
         studentDataDfMean.rename(columns = featuresOverviewAvgNames, inplace=True)
         
-        studentDataDfOverview = pd.merge(studentDataDfSum[featuresOverview], studentDataDfMean[featuresOverviewAvg].round(decimals=2), 
-                                         how='inner', on = constants.GROUPBY_FEATURE, left_index=False, right_index=False )
+#        studentDataDfOverview = pd.merge(studentDataDfSum[featuresOverview], studentDataDfMean[featuresOverviewAvg].round(decimals=2), 
+#                                         how='inner', on = constants.GROUPBY_FEATURE, left_index=False, right_index=False )
         
         
     #   Mean of comparision features    
         studentDataDfMean = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index = False).mean()
         
-        studentDataDfGrouped = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index = False)
         
         studentDataDfMeanFinal = studentDataDfMean
         
@@ -173,7 +180,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                     'backgroundColor': constants.ERROR_COLOR,
                     'color': 'white'
                 }
-                for i in studentDataDfMeanToPlot['SessionDuration Avg.'].nsmallest(1)        
+                for i in studentDataDfMeanToPlot['SessionDuration Avg.'].nsmallest(1)
             ] + 
             [
                 {
@@ -208,17 +215,6 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                 }
                 for i in studentDataDfMeanToPlot['itemsCollectedCount Avg.'].nsmallest(1)        
             ] + 
-#            [
-#                {
-#                    'if': {
-#                        'filter_query'  : '{{'+ constants.COUNT_STUDENT_FEATURE +'}} = {}'.format(i),
-#                        'column_id'     : constants.COUNT_STUDENT_FEATURE,
-#                    },
-#                    'backgroundColor': constants.ERROR_COLOR,
-#                    'color': 'white'
-#                }
-#                for i in studentDataDfMeanToPlot[constants.COUNT_STUDENT_FEATURE].nsmallest(1)        
-#            ] + 
             [
                 {
                     'if': {
@@ -227,7 +223,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                     'backgroundColor': constants.THEME_CYAN_COLOR,
                     'color': 'white'
                 }
-                for i in [ schoolKey ]        
+                for i in [ schoolKey ]
             ]
             ),
             style_header={
@@ -242,10 +238,111 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         columns2 = []
         columns2.append(dbc.Col(tableMean , align="center"))
     
-        rows.append( dbc.Row( html.Div('Overview  - all numeric values in Average') ) )
+
+        rows.append( dbc.Row( html.Div([
+                    html.H3('Overview'), 
+                ]) ) )
         rows.append( dbc.Row( columns2 ) )
         
         
+        
+#        -------------------
+#        the Quantile Plots - distribution for each feature
+        rows.append( html.Br() )
+        rows.append( dbc.Row( html.Div([
+                    html.H3('Distributions'), 
+                ]) ) )
+
+
+        studentDataDfStudentSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.COUNT_STUDENT_FEATURE, 
+                                                         constants.STUDENT_ID_FEATURE, "Name" ], as_index=False).sum()
+        
+
+#Session duration
+        figQuantile = px.box(studentDataDfStudentSum, x="GroupId", y="SessionDuration", points="all",
+                             title="Distribution of Session Duration",
+                             hover_data=[constants.STUDENT_ID_FEATURE, "Name", "SessionDuration", "Attempts", "Points"]
+#                             , marker_color = 'rgb(214,12,140)'
+                             )   
+        figQuantile.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)         
+        columns3 = []
+        columns3.append(dbc.Col(
+                dcc.Graph(
+                        figure= figQuantile
+                    ) , align="center"))    
+        rows.append( dbc.Row( columns3 ) ) 
+        rows.append( html.Br() )       
+
+#Attempts
+        figQuantile = px.box(studentDataDfStudentSum, x="GroupId", y="Attempts", points="all",
+                             title="Distribution of Attempts",
+                             hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
+                             )       
+        figQuantile.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)            
+        columns3 = []
+        columns3.append(dbc.Col(
+                dcc.Graph(
+                        figure= figQuantile
+                    ) , align="center"))    
+        rows.append( dbc.Row( columns3 ) )      
+        rows.append( html.Br() )         
+        
+#Points
+        figQuantile = px.box(studentDataDfStudentSum, x="GroupId", y="Points", points="all",
+                             title="Distribution of Points",
+                             hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
+                             )     
+        figQuantile.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)                      
+        columns3 = []
+        columns3.append(dbc.Col(
+                dcc.Graph(
+                        figure= figQuantile
+                    ) , align="center"))    
+        rows.append( dbc.Row( columns3 ) )       
+        rows.append( html.Br() )           
+
+#Items Collected
+        figQuantile = px.box(studentDataDfStudentSum, x="GroupId", y="itemsCollectedCount", points="all",
+                             title="Distribution of Items Collected",
+                             hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
+                             )    
+        figQuantile.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)                           
+        columns3 = []
+        columns3.append(dbc.Col(
+                dcc.Graph(
+                        figure= figQuantile
+                    ) , align="center"))    
+        rows.append( dbc.Row( columns3 ) )      
+        rows.append( html.Br() )             
+
+
+        fig = go.Figure()        
+        for groupId, group in studentDataDfStudentSum.groupby([constants.GROUPBY_FEATURE], as_index=False):
+#            print(group[constants.featureDescription])
+            groupDataStudent = getStudentWiseData(group)
+            fig.add_trace(go.Box(
+                y               = groupDataStudent['itemsCollectedCount'],                    
+                marker_color    = 'rgb(214,12,140)',
+                name            = groupId,
+                boxpoints       = 'all',
+                text            = groupDataStudent['Name'],
+            ))
+        
+        fig.update_layout(
+            title           ='Distribution of Items Collected',
+            paper_bgcolor   = 'rgb(243, 243, 243)',
+            plot_bgcolor    = 'rgb(243, 243, 243)',
+            yaxis_title     ='Item Collected Count', 
+            xaxis_title     = 'Group',
+        )
+        columns3 = []
+        columns3.append(dbc.Col(
+                                dcc.Graph(
+                                        figure = fig
+                                )  , align="center"))    
+        rows.append( dbc.Row( columns3 ) )  
+
+
         
 #        standard deviation and for each group
         
@@ -253,6 +350,14 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         
         studentDataDfMeanStd = studentDataDfMeanToPlot.std(axis = 0, skipna = True) 
         studentDataDfMeanStdToPlot = pd.concat([studentDataDfMeanStd], axis=1)
+        
+        
+        print('studentDataDfMeanStdToPlot')
+        print(studentDataDf.std(axis = 0, skipna = True) )
+        print(studentDataDfMeanStd)
+        print(studentDataDfMeanStdToPlot)
+        print(studentDataDfMeanStdToPlot.columns)
+        
         tableMean = dbc.Table.from_dataframe(studentDataDfMeanStdToPlot, 
                                              striped=True, bordered=True, hover=True, className = "table-comparision")
         columns3 = []
@@ -262,7 +367,8 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         rows.append( dbc.Row( columns3 ) )
         
         
-        graphs.append(html.Div(  rows  ))
+        graphs.append(html.Div(  rows,
+                     className = "width-100"  ))
         
     return graphs
 
@@ -382,5 +488,6 @@ def update_bar(groupMain, groupComparision ):
  
     graphs = plotClassOverview( int(groupMain), groupComparision )    
 
-    return  html.Div(graphs)
+    return  html.Div(graphs,
+                     className = "width-100")
     

@@ -91,11 +91,15 @@ def getPracticeDescription(dfPractice) :
     dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('CollectedCoins')) + '</b>: ' + dfPractice['CollectedCoins'].astype(str)
     dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Result')) + '</b>: ' + dfPractice['Result'].astype(str)
     dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Attempts')) + '</b>: ' + dfPractice['Attempts'].astype(str)
-    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('ConceptsUsedDetailsStr')) + '</b>: ' + dfPractice['ConceptsUsedDetailsStr'].astype(str)
-    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('lineOfCodeCount')) + '</b>: ' + dfPractice['lineOfCodeCount'].astype(str)
-    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('robotCollisionsBoxCount')) + '</b>: ' + dfPractice['robotCollisionsBoxCount'].astype(str)
+    if constants.featureConceptsUsedDetailsStr in dfPractice.columns:
+        dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get(constants.featureConceptsUsedDetailsStr)) + '</b>: ' + dfPractice[constants.featureConceptsUsedDetailsStr].astype(str)
+    if constants.featureLineOfCodeCount in dfPractice.columns:    
+        dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get(constants.featureLineOfCodeCount)) + '</b>: ' + dfPractice[constants.featureLineOfCodeCount].astype(str)
+    if constants.featureRobotCollisionsBoxCount in dfPractice.columns:
+        dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get(constants.featureRobotCollisionsBoxCount)) + '</b>: ' + dfPractice[constants.featureRobotCollisionsBoxCount].astype(str)
     dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('StudentId')) + '</b>: ' + dfPractice['StudentId'].astype(str)
     return dfPractice[featureDescription]
+
 
 def getTheoryDescription(dfTheory) :    
     dfTheory[featureDescription] = '<b>' + dfTheory['Name'].astype(str) + '</b>' + '<br>'
@@ -103,10 +107,25 @@ def getTheoryDescription(dfTheory) :
     dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Points')) + '</b>: ' + dfTheory['Points'].astype(str)
     dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Result')) + '</b>: ' + dfTheory['Result'].astype(str)
     dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Attempts')) + '</b>: ' + dfTheory['Attempts'].astype(str)
-    dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('itemsCollectedCount')) + '</b>: ' + dfTheory['itemsCollectedCount'].astype(str)
-    dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('playerShootEndEnemyHitCount')) + '</b>: ' + dfTheory['playerShootEndEnemyHitCount'].astype(str)
+    if constants.featureItemsCollectedCount in dfTheory.columns:
+        dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get(constants.featureItemsCollectedCount)) + '</b>: ' + dfTheory[constants.featureItemsCollectedCount].astype(str)
+    
+    if constants.featurePlayerShootEndEnemyHitCount in dfTheory.columns:
+        dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get(constants.featurePlayerShootEndEnemyHitCount)) + '</b>: ' + dfTheory[constants.featurePlayerShootEndEnemyHitCount].astype(str)
     dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('StudentId')) + '</b>: ' + dfTheory['StudentId'].astype(str)
     return dfTheory[featureDescription]
+
+
+def getPracticeConceptsUsedDetails(dfPractice):    
+    if constants.featureConceptsUsedDetails in dfPractice.columns:
+        return dfPractice['ConceptsUsedDetails'].apply(lambda x: x[1:-1])
+
+def getStudentWiseData(df):
+    if "Name" in df.columns:
+        return df.groupby([constants.STUDENT_ID_FEATURE, "Name"], as_index=False).sum()    
+    else :
+        return df.groupby([constants.STUDENT_ID_FEATURE], as_index=False).sum()
+
 #-------------------------- helper functions END -----------------------
 
 
@@ -173,7 +192,8 @@ def getStudentsOfSchoolDF(groupSelected):
         
         studentDF['ConceptsUsedGroup'] =  [ studentDF.ConceptsUsed.agg(get_merge_list) ] * studentDF.shape[0]
         studentDF['ConceptsUsedDetailsGroup'] = [  studentDF.ConceptsUsedDetails.agg(get_merge_list) ] * studentDF.shape[0]
-
+        
+        studentDF[featureDescription] = getPracticeDescription(studentDF)    
 
     
     if groupSelected in dfGroupedPlayerStrategyTheory.groups.keys():
@@ -183,10 +203,12 @@ def getStudentsOfSchoolDF(groupSelected):
         print('2 schoolTheory in studentGrouped')  
         print(schoolTheory)   
         schoolTheory = schoolTheory.loc[:,~schoolTheory.columns.duplicated()]  
+        studentDF[featureDescription] = getTheoryDescription(studentDF)    
         
 #        if defined, else
         try:
             studentDF = pd.concat([studentDF, schoolTheory], ignore_index=True, sort=False)
+        
             print(studentDF)
             print('in try part concated both')
         except NameError:

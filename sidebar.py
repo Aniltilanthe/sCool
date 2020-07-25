@@ -123,7 +123,26 @@ sidebar = html.Div(
         dbc.Nav(submenu_1 + br + submenu_2 + submenu_3, vertical=True),
         
         
-        visdcc.Run_js(id = 'javascript')
+        visdcc.Run_js(id = 'javascript'),
+        
+        
+        
+#        for menu link click output
+        html.Div(id='menu-link-output-hidden', style={'display':'none'}),
+        html.Div(id='menu-link-output-prevent-default', style={'display':'none'}),
+        dcc.Input(
+                id="menu-link-input",
+                type="text", 
+                style={'display':'none'},
+                value="Overview"
+            ),
+        html.Div(id='menu-sub-link-output-hidden', style={'display':'none'}),
+        dcc.Input(
+                id="menu-sub-link-input",
+                type="text", 
+                style={'display':'none'},
+                value="Overview"
+            )
     
     
     ],

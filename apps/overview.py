@@ -4,17 +4,10 @@ Created on Thu Jun 11 18:16:48 2020
 
 @author: tilan
 """
-import math
-import json
-import datetime
 import numpy as np
-from datetime import date
-from datetime import datetime as dt
-import dateutil.parser
 import plotly.express as px
 
 import pandas as pd
-import flask
 import dash
 from dash.dependencies import Input, Output, State
 import dash_table
@@ -23,7 +16,6 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 import chart_studio.plotly as py
 from plotly import graph_objs as go
-import os
 
 from app import app, indicator, millify
 

@@ -44,12 +44,7 @@ submenu_1 = [
                         
                         dbc.Button(html.Span(["Overview", html.I(className="fas fa-chevron-right mr-3", style= {'float': 'right'})]), 
                                    href="/Overview", size="lg", className="mr-1", outline=True, color="primary", id="menu-link-0", block=True),
-                        
-#                        dbc.NavLink("Overview", href="/Overview", className="menu-link", id="menu-link-0" )
                         ]),
-#                dbc.Col(
-#                    html.I(className="fas fa-chevron-right mr-3"), width="auto"
-#                ),
             ],
             className="my-1",
         ),
@@ -58,24 +53,11 @@ submenu_1 = [
     # we use the Collapse component to hide and reveal the navigation links
     dbc.Collapse(
         [
-#            dbc.NavLink("Groups", href="/Overview#Group-Information", className="menu-link", id="menu-sub-link-0" ),
-#            html.Button('Groups', className="menu-link", id="menu-link-1",
-#                        style = MENU_BUTTON_STYLE),
+
             dbc.Button("Groups", id="menu-sub-link-0", outline=True, color="primary", className="mr-2 w-100", block=True),
-#            dbc.NavLink("Custom", href="/Overview#Custom-Information", className="menu-link", id="menu-sub-link-1" ),
-#            html.Button('Custom', className="menu-link", id="menu-link-2",
-#                        style = MENU_BUTTON_STYLE),
-            dbc.Button("Custom", id="menu-sub-link-1", outline=True, color="primary", className="mr-2 w-100", block=True),
-#            dbc.NavLink("Students", href="/Overview#Student-Information", className="menu-link", id="menu-sub-link-2" ),
-#            html.Button('Students', className="menu-link", id="menu-link-3",
-#                        style = MENU_BUTTON_STYLE),
-            dbc.Button("Students", id="menu-sub-link-2", outline=True, color="primary", className="mr-2 w-100", block=True),
-#            
-#            dash_dangerously_set_inner_html.DangerouslySetInnerHTML('''
-#                <a href="/Overview#Test-Information" class="nav-link" id="menu-link-227" onclick="pageMenuScroll(event, 'Student-Information')">Testing StudentInfo</a>
-#            '''),
+            dbc.Button("Overview", id="menu-sub-link-1", outline=True, color="primary", className="mr-2 w-100", block=True),
+            dbc.Button("Distribution", id="menu-sub-link-2", outline=True, color="primary", className="mr-2 w-100", block=True),
         ],
-#        is_open = True,
         id="menu-link-0-collapse",
         className="p-left_medium",
     ),
@@ -87,56 +69,45 @@ submenu_2 = [
             [
                 dbc.Col( [
                         dbc.Button(html.Span(["Details", html.I(className="fas fa-chevron-right mr-3", style= {'float': 'right'})]), 
-                                   href="/Details", size="lg", className="mr-1", outline=True, color="primary", id="menu-link-1", block=True),
-                        
-#                        dbc.NavLink("Details", href="/Details", className="menu-link", id="menu-link-1" ),            
+                                   href="/Details", size="lg", className="mr-1", outline=True, color="primary", id="menu-link-1", block=True),                        
                         ]),
-#                dbc.Col(
-#                    html.I(className="fas fa-chevron-right mr-3"), width="auto"
-#                ),
             ],
             className="my-1",
         ),
-        id="menu-4",
     ),
     dbc.Collapse(
         [
-#            dbc.NavLink("Tasks Info", href="/Details#Task-Information", className="menu-link", id="menu-sub-link-3" ),
             dbc.Button("Tasks Info", id="menu-sub-link-3", outline=True, color="primary", className="mr-1 w-100", block=True),
-#            dash_dangerously_set_inner_html.DangerouslySetInnerHTML('''
-#                <a href="/Details#Task-Information" class="nav-link" id="menu-sub-link-3" onclick="pageMenuScroll(event, 'Task-Information')">Tasks Info</a>
-#            '''),
-#            dbc.NavLink("General Info", href="/Details#General-Information", className="menu-link", id="menu-sub-link-4" ),
             dbc.Button("General Info", id="menu-sub-link-4", outline=True, color="primary", className="mr-1 w-100", block=True),
-#             dash_dangerously_set_inner_html.DangerouslySetInnerHTML('''
-#                <a href="/Details#General-Information" class="nav-link" id="menu-link-4" onclick="pageMenuScroll(event, 'General-Information')">General-Information</a>
-#            '''),
-#            dbc.NavLink("Student Info", href="/Details#Student-Information", className="Student-Information", id="menu-sub-link-5" ),
             dbc.Button("Student Info", id="menu-sub-link-5", outline=True, color="primary", className="mr-1 w-100", block=True),
-#            dash_dangerously_set_inner_html.DangerouslySetInnerHTML('''
-#                <a href="/Details#Student-Information" class="nav-link" id="menu-link-5" onclick="pageMenuScroll(event, 'Student-Information')">Student Info</a>
-#            '''),
         ],
-#        is_open = True,
         id="menu-link-1-collapse",
         className="p-left_medium",
     ),
-    html.Div(id='menu-link-output-hidden', style={'display':'none'}),
-    html.Div(id='menu-link-output-prevent-default', style={'display':'none'}),
-    dcc.Input(
-            id="menu-link-input",
-            type="text", 
-            style={'display':'none'},
-            value="Overview"
-        ),
-    html.Div(id='menu-sub-link-output-hidden', style={'display':'none'}),
-    dcc.Input(
-            id="menu-sub-link-input",
-            type="text", 
-            style={'display':'none'},
-            value="Overview"
-        )
 ]
+
+submenu_3 = [
+    html.Li(
+        dbc.Row(
+            [
+                dbc.Col( [
+                        dbc.Button(html.Span(["Custom", html.I(className="fas fa-chevron-right mr-3", style= {'float': 'right'})]), 
+                                   href="/Custom", size="lg", className="mr-1", outline=True, color="primary", id="menu-link-2", block=True),                            
+                        ]),
+            ],
+            className="my-1",
+        ),
+        id="menu-5",
+    ),
+    dbc.Collapse(
+        [
+            dbc.Button("Custom", id="menu-sub-link-6", outline=True, color="primary", className="mr-1 w-100", block=True),
+        ],
+        id="menu-link-2-collapse",
+        className="p-left_medium",
+    ),
+]
+
 
 
 br = [html.Br()]
@@ -149,7 +120,7 @@ sidebar = html.Div(
             "Student perfomance in sCool", className="lead"
         ),
         html.Hr(),
-        dbc.Nav(submenu_1 + br + submenu_2, vertical=True),
+        dbc.Nav(submenu_1 + br + submenu_2 + submenu_3, vertical=True),
         
         
         visdcc.Run_js(id = 'javascript')
@@ -162,10 +133,11 @@ sidebar = html.Div(
 
 
 
-menuLinksCount = 2
-menuSubLinksCount = 6
+menuLinksCount = 3
+menuSubLinksCount = 7
 initUrl0 = "/Overview"
 initUrl1 = "/Details"
+initUrl2 = "/Custom"
 @app.callback(
     [Output(f"menu-link-{i}-collapse", "is_open") for i in range(menuLinksCount)],
     ([Input(f"menu-link-{i}", "n_clicks") for i in range(menuLinksCount) ] + [ Input("url", "pathname")]),
@@ -218,48 +190,21 @@ def toggle_accordion(*args):
 
 
 
-@app.callback(  [ Output("menu-link-0", "className"), Output("menu-link-1", "className") ], 
+@app.callback(  [ Output(f"menu-link-{i}", "className") for i in range(menuLinksCount) ], 
                  [Input(f"menu-link-{i}-collapse", "is_open") for i in range(menuLinksCount)] )
 def setMenuClassOnChangeOpen(*args):   
     return  np.where(args,"open highlight",'').tolist()
 
-
-
-#@app.callback ( [ Output(f"menu-link-{i}", "className")  for i in range(menuLinksCount) ] , 
-#              [Input(f"menu-link-{j}", "n_clicks")   for j in range(menuLinksCount) ])
-#def changeMenuClass(*args):
-#    ctx = dash.callback_context
-#    newClasses = [""] * (menuLinksCount)
-#
-#    print('change Menu Class')    
-#    print(args)
-#    print(ctx.triggered)
-#    
-#    if not ctx.triggered or not any(args):
-#        return newClasses
-#    
-#    triggered_id = [p['prop_id'] for p in ctx.triggered][0]
-#    clickedButton_id = triggered_id.split('.')[0]
-#    
-#    clickedButton_index = int(clickedButton_id.split('-')[2])
-#    
-#    
-#    if clickedButton_index >= 0:
-#        newClasses[clickedButton_index] = "open highlight"
-#        
-#    return newClasses    
-
-
-
        
                         
 menuLink2Scroll = {
-		"menu-sub-link-0" : 'Group-Information'
-		,"menu-sub-link-1" : 'Custom-Information'
-		,"menu-sub-link-2" : "Student-Information"
+		"menu-sub-link-0" : ''
+		,"menu-sub-link-1" : 'row-control-main-overview'
+		,"menu-sub-link-2" : "Group-Distribution-Information"
 		,"menu-sub-link-3" : 'Task-Information'
 		,"menu-sub-link-4" : 'General-Information'
 		,"menu-sub-link-5" : 'Student-Information'
+		,"menu-sub-link-6" : ''
 	}
 
 

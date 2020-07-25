@@ -87,7 +87,7 @@ content = html.Div(
     ),
 
     # Page content
-    html.Div(id="page-content", className="", style={"marginTop": "5rem"}),
+    html.Div(id="page-content", className="page-content"),
     
     ],
         

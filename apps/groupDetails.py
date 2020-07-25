@@ -923,22 +923,7 @@ def plotClassOverview(schoolKey):
 
 layout = [
         html.Div([
-                
-                
-                         
-#    html.Div([
-#            dcc.Dropdown(
-#                    id='SchoolSelector-Dropdown',                    
-#                    options =  SchoolSelector_options,
-##                    value  =   '2018-03-01' 
-#                    )
-#          ], 
-#                    style = {'padding' : '20px',
-#                             'font-size' : 'initial'}
-#    )
-#    
-#    , 
-    
+                   
     html.Div(id='Class-Overview-Container')
     
     

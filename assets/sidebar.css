@@ -6,6 +6,10 @@ html {
 	font-family: sans-serif;
 }
 
+.page-content {
+	margin-top: 2rem;
+}
+
 .highlight {
 	color: aliceblue;
     background-color: #0069d9;
@@ -82,4 +86,9 @@ html {
 
 .width-100 {
 	width: 100%;
+}
+
+.theme-cyan .table tr:nth-child(1) {
+	background-color   : rgb(230, 230, 230);
+    font-weight        : bold;
 }

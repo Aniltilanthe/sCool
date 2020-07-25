@@ -17,10 +17,10 @@ window.dash_clientside.ui = {
 				if (elmntId) {
 					var scrollToElmnt = document.getElementById(elmntId);
 					scrollToElmnt.scrollIntoView();			
+				} else {
+					window.scrollTo(0,0);
 				}
 			//}, 50);
-			
-			
 		}
 		catch (err) {
 			console.log('Error scrollIntoView_Menu : ' + err);

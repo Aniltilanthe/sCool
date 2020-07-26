@@ -54,7 +54,7 @@ dfGroupedPlayerStrategyTheory           = studentGrouped.dfGroupedPlayerStrategy
 #--------------------------- helper functions START -----------------------    
 getTaskWiseSuccessFail                  =  studentGrouped.getTaskWiseSuccessFail
 getStudentsOfSchool                     =  studentGrouped.getStudentsOfSchool
-getPracticeConceptsUsedDetails          =  studentGrouped.getPracticeConceptsUsedDetails
+getPracticeConceptsUsedDetailsStr          =  studentGrouped.getPracticeConceptsUsedDetailsStr
 getStudentWiseData                      =  studentGrouped.getStudentWiseData
 
 #--------------------------- helper functions END -----------------------  
@@ -188,7 +188,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         
         studentDataDf[constants.GROUPBY_FEATURE]    = studentDataDf[constants.GROUPBY_FEATURE].apply(str)
         studentDataDf[constants.GROUPBY_FEATURE]    = featureAdderGroup + studentDataDf[constants.GROUPBY_FEATURE]
-        studentDataDf[constants.featureConceptsUsedDetailsStr]     = getPracticeConceptsUsedDetails(studentDataDf)
+        studentDataDf[constants.featureConceptsUsedDetailsStr]     = getPracticeConceptsUsedDetailsStr(studentDataDf)
                 
         studentDataDfGrouped = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index = False)
 

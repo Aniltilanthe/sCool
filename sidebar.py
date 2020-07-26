@@ -120,7 +120,7 @@ sidebar = html.Div(
             "Student perfomance in sCool", className="lead"
         ),
         html.Hr(),
-        dbc.Nav(submenu_1 + br + submenu_2 + submenu_3, vertical=True),
+        dbc.Nav(submenu_1 + br + submenu_2 + br + submenu_3, vertical=True),
         
         
         visdcc.Run_js(id = 'javascript'),

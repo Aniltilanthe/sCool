@@ -43,9 +43,10 @@ THEME_TABLE_HEADER_STYLE = {
 #--------------------------------------------------------------------------------
 
 
-GROUPBY_FEATURE  =  'GroupId'
-COUNT_STUDENT_FEATURE  =  'CountOfStudents'
-STUDENT_ID_FEATURE  =  'StudentId'
+GROUPBY_FEATURE         =  'GroupId'
+COUNT_STUDENT_FEATURE   =  'CountOfStudents'
+STUDENT_ID_FEATURE      =  'StudentId'
+TASK_TYPE_FEATURE       =  'TaskType'
 
 
 #------------------- feature related START -----------------------------------------------

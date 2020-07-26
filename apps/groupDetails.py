@@ -591,8 +591,6 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                             
                             fig.update_yaxes(automargin=True)
                             
-                            fig.update_yaxes(automargin=True)
-                            
                             graphs.append(
                                     dcc.Graph(
                                         id='graphSchool-' + str(graphIndex),

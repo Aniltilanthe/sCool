@@ -75,12 +75,12 @@ def plotGameOverview():
     
     plotRow = []
     plotRow.append(html.Div([
-                                generateCardBase('No of Groups', len(allGroups))
+                                generateCardBase([html.I(className="fas fa-globe m-right-small"),   'No of Groups'], len(allGroups))
                             ],
                             className="col-sm-6",
                         ))
     plotRow.append( html.Div([
-                                generateCardBase('No of Students', len(allStudents))
+                                generateCardBase([html.I(className="fas fa-users m-right-small"),   'No of Students'], len(allStudents))
                             ],
                             className="col-sm-6",
                         ))
@@ -95,7 +95,7 @@ def plotGameOverview():
     plotRow = []    
     plotRow.append(
             html.Div([
-                   generateCardDetail('Game Time', 
+                   generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
                                         '' + seconds_2_dhms(dfAllData['SessionDuration'].sum().round(decimals=2)), 
                                         '' + str(dfAllData['SessionDuration'].mean().round(decimals=2)) + 's', 
                                         '' + str(dfAllData['SessionDuration'].std().round(decimals=2)) + 's', 
@@ -123,7 +123,7 @@ def plotGameOverview():
 
     plotRow.append(
             html.Div([
-                   generateCardDetail2('Game Time Spent - Practice vs Theory', 
+                   generateCardDetail2([html.I(className="fas fa-clock m-right-small"),   'Game Time Spent - Practice vs Theory'], 
                                         '' + seconds_2_dhms(dfPracticeDB['SessionDuration'].sum().round(decimals=2)), 
                                         '' + seconds_2_dhms(dfPlayerStrategyTheory['SessionDuration'].sum().round(decimals=2)), 
                                         'Practice',

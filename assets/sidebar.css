@@ -131,11 +131,11 @@ html {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 }
 .c-card .card_label {
-	font-size: 2rem;
+	font-size: 1.5rem;
 }
 .c-card .card_value {
 	font-weight: bold;
-    font-size: 2rem;
+    font-size: 3rem;
 }
 .c-card .card_value1, .c-card .card_value2 {
 	width: 50%;

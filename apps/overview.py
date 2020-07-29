@@ -183,11 +183,10 @@ def plotGroupOverview(groupSelected):
                      className = "row")
     )
 
-
     plotRow = []    
     plotRow.append(
             html.Div([
-                   generateCardDetail('Time', 
+                   generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
                                         '' + seconds_2_dhms(studentDataDf['SessionDuration'].sum().round(decimals=2)), 
                                         '' + str(studentDataDf['SessionDuration'].mean().round(decimals=2)) + 's', 
                                         '' + str(studentDataDf['SessionDuration'].std().round(decimals=2)) + 's', 
@@ -215,7 +214,7 @@ def plotGroupOverview(groupSelected):
             
     plotRow.append(
             html.Div([
-                   generateCardDetail2('Time - Practice vs Theory', 
+                   generateCardDetail2([html.I(className="fas fa-clock m-right-small"),   'Game Time - Practice vs Theory'], 
                                         '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] == 'Practice'][
                                                 'SessionDuration'].sum().round(decimals=2)), 
                                         '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] == 'Theory'][

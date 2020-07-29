@@ -33,7 +33,7 @@ dfStudentDetails = main.getStudentDetails()
 dfPracticeTaskDetails = studentGroupedPerformance.dfPracticeTaskDetails
 dfTheoryTaskDetails   = studentGroupedPerformanceTheory.dfTheoryTaskDetails
 
-
+dfPracticeDB                            = studentGroupedPerformance.dfPractice
 dfGroupedPractice                       = studentGroupedPerformance.dfGrouped
 dfGroupedOriginal                       = studentGroupedPerformance.dfGroupedOriginal
 dfPlayerStrategyPractice                = studentGroupedPerformance.dfPlayerStrategyPractice  

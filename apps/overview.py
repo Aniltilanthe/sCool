@@ -17,8 +17,9 @@ import dash_bootstrap_components as dbc
 import chart_studio.plotly as py
 from plotly import graph_objs as go
 
-from app import app, indicator, millify
 
+
+from app import app, generateCardBase, generateCardDetail, generateCardDetail2, seconds_2_dhms, millify
 
 
 import studentGrouped
@@ -44,6 +45,7 @@ dfPlayerStrategyPractice                = studentGrouped.dfPlayerStrategyPractic
 dfGroupedPracticeTaskWise               = studentGrouped.dfGroupedPracticeTaskWise
 dfGroupedPracticeDB                     = studentGrouped.dfGroupedPracticeDB
 dfRuns                                  = studentGrouped.dfRuns
+dfPracticeDB                            = studentGrouped.dfPracticeDB
 
 
 dfPlayerStrategyTheory                  = studentGrouped.dfPlayerStrategyTheory
@@ -158,6 +160,80 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
             style_header = constants.THEME_TABLE_HEADER_STYLE
         )
 
+    
+def plotGroupOverview(groupSelected):
+    
+    groupStudents     =  getStudentsOfSchool(groupSelected)
+    studentDataDf     =  studentGrouped.getStudentsOfSchoolDF(groupSelected)
+    
+    plots = []
+    
+    plotRow = []
+    
+    plotRow.append( html.Div([],
+                            className="col-sm-3",
+                    ))
+    plotRow.append( html.Div([
+                                generateCardBase('No of Students', len(groupStudents))
+                            ],
+                            className="col-sm-6",
+                    ))
+    plots.append(
+            html.Div(children  = plotRow,                
+                     className = "row")
+    )
+
+
+    plotRow = []    
+    plotRow.append(
+            html.Div([
+                   generateCardDetail('Time', 
+                                        '' + seconds_2_dhms(studentDataDf['SessionDuration'].sum().round(decimals=2)), 
+                                        '' + str(studentDataDf['SessionDuration'].mean().round(decimals=2)) + 's', 
+                                        '' + str(studentDataDf['SessionDuration'].std().round(decimals=2)) + 's', 
+                                        'total',
+                                        'mean',
+                                        'std',
+                                        )
+                ],
+                className="col-sm-4",
+            ))
+    
+    plotRow.append(
+            html.Div([
+                   generateCardDetail('Points', 
+                                        '' + millify(studentDataDf['Points'].sum().round(decimals=2)), 
+                                        '' + str(studentDataDf['Points'].mean().round(decimals=2)), 
+                                        '' + str(studentDataDf['Points'].std().round(decimals=2)), 
+                                        'total',
+                                        'mean',
+                                        'std',
+                                        )
+                ],            
+                className="col-sm-4",
+            ))
+            
+    plotRow.append(
+            html.Div([
+                   generateCardDetail2('Time - Practice vs Theory', 
+                                        '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] == 'Practice'][
+                                                'SessionDuration'].sum().round(decimals=2)), 
+                                        '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] == 'Theory'][
+                                                'SessionDuration'].sum().round(decimals=2)), 
+                                        'Practice',
+                                        'Theory'
+                                        )
+                ],
+                className="col-sm-4",
+            ))
+    plots.append(
+            html.Div(children  = plotRow,                
+                     className = "row")
+    )
+    
+    return plots
+
+    
 
 #Student Interaction with Game - TIMELINE
 def plotClassOverview(schoolKey, schoolKeys2Compare):
@@ -419,14 +495,35 @@ def generateControlCard():
 
 
 layout = [
-
+            
+    dbc.Row([
+            dbc.Col(
+                html.Div(
+                    id="group-main-overview",
+                    className="",
+                    children=  [html.H1("Group")]  ,
+                ),
+        ),
+    ]),
+    dbc.Row([
+            dbc.Col(
+                html.Div(
+                    id="group-main-overview-content",
+                    className="overview m-bottom_medium ",
+                    children= []  ,
+                ),
+        ),
+    ]),
+                        
     dbc.Row([
             dbc.Col(
                 # Left column
                 html.Div(
                     id="row-control-main-overview",
-                    className="",
-                    children=[ generateControlCard() ]
+                    className="p-top_medium m-bottom_medium",
+                    children=
+                    [html.H1("Group Comparision")] +
+                    [ generateControlCard() ]
                     + [
                         html.Div(
                             ["initial child"], id="row-control-main-output-clientside-overview", style={"display": "none"}
@@ -435,6 +532,8 @@ layout = [
                 ),
         ),
     ]),
+        
+                    
 
     html.Div(id='group-comparision-container', className = "row group-comparision-container" )
     
@@ -488,3 +587,22 @@ def update_bar(groupMain, groupComparision ):
     return  html.Div(graphs,
                      className = "width-100")
     
+
+# Update bar plot
+@app.callback(
+    Output("group-main-overview-content", "children"),
+    [
+        Input("group-selector-main", "value"),
+    ],
+)
+def update_main_overview(groupMain):    
+    graphs = []
+
+    if groupMain is None or not int(groupMain) >= 0:
+        return html.Div(graphs)
+ 
+    graphs = plotGroupOverview(groupMain)  
+
+    return  html.Div(graphs,
+#                     className = "width-100"
+                     )

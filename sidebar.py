@@ -28,22 +28,25 @@ keyHref     = 'href'
 keySubmenu  = 'submenu'
 keyValue    = 'value'
 keyScrollTo  = 'scrollTo'
+keyClassName  = 'className'
 
-menu = {
-    "Overview" : { keyLabel : 'Overview', keyHref : '/Overview',
+menuLink = {
+     "Home" : { keyLabel : 'Home', keyHref : '/Home',
+                  keySubmenu : [ ],  keyClassName : 'fas fa-home m-right-small' }
+    , "Overview" : { keyLabel : 'Overview', keyHref : '/Overview',
                   keySubmenu : [
                           "menu-sub-link-0", "menu-sub-link-1", "menu-sub-link-2"
-                          ]  }
+                          ],  keyClassName : 'fas fa-list m-right-small'   }
     ,   "Details" : { keyLabel : 'Details', keyHref : '/Details' ,
                   keySubmenu : [
                           "menu-sub-link-3", "menu-sub-link-4", "menu-sub-link-5"
-                          ]  }
+                          ],  keyClassName : 'fas fa-clipboard m-right-small'   }
     ,   "Custom" : { keyLabel : 'Custom', 'href' : '/Custom' ,
                   keySubmenu : [
                           "menu-sub-link-6"
-                          ]  }
+                          ],  keyClassName : 'fas fa-wrench m-right-small'   }
 }
-menuLink2Scroll = {
+menuSubLink2Scroll = {
 		"menu-sub-link-0"  :  {keyLabel : "Overview", keyScrollTo: ''}
 		,"menu-sub-link-1" :  {keyLabel : "Groups", keyScrollTo: 'row-control-main-overview'}
 		,"menu-sub-link-2" :  {keyLabel : "Distribution", keyScrollTo: "Group-Distribution-Information"}
@@ -57,13 +60,13 @@ menuLink2Scroll = {
 br = [html.Br()]
 
 def getSubmenuButtons(menuKey):
-    currentMenu = menu.get(menuKey)
+    currentMenu = menuLink.get(menuKey)
     result = []
     countMenuSubLink = 0
     
     for submenuKey in currentMenu.get(keySubmenu):
         result.append(
-                dbc.Button(menuLink2Scroll.get(submenuKey).get('label'), 
+                dbc.Button(menuSubLink2Scroll.get(submenuKey).get('label'), 
                                    id="menu-sub-link-" + str(countMenuSubLink), 
                                    outline=True, color="primary", 
                                    className="mr-2 w-100", 
@@ -76,8 +79,13 @@ def getMenu():
     countMenuLink = 0
     countMenuSubLink = 0
     
-    for menuKey in menu.keys():
-        currentMenu = menu.get(menuKey)
+    for menuKey in menuLink.keys():
+        currentMenu = menuLink.get(menuKey)
+        
+        menuOpener = [html.I(className="fas fa-chevron-right mr-3", style= {'float': 'right'})] 
+        if len(currentMenu.get(keySubmenu)) == 0  :
+            menuOpener = []
+        
         menus.append( 
             html.Li(
                 # use Row and Col components to position the chevrons
@@ -85,9 +93,10 @@ def getMenu():
                     [
                         dbc.Col([
                                 
-                                dbc.Button(html.Span([ currentMenu.get(keyLabel) , 
-                                                      html.I(className="fas fa-chevron-right mr-3", 
-                                                             style= {'float': 'right'})]), 
+                                dbc.Button(html.Span([html.I(className=  currentMenu.get(keyClassName)),
+                                                      currentMenu.get(keyLabel) ]
+                                                       +
+                                                       menuOpener ), 
                                            href= currentMenu.get(keyHref) , 
                                            size="lg", 
                                            className="mr-1", 
@@ -105,7 +114,7 @@ def getMenu():
         
         for submenuKey in currentMenu.get(keySubmenu):
             subMenuButtons.append(
-                    dbc.Button(menuLink2Scroll.get(submenuKey).get('label'), 
+                    dbc.Button(menuSubLink2Scroll.get(submenuKey).get('label'), 
                                        id="menu-sub-link-" + str(countMenuSubLink), 
                                        outline=True, color="primary", 
                                        className="mr-2 w-100", 
@@ -164,11 +173,8 @@ sidebar = html.Div(
 
 
 #CHANGE THE MENU LINK COUNT WHEN ADDING A NEW MENU
-menuLinksCount      =   3
-menuSubLinksCount   =   len(menuLink2Scroll.keys())
-initUrl0 = "/Overview"
-initUrl1 = "/Details"
-initUrl2 = "/Custom"
+menuLinksCount      =   len(menuLink.keys())  
+menuSubLinksCount   =   len(menuSubLink2Scroll.keys())
 @app.callback(
     [Output(f"menu-link-{i}-collapse", "is_open") for i in range(menuLinksCount)],
     ([Input(f"menu-link-{i}", "n_clicks") for i in range(menuLinksCount) ] + [ Input("url", "pathname")]),
@@ -184,19 +190,20 @@ def toggle_accordion(*args):
 
     triggered_id = [p['prop_id'] for p in ctx.triggered][0]
     clickedButton_id = triggered_id.split('.')[0]     
-    
+            
 #    on INIT url changes is the clickedButton_id
     if len(clickedButton_id.split('-')) == 1 :
-        if args[menuLinksCount ] in ["/", initUrl0]:
+        if args[menuLinksCount ] in ["/"]:
             newToggle[0] = True 
-        elif args[menuLinksCount ] == initUrl1:
-            newToggle[1] = True
-        print(newToggle)
+        else :
+            for index, menuLinkKey in enumerate(list(menuLink.keys())):
+                if args[menuLinksCount ].lower() in '/' + menuLinkKey.lower():
+                    newToggle[index] = True   
+        
         return newToggle
 
     clickedButton_index = int(clickedButton_id.split('-')[2])
     
-        
     if clickedButton_index >= 0  and  args[clickedButton_index] :
         newToggle[clickedButton_index] = not args[menuLinksCount + 1 + clickedButton_index ]   # add 1 for URL pathname param
         
@@ -231,8 +238,8 @@ def changeMenuSetInput(*args):
 
     print(clickedButton_id)
     
-    if clickedButton_id     and   clickedButton_id in menuLink2Scroll :
-         return menuLink2Scroll.get(clickedButton_id).get('scrollTo')
+    if clickedButton_id     and   clickedButton_id in menuSubLink2Scroll :
+         return menuSubLink2Scroll.get(clickedButton_id).get('scrollTo')
         
     return newValue    
     

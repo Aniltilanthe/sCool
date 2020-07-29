@@ -70,7 +70,9 @@ TASK_TYPE_FEATURE       =  'TaskType'
 #------------------- feature related START -----------------------------------------------
 featureAdderGroup = "GroupId-"
 featureAdderAvg = ' Avg.'
-featuresOverview = [GROUPBY_FEATURE,'SessionDuration', 'Points', 'Attempts', 'itemsCollectedCount' ]
+
+featuresCombined = [GROUPBY_FEATURE,'SessionDuration', 'Points', 'Attempts' ]
+featuresOverview = featuresCombined + ['itemsCollectedCount' ]
 featuresOverviewAvg = [GROUPBY_FEATURE, 'SessionDuration'+ featureAdderAvg, 'Points'+ featureAdderAvg
                        , 'Attempts'+ featureAdderAvg, 'itemsCollectedCount'+ featureAdderAvg ]
 

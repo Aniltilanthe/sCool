@@ -7,7 +7,7 @@ Created on Thu Jun 11 18:04:10 2020
 
 # -*- coding: utf-8 -*-
 import dash
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -21,7 +21,7 @@ from plotly import graph_objs as go
 import math
 
 from app import app
-from apps import overview, groupDetails, custom
+from apps import overview, groupDetails, custom, home
 
 from sidebar import sidebar
 
@@ -60,35 +60,35 @@ def generateControlCard():
 content = html.Div(
         children=[
         
-    dbc.Navbar(
-        children = [
-                dbc.Row([
-                        dbc.Col(
-                            # Left column
-                            html.Div(
-                                id="row-control-main-index",
-                                className="",
-                                children=[ generateControlCard() ]
-                                + [
+            dbc.Navbar(
+                children = [
+                        dbc.Row([
+                                dbc.Col(
+                                    # Left column
                                     html.Div(
-                                        ["initial child"], id="row-control-main-output-clientside-index", style={"display": "none"}
-                                    )
-                                ],
+                                        id="row-control-main-index",
+                                        className="",
+                                        children=[ generateControlCard() ]
+                                        + [
+                                            html.Div(
+                                                ["initial child"], id="row-control-main-output-clientside-index", style={"display": "none"}
+                                            )
+                                        ],
+                                    ),
                             ),
-                    ),
+                        ],
+                            className = "row w-100  selector-main-row"
+                        ),                
                 ],
-                    className = "row w-100  selector-main-row"
-                ),                
-        ],
-        id="page-topbar", 
-        sticky          = "top" ,
-        light           = False ,
-        className       = "navbar-main",
-    ),
+                id="page-topbar", 
+                sticky          = "top" ,
+                light           = False ,
+                className       = "navbar-main hidden",
+            ),
 
-    # Page content
-    html.Div(id="page-content", className="page-content"),
-    
+            # Page content
+            html.Div(id="page-content", className="page-content"),
+                    
     ],
         
     id="page-main", 
@@ -99,9 +99,13 @@ content = html.Div(
 app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
 
 
+
+
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
-    if pathname in ["/", "/Overview"]:
+    if pathname in ["/", "/Home"]:
+        return home.layout
+    if pathname in ["/Overview"]:
         return overview.layout
     elif pathname == "/Details":
         return groupDetails.layout
@@ -118,6 +122,28 @@ def render_page_content(pathname):
         ]
     )
 
+# Update bar plot
+@app.callback(
+    Output("page-topbar", "className"),
+    [
+        Input("url", "pathname")
+    ],
+     state=[ State(component_id='page-topbar', component_property='className')
+                ]
+)
+def show_hide_topbar(pathname, currentClasses):
+    currentClassesS = set() 
+    
+    if not (None is currentClasses) and not ('' == currentClasses) :
+        currentClassesS = set(currentClasses.split(' '))
+
+    currentClassesS.discard('hidden')
+    
+    if pathname in  ["/", "/Home"]:
+        currentClassesS.add('hidden')
+        
+    return  ' '.join(currentClassesS) 
+    
 
 
 #if __name__ == "__main__":

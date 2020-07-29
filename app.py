@@ -26,14 +26,12 @@ import math
 
 FA = "https://use.fontawesome.com/releases/v5.8.1/css/all.css"
 MATERIAL_CSS = "https://fonts.googleapis.com/icon?family=Material+Icons"
-BOOTSTRAP_CSS = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
 
 external_stylesheets = [
                         dbc.themes.BOOTSTRAP,
                         dbc.themes.MATERIA,
                         FA,
-                        MATERIAL_CSS,
-                        BOOTSTRAP_CSS
+#                        MATERIAL_CSS
                         ]
 
 
@@ -61,11 +59,98 @@ def indicator(color, text, id_value):
             ),
         ],
         className="four columns indicator",
+    )
+
+
+
+def generateCardBase(label, value):
+    return html.Div(
+        [
+            html.Span(
+                children = [ value ],
+                className="card_value"
+            ),
+            html.P(
+                label,
+                className="card_label"
+            ),
+        ],
+        className="c-card card-base",
+    )
         
-)
-        
-        
-        
+  
+def generateCardDetail(label, valueMain = '', value1 = '', value2 = '', 
+                       valueMainLabel = '', value1Label = '', value2Label = '',
+                       
+                       
+                       description = '', ):
+    return html.Div(
+        [
+            html.Div(
+                children = [html.Div(
+                                    children = [ value1Label ],
+                                    className="card_value_label"
+                                ), value1 ],
+                className="card_value1"
+            ),
+            html.Div(
+                children = [html.Div(
+                                    children = [ value2Label ],
+                                    className="card_value_label"
+                                ),   value2 ],
+                className="card_value2"
+            ),
+            html.Div(
+                children =[html.Div(
+                                    children = [ valueMainLabel ],
+                                    className="card_value_label"
+                                ),  valueMain],
+                className="card_value"
+            ),
+            html.Span(
+                label,
+                className="card_label"
+            ),
+            html.Span(
+                description,
+                className="card_description"
+            ),
+        ],
+        className="c-card card-detail",
+    )
+              
+
+def generateCardDetail2(label, value1 = '', value2 = '',
+                        value1Label = '', value2Label = '',
+                        description = '', ):
+    return html.Div(
+        [
+            html.Div(
+                children = [html.Div(
+                                    children = [ value1Label ],
+                                    className="card_value_label"
+                                ),  value1 ],
+                className="card_value1"
+            ),
+            html.Div(
+                children = [html.Div(
+                                    children = [ value2Label ],
+                                    className="card_value_label"
+                                ),  value2 ],
+                className="card_value2"
+            ),
+            html.Span(
+                label,
+                className="card_label"
+            ),
+            html.Span(
+                description,
+                className="card_description"
+            ),
+        ],
+        className="c-card card-detail-2",
+    )
+                      
 
 millnames = ["", " K", " M", " B", " T"] # used to convert numbers
 
@@ -80,3 +165,44 @@ def millify(n):
     )
 
     return "{:.0f}{}".format(n / 10 ** (3 * millidx), millnames[millidx])
+
+
+#converts seconds to Day, Hour, Minutes, Seconds
+def seconds_2_dhms(time, isLong = False):
+    seconds_to_minute   = 60
+    seconds_to_hour     = 60 * seconds_to_minute
+    seconds_to_day      = 24 * seconds_to_hour
+
+    days    =   time // seconds_to_day
+    time    %=  seconds_to_day
+
+    hours   =   time // seconds_to_hour
+    time    %=  seconds_to_hour
+
+    minutes =   time // seconds_to_minute
+    time    %=  seconds_to_minute
+
+    seconds = time
+    
+    result = ''
+    
+    dayLabel = 'days' if days > 1 else 'day'
+    hoursLabel = 'hours' if hours > 1 else 'hour'
+    minutesLabel = 'minutes' if minutes > 1 else 'minute'
+    secondsLabel = 'seconds' if seconds > 1 else 'second'
+    
+    if days > 0:
+            result = "%d %s, %d:%d:%d" % (days, dayLabel, hours, minutes, seconds)
+            if isLong :
+                result = "%d %s, %d %s, %d %s, %d %s" % (days, dayLabel, hours, hoursLabel, minutes, minutesLabel, seconds, secondsLabel)
+    else :
+        if isLong :
+            if hours > 0 :
+                result = "%d %s, %d %s, %d %s" % (hours, hoursLabel, minutes, minutesLabel, seconds, secondsLabel)
+            else :
+                result = "%d %s, %d %s" % (minutes, minutesLabel, seconds, secondsLabel)
+        else :
+            result = "%d:%d:%d" % (hours, minutes, seconds)
+            
+    return result
+            

@@ -76,6 +76,10 @@ FeaturesCustomTheory = ['playerShootCount', 'playerShootEndCount', 'playerShootE
 
 
 
+def BuildOptionsFeatures(options):  
+    return [{'label': constants.feature2UserNamesDict.get(i) if i in constants.feature2UserNamesDict.keys() else i , 'value': i} for i in options]
+
+
 #Student Interaction with Game - TIMELINE
 def plotClassOverview(schoolKey, featureToPlot, selectedAxis, selectedFigureType):
 
@@ -125,6 +129,8 @@ def plotClassOverview(schoolKey, featureToPlot, selectedAxis, selectedFigureType
         featureX2Plot = featureToPlot
         featureY2Plot = 'Name'
         
+        plotTitle = ' Details of students ' + constants.feature2UserNamesDict.get(featureToPlot) if featureToPlot in constants.feature2UserNamesDict.keys() else featureToPlot
+        
         if selectedFigureType == 'Scatter':
         
             if not None == selectedAxis and selectedAxis == 'Vertical':
@@ -132,7 +138,7 @@ def plotClassOverview(schoolKey, featureToPlot, selectedAxis, selectedFigureType
                 featureY2Plot = featureToPlot
             
             figStudents = px.scatter(studentDataDfSum, x = featureX2Plot, y = featureY2Plot
-                 , title  = ' Details of students ' + featureToPlot
+                 , title  = plotTitle
                  , labels  =  constants.feature2UserNamesDict # customize axis label
                  , hover_name  =  "Name"
                  , hover_data  =  ["CollectedCoins", "Result", "SessionDuration", "Attempts", "robotCollisionsBoxCount", "Points", "ConceptsUsedDetailsStr", "lineOfCodeCount", 'StudentId']
@@ -151,7 +157,7 @@ def plotClassOverview(schoolKey, featureToPlot, selectedAxis, selectedFigureType
             if selectedFigureType == 'Pie':
                 figStudents = px.pie(studentDataDfSum, values=featureToPlot, 
                                      names= 'Name', 
-                                     title= ' Details of students ' + featureToPlot
+                                     title= plotTitle
                                      , labels  =  constants.feature2UserNamesDict # customize axis label
                                      , hover_name  =  "Name"
 #                                     , hover_data  =  ["CollectedCoins", "Result", "SessionDuration", "Attempts", "robotCollisionsBoxCount", "Points", "ConceptsUsedDetailsStr", "lineOfCodeCount", 'StudentId']
@@ -183,7 +189,7 @@ def generateControlCard():
             html.P("Select Features"),
             dcc.Dropdown(
                 id      ="form-feature-selector-custom",
-                options = BuildOptions( FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory ),
+                options = BuildOptionsFeatures( FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory ),
             ),
             dcc.RadioItems(
                 id      ="form-figure-type-custom",
@@ -206,7 +212,7 @@ def generateControlCard():
                 className   = "radio-items-inline"
             ), 
             html.Button(children=[
-                    'Submit',
+                    'Add Plot',
                     html.I(className="fas fa-plus font-size_medium p-left_xx-small")], 
                         id='form-submit-btn-custom', 
                         className="button w3-btn w3-xlarge", n_clicks=0),

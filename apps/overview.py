@@ -514,13 +514,13 @@ layout = [
                 ),
         ),
     ]),
-                        
+                
     dbc.Row([
             dbc.Col(
                 # Left column
                 html.Div(
                     id="row-control-main-overview",
-                    className="p-top_medium m-bottom_medium",
+                    className="p-top_x-large m-bottom_medium",
                     children=
                     [html.H1("Group Comparision")] +
                     [ generateControlCard() ]

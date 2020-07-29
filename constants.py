@@ -29,6 +29,24 @@ else :
 
 
 ERROR_COLOR = "#FF4136"
+
+
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "16rem",
+    "padding": "2rem 1rem",
+    "backgroundColor": "#f8f9fa",
+}
+
+
+MENU_BUTTON_STYLE = {     
+    'width': '100%'
+}
+
+
 #-------------------------------- STYLES END -----------------------------------
 THEME_CYAN_EXPRESS_LAYOUT = {
     "plot_bgcolor"      : 'rgb(243, 243, 243)',
@@ -50,6 +68,22 @@ TASK_TYPE_FEATURE       =  'TaskType'
 
 
 #------------------- feature related START -----------------------------------------------
+featureAdderGroup = "GroupId-"
+featureAdderAvg = ' Avg.'
+featuresOverview = [GROUPBY_FEATURE,'SessionDuration', 'Points', 'Attempts', 'itemsCollectedCount' ]
+featuresOverviewAvg = [GROUPBY_FEATURE, 'SessionDuration'+ featureAdderAvg, 'Points'+ featureAdderAvg
+                       , 'Attempts'+ featureAdderAvg, 'itemsCollectedCount'+ featureAdderAvg ]
+
+featuresOverviewAvgNames = {
+        'SessionDuration': 'SessionDuration'+ featureAdderAvg,
+                                      'Points': 'Points' + featureAdderAvg,
+                                      'Attempts' : 'Attempts' + featureAdderAvg,
+                                      'itemsCollectedCount' : 'itemsCollectedCount' + featureAdderAvg
+  }
+
+
+
+
 countStudentCompletingTaskFeature   = "No. of Students Completing Task"
 countTaskCompletedByStudentFeature  = "No. of Tasks Completed"
 featurePracticeTaskDesc             = "PracticeTaskDesc"

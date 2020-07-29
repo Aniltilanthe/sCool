@@ -62,17 +62,13 @@ getStudentWiseData                      =  studentGrouped.getStudentWiseData
 
 
 #-----------------------------------Functions START ----------------------------------------
-featureAdderGroup = "GroupId-"
-featureAdderAvg = ' Avg.'
-featuresOverview = [constants.GROUPBY_FEATURE,'SessionDuration', 'Points', 'Attempts', 'itemsCollectedCount' ]
-featuresOverviewAvg = [constants.GROUPBY_FEATURE, 'SessionDuration'+ featureAdderAvg, 'Points'+ featureAdderAvg
-                       , 'Attempts'+ featureAdderAvg, 'itemsCollectedCount'+ featureAdderAvg ]
-featuresOverviewAvgNames = {
-        'SessionDuration': 'SessionDuration'+ featureAdderAvg,
-                                      'Points': 'Points' + featureAdderAvg,
-                                      'Attempts' : 'Attempts' + featureAdderAvg,
-                                      'itemsCollectedCount' : 'itemsCollectedCount' + featureAdderAvg
-                                      }
+featureAdderGroup       =   constants.featureAdderGroup
+featureAdderAvg         =   constants.featureAdderAvg
+featuresOverview        =   constants.featuresOverview
+featuresOverviewAvg     =   constants.featuresOverviewAvg
+
+featuresOverviewAvgNames =  constants.featuresOverviewAvgNames
+
 featuresOverviewGeneralNames = {constants.COUNT_STUDENT_FEATURE: 'No. of Students'}
 
 def get_merge_list(values):

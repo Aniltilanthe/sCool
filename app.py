@@ -25,11 +25,15 @@ import math
 
 
 FA = "https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+MATERIAL_CSS = "https://fonts.googleapis.com/icon?family=Material+Icons"
+BOOTSTRAP_CSS = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
 
 external_stylesheets = [
                         dbc.themes.BOOTSTRAP,
                         dbc.themes.MATERIA,
-                        FA
+                        FA,
+                        MATERIAL_CSS,
+                        BOOTSTRAP_CSS
                         ]
 
 

@@ -176,28 +176,26 @@ def get_merge_list(values):
 
 #get List of Students for a group
 def getStudentsOfSchool(groupSelected):
-    
-    print(groupSelected)
-    
-    students = list()
-
-    try :
-        studentWiseData = dfGroupedOriginal.get_group(groupSelected)
-        students = studentWiseData['StudentId'].unique()
-        students = list(students)   
-    except Exception as e: 
-        print(e)
-    
-    try :
-        groupOriginalTheory = dfGroupedPlayerStrategyTheory.get_group(groupSelected)
-        studentsTheory = groupOriginalTheory['StudentId'].unique()
-        studentsTheory = list(studentsTheory)
         
-        students = students + studentsTheory        
-    except Exception as e: 
-        print(e)
-        
-    students = list(set(students))
+    students = list(dfStudentDetails[dfStudentDetails['GroupId'] == groupSelected]['StudentId'].unique())
+    
+#    try :
+#        studentWiseData = dfGroupedOriginal.get_group(groupSelected)
+#        students = studentWiseData['StudentId'].unique()
+#        students = list(students)   
+#    except Exception as e: 
+#        print(e)
+#    
+#    try :
+#        groupOriginalTheory = dfGroupedPlayerStrategyTheory.get_group(groupSelected)
+#        studentsTheory = groupOriginalTheory['StudentId'].unique()
+#        studentsTheory = list(studentsTheory)
+#        
+#        students = students + studentsTheory        
+#    except Exception as e: 
+#        print(e)
+#    
+#    students = list(set(students))
     
     return students
 
@@ -231,8 +229,6 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
 #        if defined, else
         try:
             studentDF = pd.concat([studentDF, schoolTheory], ignore_index=True, sort=False)
-        
-            print(studentDF)
             print('in try part concated both')
         except NameError:
             print("studentDF WASN'T defined after all!")
@@ -243,9 +239,7 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
     
     
     if 'studentDF' in locals()     and    studentDF is not None :
-        print('Students of group')
-        print(groupStudents)
-        print('studentDF.columns')
+        print('getStudentsOfSchoolDF studentDF.columns')
         print(studentDF.columns)
         
         if len(groupStudents) > 0:

@@ -77,7 +77,7 @@ FeaturesCustomTheory = ['playerShootCount', 'playerShootEndCount', 'playerShootE
 
 
 #Student Interaction with Game - TIMELINE
-def plotClassOverview(schoolKey, featureToPlot, selectedAxis):
+def plotClassOverview(schoolKey, featureToPlot, selectedAxis, selectedFigureType):
 
     graphs = []
     rows = []
@@ -125,36 +125,41 @@ def plotClassOverview(schoolKey, featureToPlot, selectedAxis):
         featureX2Plot = featureToPlot
         featureY2Plot = 'Name'
         
-        if not None == selectedAxis and selectedAxis == 'Vertical':
-            featureX2Plot = 'Name'
-            featureY2Plot = featureToPlot
+        if selectedFigureType == 'Scatter':
         
-        figStudents = px.scatter(studentDataDfSum, x = featureX2Plot, y = featureY2Plot
-             , title  = ' Details of students ' + featureToPlot
-             , labels  =  constants.feature2UserNamesDict # customize axis label
-             , hover_name  =  "Name"
-             , hover_data  =  ["CollectedCoins", "Result", "SessionDuration", "Attempts", "robotCollisionsBoxCount", "Points", "ConceptsUsedDetailsStr", "lineOfCodeCount", 'StudentId']
-#             , marginal_x  = "box"
-             , height       = constants.graphHeight
-             , template     = constants.graphTemplete
-            )
-        figStudents.update_traces(marker=dict(size = 16
-                                    , showscale    = False
-                                    ,  line = dict(width=1,
-                                                color='DarkSlateGrey')),
-                          selector=dict(mode='markers'))
-        figStudents.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)
+            if not None == selectedAxis and selectedAxis == 'Vertical':
+                featureX2Plot = 'Name'
+                featureY2Plot = featureToPlot
+            
+            figStudents = px.scatter(studentDataDfSum, x = featureX2Plot, y = featureY2Plot
+                 , title  = ' Details of students ' + featureToPlot
+                 , labels  =  constants.feature2UserNamesDict # customize axis label
+                 , hover_name  =  "Name"
+                 , hover_data  =  ["CollectedCoins", "Result", "SessionDuration", "Attempts", "robotCollisionsBoxCount", "Points", "ConceptsUsedDetailsStr", "lineOfCodeCount", 'StudentId']
+    #             , marginal_x  = "box"
+                 , height       = constants.graphHeight
+                 , template     = constants.graphTemplete
+                )
+            figStudents.update_traces(marker=dict(size = 16
+                                        , showscale    = False
+                                        ,  line = dict(width=1,
+                                                    color='DarkSlateGrey')),
+                              selector=dict(mode='markers'))
+            figStudents.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)
         
-#        columns3 = []
-#        columns3.append(dbc.Col(
-#                dcc.Graph(
-#                        figure= figStudents
-#                    ) , align="center"))    
-#        rows.append( dbc.Row( columns3 ) ) 
-#        rows.append( html.Br() )       
-#        graphs.append(html.Div(  rows,
-#                     className = "width-100"  ))
-
+        else :
+            if selectedFigureType == 'Pie':
+                figStudents = px.pie(studentDataDfSum, values=featureToPlot, 
+                                     names= 'Name', 
+                                     title= ' Details of students ' + featureToPlot
+                                     , labels  =  constants.feature2UserNamesDict # customize axis label
+                                     , hover_name  =  "Name"
+#                                     , hover_data  =  ["CollectedCoins", "Result", "SessionDuration", "Attempts", "robotCollisionsBoxCount", "Points", "ConceptsUsedDetailsStr", "lineOfCodeCount", 'StudentId']
+                                     , height       = constants.graphHeight
+                                     , template     = constants.graphTemplete
+                                     )
+                figStudents.update_traces(textposition='inside', textinfo='percent+label+value')
+                figStudents.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)
         
         graphs.append(
             dcc.Graph(
@@ -181,6 +186,16 @@ def generateControlCard():
                 options = BuildOptions( FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory ),
             ),
             dcc.RadioItems(
+                id      ="form-figure-type-custom",
+                options=[
+                    {'label': 'Scatter', 'value': 'Scatter'},
+                    {'label': 'Pie', 'value': 'Pie'},
+                ],
+                value       = 'Scatter',
+                labelStyle  = {'display': 'inline-block'},
+                className   = "radio-items-inline"
+            ), 
+            dcc.RadioItems(
                 id      ="form-feature-axis-custom",
                 options=[
                     {'label': 'Horizontal (x-axis)', 'value': 'Horizontal'},
@@ -189,8 +204,12 @@ def generateControlCard():
                 value       = 'Horizontal',
                 labelStyle  = {'display': 'inline-block'},
                 className   = "radio-items-inline"
-            ),  
-            html.Button('Submit', id='form-submit-btn-custom', className="button", n_clicks=0),
+            ), 
+            html.Button(children=[
+                    'Submit',
+                    html.I(className="fas fa-plus font-size_medium p-left_xx-small")], 
+                        id='form-submit-btn-custom', 
+                        className="button w3-btn w3-xlarge", n_clicks=0),
             html.Br(),
         ],
         className = "form"
@@ -257,15 +276,17 @@ def on_reset(reset_click):
      state=[ State(component_id='group-selector-main', component_property='value'),
                 State(component_id='form-feature-selector-custom', component_property='value'),
                 State(component_id='form-feature-axis-custom', component_property='value'),
-                State(component_id='custom-main-container', component_property='children')]
+                State(component_id='form-figure-type-custom', component_property='value'),
+                State(component_id='custom-main-container', component_property='children'),
+                ]
 )
-def update_bar(n_clicks, groupMain, selectedFeature, selectedAxis, containerChildren ):    
+def update_bar(n_clicks, groupMain, selectedFeature, selectedAxis, selectedFigureType, containerChildren ):    
     graphs = []
 
     if n_clicks == 0 or groupMain is None or not int(groupMain) >= 0  or None is selectedFeature or '' == selectedFeature:
         return html.Div(graphs)
     
-    graphs = plotClassOverview( int(groupMain), selectedFeature, selectedAxis )    
+    graphs = plotClassOverview( int(groupMain), selectedFeature, selectedAxis, selectedFigureType )    
     
     if not(None is containerChildren):
         if isinstance(containerChildren, list):

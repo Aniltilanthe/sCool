@@ -517,7 +517,7 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                                 , how='inner')  
         
         
-        studentWiseData[featureDescription] = getPracticeDescription(studentWiseData)    
+        studentWiseData[featureDescription] = getPracticeDescription(studentWiseData)
         
         
         

@@ -40,10 +40,20 @@ html {
 	padding-left: 20px;
 }
 .p-left_xx-small {
-	padding-left: 10px;
+	padding-left: 1rem;
 }
 .p-left_xxx-small {
 	padding-left: 5px;
+}
+
+.font-size_small {
+	font-size: 1em;
+}
+.font-size_medium {
+	font-size: 1.5em;
+}
+.font-size_large {
+	font-size: 2em;
 }
 
 .form .button {

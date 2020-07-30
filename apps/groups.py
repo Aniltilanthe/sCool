@@ -7,7 +7,7 @@ Created on Thu Jul 30 21:01:42 2020
 
 import numpy as np
 import plotly.express as px
-
+import io
 import pandas as pd
 import dash
 from dash.dependencies import Input, Output, State
@@ -18,13 +18,16 @@ import dash_bootstrap_components as dbc
 import chart_studio.plotly as py
 from plotly import graph_objs as go
 
+#from flask import Flask, send_file
 
+from six.moves.urllib.parse import quote
 
-from app import app, generateCardBase, generateCardDetail, generateCardDetail2, seconds_2_dhms, millify
+from app import app
 
 
 import studentGrouped
 import constants
+import util
 
 #--------------------- school selection START ----------------------
 GroupSelector_options = studentGrouped.GroupSelector_options 
@@ -161,7 +164,8 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
             style_header = constants.THEME_TABLE_HEADER_STYLE
         )
 
-    
+
+
 def plotGroupOverview(groupSelected):
     
     groupStudents     =  getStudentsOfSchool(groupSelected)
@@ -175,7 +179,7 @@ def plotGroupOverview(groupSelected):
                             className="col-sm-3",
                     ))
     plotRow.append( html.Div([
-                                generateCardBase('No of Students', len(groupStudents))
+                                util.generateCardBase('No of Students', len(groupStudents))
                             ],
                             className="col-sm-6",
                     ))
@@ -187,8 +191,8 @@ def plotGroupOverview(groupSelected):
     plotRow = []    
     plotRow.append(
             html.Div([
-                   generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
-                                        '' + seconds_2_dhms(studentDataDf['SessionDuration'].sum().round(decimals=2)), 
+                   util.generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
+                                        '' + util.seconds_2_dhms(studentDataDf['SessionDuration'].sum().round(decimals=2)), 
                                         '' + str(studentDataDf['SessionDuration'].mean().round(decimals=2)) + 's', 
                                         '' + str(studentDataDf['SessionDuration'].std().round(decimals=2)) + 's', 
                                         'total',
@@ -201,8 +205,8 @@ def plotGroupOverview(groupSelected):
     
     plotRow.append(
             html.Div([
-                   generateCardDetail('Points', 
-                                        '' + millify(studentDataDf['Points'].sum().round(decimals=2)), 
+                   util.generateCardDetail('Points', 
+                                        '' + util.millify(studentDataDf['Points'].sum().round(decimals=2)), 
                                         '' + str(studentDataDf['Points'].mean().round(decimals=2)), 
                                         '' + str(studentDataDf['Points'].std().round(decimals=2)), 
                                         'total',
@@ -215,10 +219,10 @@ def plotGroupOverview(groupSelected):
             
     plotRow.append(
             html.Div([
-                   generateCardDetail2([html.I(className="fas fa-clock m-right-small"),   'Game Time - Practice vs Theory'], 
-                                        '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] == 'Practice'][
+                   util.generateCardDetail2([html.I(className="fas fa-clock m-right-small"),   'Game Time - Practice vs Theory'], 
+                                        '' + util.seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] == 'Practice'][
                                                 'SessionDuration'].sum().round(decimals=2)), 
-                                        '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] == 'Theory'][
+                                        '' + util.seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] == 'Theory'][
                                                 'SessionDuration'].sum().round(decimals=2)), 
                                         'Practice',
                                         'Theory'
@@ -233,16 +237,14 @@ def plotGroupOverview(groupSelected):
     
     return plots
 
+
+
+def getGroupData(schoolKey, schoolKeys2Compare):
     
-
-#Student Interaction with Game - TIMELINE
-def plotClassOverview(schoolKey, schoolKeys2Compare):
-
-    graphs = []
-    rows = []
+    studentDataDf = pd.DataFrame()
     
     if (None == schoolKey) :
-        return html.Div()
+        return studentDataDf
     
     if (None == schoolKeys2Compare) :
         schoolKeys2Compare = []
@@ -259,8 +261,27 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
     if 'studentDataDf' in locals()     and    studentDataDf is not None  :
         
         studentDataDf[constants.GROUPBY_FEATURE]    = studentDataDf[constants.GROUPBY_FEATURE].apply(str)
-#        studentDataDf[constants.GROUPBY_FEATURE]    = featureAdderGroup + studentDataDf[constants.GROUPBY_FEATURE]
+        studentDataDf[constants.GROUPBY_FEATURE]    = featureAdderGroup + studentDataDf[constants.GROUPBY_FEATURE]
 #        studentDataDf[constants.featureConceptsUsedDetailsStr]     = getPracticeConceptsUsedDetailsStr(studentDataDf)
+        
+    return studentDataDf
+    
+
+#Student Interaction with Game - TIMELINE
+def plotClassOverview(schoolKey, schoolKeys2Compare):
+
+    graphs = []
+    rows = []
+    
+    if (None == schoolKey) :
+        return html.Div()
+    
+    if (None == schoolKeys2Compare) :
+        schoolKeys2Compare = []
+    
+    studentDataDf = getGroupData(schoolKey, schoolKeys2Compare)
+    
+    if 'studentDataDf' in locals()     and    studentDataDf is not None  :
                 
         studentDataDfGrouped = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index = False)
 
@@ -337,6 +358,9 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                     html.H4('Overall Sum'), 
                 ]) ) )
         rows.append( dbc.Row( columns2 ) )
+        rows.append( dbc.Row( html.Div([html.A("download data", id = "groups_download_overview_link", 
+                                               href="/Groups_download_overview", target="_blank",
+                                               download='groups-overview.csv' )]) ) )
 
 #-------------------------------------------------------------------------------------
     #   Mean of comparision features    
@@ -684,11 +708,12 @@ def update_bar(groupMain, groupComparision ):
     
     graphs = []
 
+
     if groupMain is None or not int(groupMain) >= 0:
         return html.Div(graphs)
  
     graphs = plotClassOverview( int(groupMain), groupComparision )    
-
+    
     return  html.Div(graphs,
                      className = "width-100")
     
@@ -711,3 +736,23 @@ def update_main_overview(groupMain):
     return  html.Div(graphs,
 #                     className = "width-100"
                      )
+
+
+def get_download_link(df):
+    csv_string = df.to_csv(index=False, encoding='utf-8')
+    csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + quote(csv_string)
+    return csv_string
+
+@app.callback(
+    Output('groups_download_overview_link', 'href'),
+    [ Input("group-selector-main", "value"),
+        Input("group-selector-comparision-overview", "value"), ])
+def update_download_link(groupMain, groupComparision):
+#    dff = filter_data(filter_value)
+
+    if groupMain is None or not int(groupMain) >= 0:
+        return ""
+    
+    csv_string = getGroupData( int(groupMain), groupComparision).to_csv(index=False, encoding='utf-8')
+    csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + quote(csv_string)
+    return csv_string

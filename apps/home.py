@@ -26,11 +26,12 @@ from plotly import graph_objs as go
 
 
 
-from app import app, generateCardBase, generateCardDetail, generateCardDetail2, seconds_2_dhms, millify
+from app import app
 
 
 import studentGrouped
 import constants
+import util
 
 #--------------------- school selection START ----------------------
 GroupSelector_options = studentGrouped.GroupSelector_options 
@@ -75,12 +76,12 @@ def plotGameOverview():
     
     plotRow = []
     plotRow.append(html.Div([
-                                generateCardBase([html.I(className="fas fa-globe m-right-small"),   'No of Groups'], len(allGroups))
+                                util.generateCardBase([html.I(className="fas fa-globe m-right-small"),   'No of Groups'], len(allGroups))
                             ],
                             className="col-sm-6",
                         ))
     plotRow.append( html.Div([
-                                generateCardBase([html.I(className="fas fa-users m-right-small"),   'No of Students'], len(allStudents))
+                                util.generateCardBase([html.I(className="fas fa-users m-right-small"),   'No of Students'], len(allStudents))
                             ],
                             className="col-sm-6",
                         ))
@@ -95,8 +96,8 @@ def plotGameOverview():
     plotRow = []    
     plotRow.append(
             html.Div([
-                   generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
-                                        '' + seconds_2_dhms(dfAllData['SessionDuration'].sum().round(decimals=2)), 
+                   util.generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
+                                        '' + util.seconds_2_dhms(dfAllData['SessionDuration'].sum().round(decimals=2)), 
                                         '' + str(dfAllData['SessionDuration'].mean().round(decimals=2)) + 's', 
                                         '' + str(dfAllData['SessionDuration'].std().round(decimals=2)) + 's', 
                                         'total',
@@ -109,8 +110,8 @@ def plotGameOverview():
     
     plotRow.append(
             html.Div([
-                   generateCardDetail('Points Collected', 
-                                        '' + millify(dfAllData['Points'].sum().round(decimals=2)), 
+                   util.generateCardDetail('Points Collected', 
+                                        '' + util.millify(dfAllData['Points'].sum().round(decimals=2)), 
                                         '' + str(dfAllData['Points'].mean().round(decimals=2)), 
                                         '' + str(dfAllData['Points'].std().round(decimals=2)), 
                                         'total',
@@ -123,9 +124,9 @@ def plotGameOverview():
 
     plotRow.append(
             html.Div([
-                   generateCardDetail2([html.I(className="fas fa-clock m-right-small"),   'Game Time Spent - Practice vs Theory'], 
-                                        '' + seconds_2_dhms(dfPracticeDB['SessionDuration'].sum().round(decimals=2)), 
-                                        '' + seconds_2_dhms(dfPlayerStrategyTheory['SessionDuration'].sum().round(decimals=2)), 
+                   util.generateCardDetail2([html.I(className="fas fa-clock m-right-small"),   'Game Time Spent - Practice vs Theory'], 
+                                        '' + util.seconds_2_dhms(dfPracticeDB['SessionDuration'].sum().round(decimals=2)), 
+                                        '' + util.seconds_2_dhms(dfPlayerStrategyTheory['SessionDuration'].sum().round(decimals=2)), 
                                         'Practice',
                                         'Theory'
                                         )

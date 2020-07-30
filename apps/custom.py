@@ -17,7 +17,7 @@ import dash_bootstrap_components as dbc
 import chart_studio.plotly as py
 from plotly import graph_objs as go
 
-from app import app, indicator, millify
+from app import app
 
 
 

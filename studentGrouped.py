@@ -213,6 +213,7 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
         
         studentDF['ConceptsUsedGroup'] =  [ studentDF.ConceptsUsed.agg(get_merge_list) ] * studentDF.shape[0]
         studentDF['ConceptsUsedDetailsGroup'] = [  studentDF.ConceptsUsedDetails.agg(get_merge_list) ] * studentDF.shape[0]
+        studentDF[constants.featureConceptsUsedDetailsStr]     = getPracticeConceptsUsedDetailsStr(studentDF)
         
         studentDF[featureDescription] = getPracticeDescription(studentDF)    
 
@@ -223,8 +224,8 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
         schoolTheory[constants.TASK_TYPE_FEATURE]    = 'Theory' 
         print('2 schoolTheory in studentGrouped')  
         print(schoolTheory)   
-        schoolTheory = schoolTheory.loc[:,~schoolTheory.columns.duplicated()]  
-        studentDF[featureDescription] = getTheoryDescription(studentDF)    
+        schoolTheory = schoolTheory.loc[:,~schoolTheory.columns.duplicated()]          
+        schoolTheory[featureDescription] = getTheoryDescription(schoolTheory)    
         
 #        if defined, else
         try:

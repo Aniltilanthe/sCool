@@ -200,9 +200,30 @@ html {
 	width: 100%;
 }
 
-.theme-cyan .table tr:nth-child(1) {
+.theme-cyan .table tr:nth-child(2) {
 	background-color   : rgb(230, 230, 230);
     font-weight        : bold;
+}
+
+.theme-cyan .table th {
+	background-color: rgb(230, 230, 230);
+    font-weight: bold;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(211, 211, 211);
+}
+
+.table tr:nth-child(2) {
+	background-color   : rgb(230, 230, 230);
+    font-weight        : bold;
+}
+
+.table th {
+	background-color: rgb(230, 230, 230);
+    font-weight: bold;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(211, 211, 211);
 }
 
 .theme-cyan .graph-small {

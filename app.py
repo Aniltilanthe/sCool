@@ -192,7 +192,7 @@ def seconds_2_dhms(time, isLong = False):
     secondsLabel = 'seconds' if seconds > 1 else 'second'
     
     if days > 0:
-            result = "%d %s, %d:%d:%d" % (days, dayLabel, hours, minutes, seconds)
+            result = "%d %s, %02d:%02d:%02d" % (days, dayLabel, hours, minutes, seconds)
             if isLong :
                 result = "%d %s, %d %s, %d %s, %d %s" % (days, dayLabel, hours, hoursLabel, minutes, minutesLabel, seconds, secondsLabel)
     else :
@@ -202,7 +202,7 @@ def seconds_2_dhms(time, isLong = False):
             else :
                 result = "%d %s, %d %s" % (minutes, minutesLabel, seconds, secondsLabel)
         else :
-            result = "%d:%d:%d" % (hours, minutes, seconds)
+            result = "%02d:%02d:%02d" % (hours, minutes, seconds)
             
     return result
             

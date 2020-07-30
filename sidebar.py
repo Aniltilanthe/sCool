@@ -33,7 +33,7 @@ keyClassName  = 'className'
 menuLink = {
      "Home" : { keyLabel : 'Home', keyHref : '/Home',
                   keySubmenu : [ ],  keyClassName : 'fas fa-home m-right-small' }
-    , "Overview" : { keyLabel : 'Overview', keyHref : '/Overview',
+    , "Groups" : { keyLabel : 'Groups', keyHref : '/Groups',
                   keySubmenu : [
                           "menu-sub-link-0", "menu-sub-link-1", "menu-sub-link-2"
                           ],  keyClassName : 'fas fa-list m-right-small'   }
@@ -48,7 +48,7 @@ menuLink = {
 }
 menuSubLink2Scroll = {
 		"menu-sub-link-0"  :  {keyLabel : "Overview", keyScrollTo: ''}
-		,"menu-sub-link-1" :  {keyLabel : "Groups", keyScrollTo: 'row-control-main-overview'}
+		,"menu-sub-link-1" :  {keyLabel : "Compare Groups", keyScrollTo: 'row-control-main-overview'}
 		,"menu-sub-link-2" :  {keyLabel : "Distribution", keyScrollTo: "Group-Distribution-Information"}
 		,"menu-sub-link-3" :  {keyLabel : "Tasks Info", keyScrollTo: 'Task-Information'}
 		,"menu-sub-link-4" :  {keyLabel : "General Info", keyScrollTo: 'General-Information'}
@@ -155,14 +155,14 @@ sidebar = html.Div(
                 id="menu-link-input",
                 type="text", 
                 style={'display':'none'},
-                value="Overview"
+                value="Groups"
             ),
         html.Div(id='menu-sub-link-output-hidden', style={'display':'none'}),
         dcc.Input(
                 id="menu-sub-link-input",
                 type="text", 
                 style={'display':'none'},
-                value="Overview"
+                value="Groups"
             )
     
     

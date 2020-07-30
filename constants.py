@@ -132,6 +132,7 @@ feature2UserNamesDict = {
 		,"runsLineOfCodeCountAvg" : "Avg. Count of Lines of Code"   
         ,featureConceptsUsedDetailsStr : "Concepts used details"
         ,"StudentId" : "StudentId"
+        , "Result" : "Result"
         
 		,"runsErrorAttribiteCount" : "Attribute Errors in Code (No. of times)"
 		,"runsErrorTypeCount" : "Type Errors in Code (No. of times)"
@@ -165,17 +166,22 @@ feature2UserNamesDict = {
 		,"hasStatements" : "Used Statements in Code"
 		,"hasComprehensions" : "Used Comprehensions in Code"
 		,"hasSubscripting" : "Used Subscription in Code"
+        
+		,"PracticeSessionDuration" : "Time Practice Tasks(s)"
+		,"TheorySessionDuration" : "Time Theory Tasks(s)"
+        ,"SessionDuration" : "Session Duration(s)"
+        ,COUNT_STUDENT_FEATURE : "No. of Students"
+        
+        ,"playerShootEndEnemyHitCount" : "Player Shoot Enemy Hit Count"
 	}
+
 
 feature2UserNamesDict[featurePracticeTaskDesc] = "Practice Task"
 feature2UserNamesDict[featureTheoryTaskDesc] = "Theory Task"
 feature2UserNamesDict[featureTaskDesc] = "Task"
 feature2UserNamesDict[featureTaskType] = "Task Type"
-feature2UserNamesDict["SessionDuration"] = "Session Duration"
-feature2UserNamesDict["playerShootEndEnemyHitCount"] = "Player Shoot Enemy Hit Count"
 feature2UserNamesDict[featureItemsCollectedCount] = "Items Collected Count"
 feature2UserNamesDict[featureRobotCollisionsBoxCount] = "Robot box collision Count"
-feature2UserNamesDict["Result"] = "Result"
 feature2UserNamesDict[featureConceptsUsedDetailsStr] = "Concepts used details"
 
 

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jun 11 18:16:48 2020
+Created on Thu Jul 30 21:01:42 2020
 
 @author: tilan
 """
+
 import numpy as np
 import plotly.express as px
 
@@ -154,7 +155,7 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                     'backgroundColor': constants.THEME_CYAN_COLOR,
                     'color': 'white'
                 }
-                for i in [ featureAdderGroup + str(groupKey) ]
+                for i in [ groupKey ]
             ] )
             ),
             style_header = constants.THEME_TABLE_HEADER_STYLE
@@ -258,7 +259,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
     if 'studentDataDf' in locals()     and    studentDataDf is not None  :
         
         studentDataDf[constants.GROUPBY_FEATURE]    = studentDataDf[constants.GROUPBY_FEATURE].apply(str)
-        studentDataDf[constants.GROUPBY_FEATURE]    = featureAdderGroup + studentDataDf[constants.GROUPBY_FEATURE]
+#        studentDataDf[constants.GROUPBY_FEATURE]    = featureAdderGroup + studentDataDf[constants.GROUPBY_FEATURE]
 #        studentDataDf[constants.featureConceptsUsedDetailsStr]     = getPracticeConceptsUsedDetailsStr(studentDataDf)
                 
         studentDataDfGrouped = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index = False)
@@ -268,7 +269,11 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         studentDataDfStudentSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.COUNT_STUDENT_FEATURE, 
                                                   constants.STUDENT_ID_FEATURE], as_index=False).sum()
         studentDataDfStudentSumGrouped = studentDataDfStudentSum.groupby([constants.GROUPBY_FEATURE], as_index = False)
+        studentDataDfStudentSumGrouped.fillna(0, inplace=True)  
         
+        studentDataDfStudentTaskWiseSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.STUDENT_ID_FEATURE, 
+                                                              constants.TASK_TYPE_FEATURE], as_index=False).sum()   
+        studentDataDfStudentTaskWiseSum.fillna(0, inplace=True)  
         
     
 #--------------------------------Total of each Features ----------------------------------             
@@ -338,8 +343,43 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         studentDataDfMean = studentDataDfStudentSum.groupby([constants.GROUPBY_FEATURE], as_index = False).mean()
         
         studentDataDfMeanToPlot = studentDataDfMean[ featuresOverview ].round(decimals=2)
-        studentDataDfMeanToPlot.rename(columns = featuresOverviewAvgNames, inplace=True)
+        
+        studentDataDfMeanTaskWise = studentDataDfStudentTaskWiseSum.groupby([constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE], 
+                                        as_index=False).mean()[[constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE,
+                                        'SessionDuration']].round(decimals=2)        
+        GroupId = []
+        PracticeSessionDuration = []
+        TheorySessionDuration = []
+        for groupKey, group in studentDataDfGrouped :
+            GroupId.append(groupKey)
+            
+            groupDataPractice = studentDataDfMeanTaskWise[ (studentDataDfMeanTaskWise[constants.GROUPBY_FEATURE] == groupKey)   &
+                        (studentDataDfMeanTaskWise[constants.TASK_TYPE_FEATURE] == 'Practice')  ]
+            
+            if groupDataPractice.shape[0] > 0 :
+                PracticeSessionDuration.append( groupDataPractice[  'SessionDuration'  ]  )
+            else :
+                PracticeSessionDuration.append(0)
                 
+            groupDataTheory = studentDataDfMeanTaskWise[ (studentDataDfMeanTaskWise[constants.GROUPBY_FEATURE] == groupKey)   &
+                        (studentDataDfMeanTaskWise[constants.TASK_TYPE_FEATURE] == 'Theory')  ]
+            if groupDataTheory.shape[0] > 0 :
+                TheorySessionDuration.append( groupDataTheory[  'SessionDuration'  ] )
+            else :
+                TheorySessionDuration.append(0)
+        
+        studentDataDfFeaturesInterpreted = pd.DataFrame(
+            {constants.GROUPBY_FEATURE : GroupId,
+             constants.feature2UserNamesDict.get('PracticeSessionDuration') + featureAdderAvg: PracticeSessionDuration,
+             constants.feature2UserNamesDict.get('TheorySessionDuration') + featureAdderAvg: TheorySessionDuration,
+            })
+            
+        studentDataDfMeanToPlot = studentDataDfMeanToPlot.merge(right= studentDataDfFeaturesInterpreted
+                                          , left_on=constants.GROUPBY_FEATURE, right_on=constants.GROUPBY_FEATURE
+                                            , left_index=False, right_index=False
+                                            , how='inner')
+        
+        studentDataDfMeanToPlot.rename(columns = featuresOverviewAvgNames, inplace=True)
         
         tableMean = getTable(studentDataDfMeanToPlot, schoolKey, False, True, featureAdderAvg)
 
@@ -359,14 +399,53 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                     [constants.GROUPBY_FEATURE], as_index = False).agg([np.std])
         studentDataDfStd.reset_index(level=0, inplace=True)
         studentDataDfStd = studentDataDfStd.round(decimals=2)
+        
+        studentDataDfMeanTaskWise = studentDataDfStudentTaskWiseSum.groupby([constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE], 
+                                        as_index=False).agg([np.std])      
+        studentDataDfMeanTaskWise.fillna(0, inplace=True)  
+        studentDataDfMeanTaskWise.reset_index(level=[0,1], inplace=True)
+        studentDataDfMeanTaskWise = studentDataDfMeanTaskWise[[constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE,
+                                        'SessionDuration']].round(decimals=2) 
+        studentDataDfMeanTaskWise.columns = studentDataDfMeanTaskWise.columns.droplevel(1)
+        
+        GroupId = []
+        PracticeSessionDuration = []
+        TheorySessionDuration = []
+        for groupKey, group in studentDataDfGrouped :
+            GroupId.append(groupKey)
+            
+            groupDataPractice = studentDataDfMeanTaskWise[ (studentDataDfMeanTaskWise[constants.GROUPBY_FEATURE] == groupKey)   &
+                        (studentDataDfMeanTaskWise[constants.TASK_TYPE_FEATURE] == 'Practice')  ]
+            
+            if groupDataPractice.shape[0] > 0 :
+                PracticeSessionDuration.append( groupDataPractice[  'SessionDuration'  ]  )
+            else :
+                PracticeSessionDuration.append(0)
+                
+            groupDataTheory = studentDataDfMeanTaskWise[ (studentDataDfMeanTaskWise[constants.GROUPBY_FEATURE] == groupKey)   &
+                        (studentDataDfMeanTaskWise[constants.TASK_TYPE_FEATURE] == 'Theory')  ]
+            if groupDataTheory.shape[0] > 0 :
+                TheorySessionDuration.append( groupDataTheory[  'SessionDuration'  ] )
+            else :
+                TheorySessionDuration.append(0)
+        
+        studentDataDfFeaturesInterpreted = pd.DataFrame(
+            {constants.GROUPBY_FEATURE : GroupId,
+             constants.feature2UserNamesDict.get('PracticeSessionDuration') + ' std': PracticeSessionDuration,
+             constants.feature2UserNamesDict.get('TheorySessionDuration') + ' std': TheorySessionDuration,
+            })
+        studentDataDfFeaturesInterpreted.columns = pd.MultiIndex.from_product([studentDataDfFeaturesInterpreted.columns, ['']])
+        
+        studentDataDfStd = studentDataDfStd.merge(right= studentDataDfFeaturesInterpreted
+                                          , left_on=constants.GROUPBY_FEATURE, right_on=constants.GROUPBY_FEATURE
+                                            , left_index=False, right_index=False
+                                            , how='inner')
+        
                 
         studentDataDfStd.columns = [" ".join(x) for x in studentDataDfStd.columns.ravel()]
         studentDataDfStd.rename(columns = {
                     constants.GROUPBY_FEATURE + ' '   : constants.GROUPBY_FEATURE
                 }, inplace=True)
-        
-        print('studentDataDfStd.columns')
-        print(studentDataDfStd.columns) 
         
         tableStd = getTable(studentDataDfStd, schoolKey, False, False, ' std')
 

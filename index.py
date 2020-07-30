@@ -21,7 +21,7 @@ from plotly import graph_objs as go
 import math
 
 from app import app
-from apps import overview, groupDetails, custom, home
+from apps import groups, groupDetails, custom, home
 
 from sidebar import sidebar
 
@@ -105,8 +105,8 @@ app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
 def render_page_content(pathname):
     if pathname in ["/", "/Home"]:
         return home.layout
-    if pathname in ["/Overview"]:
-        return overview.layout
+    if pathname in ["/Overview", "/Groups"]:
+        return groups.layout
     elif pathname == "/Details":
         return groupDetails.layout
     elif pathname == "/Custom":

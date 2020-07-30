@@ -177,7 +177,7 @@ def plotSingleClass( titleTextAdd, school ):
         
         
         graphs.append(html.Div(id='Task-Information',
-                               children = [], 
+                               children = [html.H2('Task Information')], 
                     style = {'padding' : '20px',
                              'padding-top' : '100px',
                              'font-size' : 'initial'}))        
@@ -220,11 +220,11 @@ def plotSingleClass( titleTextAdd, school ):
                 columns=[
                     {"name": i, "id": i, "deletable": True, "selectable": True} for i in dfTaskWiseSuccessFail.columns
                 ],
-                data                = dfTaskWiseSuccessFail.to_dict('records'),
-                editable=True,
-                filter_action="native",
-                sort_action="native",
-                sort_mode="multi"
+                data            =   dfTaskWiseSuccessFail.to_dict('records'),
+                editable        =   True,
+                filter_action   =   "native",
+                sort_action     =   "native",
+                sort_mode       =   "multi"
             )
             
         graphs.append(  
@@ -1013,7 +1013,7 @@ def setClassOverview(schoolSelected):
         return html.Div(graphs)
     
 #    graphs = plotClassOverview( format(schoolSelected) )    
-    graphs = plotClassOverview( int(schoolSelected) )    
+#    graphs = plotClassOverview( int(schoolSelected) )    
 
     return  html.Div(graphs)
     

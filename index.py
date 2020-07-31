@@ -6,19 +6,18 @@ Created on Thu Jun 11 18:04:10 2020
 """
 
 # -*- coding: utf-8 -*-
+import pandas as pd
+
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-import pandas as pd
-import flask
 import chart_studio.plotly as py
 import plotly.express as px
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 from plotly import graph_objs as go
-import math
 
 from app import app
 from apps import groups, groupDetails, custom, home
@@ -111,8 +110,6 @@ def render_page_content(pathname):
         return groupDetails.layout
     elif pathname == "/Custom":
         return custom.layout
-    elif pathname == "/page-2/2":
-        return html.P("No way! This is page 2.2!")
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
         [

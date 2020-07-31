@@ -31,17 +31,17 @@ keyScrollTo  = 'scrollTo'
 keyClassName  = 'className'
 
 menuLink = {
-     "Home" : { keyLabel : 'Home', keyHref : '/Home',
+     "menu-link-0" : { keyLabel : 'Home', keyHref : '/Home',
                   keySubmenu : [ ],  keyClassName : 'fas fa-home m-right-small' }
-    , "Groups" : { keyLabel : 'Groups', keyHref : '/Groups',
+    , "menu-link-1" : { keyLabel : 'Groups', keyHref : '/Groups',
                   keySubmenu : [
                           "menu-sub-link-0", "menu-sub-link-1", "menu-sub-link-2"
                           ],  keyClassName : 'fas fa-list m-right-small'   }
-    ,   "Details" : { keyLabel : 'Details', keyHref : '/Details' ,
+    ,   "menu-link-2" : { keyLabel : 'Details', keyHref : '/Details' ,
                   keySubmenu : [
                           "menu-sub-link-3", "menu-sub-link-4", "menu-sub-link-5"
                           ],  keyClassName : 'fas fa-clipboard m-right-small'   }
-    ,   "Custom" : { keyLabel : 'Custom', 'href' : '/Custom' ,
+    ,   "menu-link-3" : { keyLabel : 'Custom', 'href' : '/Custom' ,
                   keySubmenu : [
                           "menu-sub-link-6"
                           ],  keyClassName : 'fas fa-wrench m-right-small'   }
@@ -101,7 +101,7 @@ def getMenu():
                                            size="lg", 
                                            className="mr-1", 
                                            outline=True, color="primary", 
-                                           id="menu-link-" + str(countMenuLink), 
+                                           id= menuKey, 
                                            block=True),
                                 ]),
                     ],
@@ -115,7 +115,7 @@ def getMenu():
         for submenuKey in currentMenu.get(keySubmenu):
             subMenuButtons.append(
                     dbc.Button(menuSubLink2Scroll.get(submenuKey).get('label'), 
-                                       id="menu-sub-link-" + str(countMenuSubLink), 
+                                       id=  submenuKey , 
                                        outline=True, color="primary", 
                                        className="mr-2 w-100", 
                                        block=True),
@@ -126,7 +126,7 @@ def getMenu():
         menus.append( 
                 dbc.Collapse(
                     subMenuButtons,
-                    id="menu-link-" + str(countMenuLink) + "-collapse",
+                    id= menuKey + "-collapse",
                     className="p-left_medium",
                 )
         )
@@ -172,13 +172,11 @@ sidebar = html.Div(
 )
 
 
-#CHANGE THE MENU LINK COUNT WHEN ADDING A NEW MENU
 menuLinksCount      =   len(menuLink.keys())  
-menuSubLinksCount   =   len(menuSubLink2Scroll.keys())
 @app.callback(
-    [Output(f"menu-link-{i}-collapse", "is_open") for i in range(menuLinksCount)],
-    ([Input(f"menu-link-{i}", "n_clicks") for i in range(menuLinksCount) ] + [ Input("url", "pathname")]),
-    [State(f"menu-link-{i}-collapse", "is_open") for i in range(menuLinksCount)],
+    [Output(f"{i}-collapse", "is_open") for i in menuLink],
+    ([Input(f"{i}", "n_clicks") for i in menuLink ] + [ Input("url", "pathname")]),
+    [State(f"{i}-collapse", "is_open") for i in menuLink],
 )
 def toggle_accordion(*args):
     ctx = dash.callback_context
@@ -197,7 +195,7 @@ def toggle_accordion(*args):
             newToggle[0] = True 
         else :
             for index, menuLinkKey in enumerate(list(menuLink.keys())):
-                if args[menuLinksCount ].lower() in '/' + menuLinkKey.lower():
+                if args[ menuLinksCount ].lower()   in  menuLink.get(menuLinkKey).get(keyHref).lower():
                     newToggle[index] = True   
         
         return newToggle
@@ -214,8 +212,8 @@ def toggle_accordion(*args):
 
 
 
-@app.callback(  [ Output(f"menu-link-{i}", "className") for i in range(menuLinksCount) ], 
-                 [Input(f"menu-link-{i}-collapse", "is_open") for i in range(menuLinksCount)] )
+@app.callback(  [ Output(f"{i}", "className") for i in menuLink ], 
+                 [Input(f"{i}-collapse", "is_open") for i in menuLink] )
 def setMenuClassOnChangeOpen(*args):   
     return  np.where(args,"open highlight",'').tolist()
 
@@ -224,7 +222,7 @@ def setMenuClassOnChangeOpen(*args):
 
 
 @app.callback ( Output("menu-sub-link-input", "value") , 
-              [Input(f"menu-sub-link-{j}", "n_clicks")   for j in range(menuSubLinksCount) ])
+              [Input(f"{j}", "n_clicks")   for j in menuSubLink2Scroll ])
 def changeMenuSetInput(*args):
     ctx = dash.callback_context
     newValue = ""

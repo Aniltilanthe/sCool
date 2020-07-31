@@ -42,7 +42,7 @@ SIDEBAR_STYLE = {
 }
 
 
-MENU_BUTTON_STYLE = {     
+MENU_BUTTON_STYLE = {
     'width': '100%'
 }
 
@@ -110,7 +110,7 @@ TaskTypeTheory                      = "Theory "
 
 #User understandable Column names
 feature2UserNamesDict = {
-		"Attempts" : "Attempts (total)"
+		"Attempts" : "Attempts"
 		,"PracticeTaskId" : "Practice Task Id"
 		,"Points" : "Points"
 		,"ConceptsUsed" : 'Concept Used'
@@ -167,8 +167,8 @@ feature2UserNamesDict = {
 		,"hasComprehensions" : "Used Comprehensions in Code"
 		,"hasSubscripting" : "Used Subscription in Code"
         
-		,"PracticeSessionDuration" : "Time Practice Tasks(s)"
-		,"TheorySessionDuration" : "Time Theory Tasks(s)"
+		,"PracticeSessionDuration" : "Session D. Practice(s)"
+		,"TheorySessionDuration" : "Session D. Theory(s)"
         ,"SessionDuration" : "Session Duration(s)"
         ,COUNT_STUDENT_FEATURE : "No. of Students"
         
@@ -180,7 +180,7 @@ feature2UserNamesDict[featurePracticeTaskDesc] = "Practice Task"
 feature2UserNamesDict[featureTheoryTaskDesc] = "Theory Task"
 feature2UserNamesDict[featureTaskDesc] = "Task"
 feature2UserNamesDict[featureTaskType] = "Task Type"
-feature2UserNamesDict[featureItemsCollectedCount] = "Items Collected Count"
+feature2UserNamesDict[featureItemsCollectedCount] = "No. Items Collected"
 feature2UserNamesDict[featureRobotCollisionsBoxCount] = "Robot box collision Count"
 feature2UserNamesDict[featureConceptsUsedDetailsStr] = "Concepts used details"
 

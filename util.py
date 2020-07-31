@@ -4,6 +4,12 @@ Created on Thu Jul 30 23:15:55 2020
 
 @author: tilan
 """
+import numpy as np
+import pandas as pd
+from dateutil.parser import parse
+from six.moves.urllib.parse import quote
+
+
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -12,13 +18,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 
-
-import numpy as np
-import pandas as pd
 import dash_table
 import math
 
-
+#---------------------------------- UI ------------------------------------
 def generateCardBase(label, value):
     return html.Div(
         [
@@ -106,6 +109,12 @@ def generateCardDetail2(label, value1 = '', value2 = '',
         ],
         className="c-card card-detail-2",
     )
+                
+                
+#----------------------------- UI END ----------------------------------------
+                
+
+#-------------------------------------------------------------------------
                       
 
 millnames = ["", " K", " M", " B", " T"] # used to convert numbers
@@ -161,4 +170,21 @@ def seconds_2_dhms(time, isLong = False):
             result = "%02d:%02d:%02d" % (hours, minutes, seconds)
             
     return result
-            
+
+
+
+def get_download_link_data_uri(df):
+    if df is None:
+        return ''
+    
+    csv_string = df.to_csv(index=False, encoding='utf-8')
+    csv_string = "data:text/csv;charset=utf-8,%EF%BB%BF" + quote(csv_string)
+    return csv_string
+
+
+def is_valid_date(dateStr):
+    try:
+        parse(dateStr)
+        return True
+    except ValueError:
+        return False

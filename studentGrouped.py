@@ -39,10 +39,11 @@ dfGroupedOriginal                       = studentGroupedPerformance.dfGroupedOri
 dfPlayerStrategyPractice                = studentGroupedPerformance.dfPlayerStrategyPractice  
 dfGroupedPracticeTaskWise               = studentGroupedPerformance.dfGroupedPracticeTaskWise
 #dfGroupedPracticeDB  = studentGroupedPerformance.dfPractice.groupby(  [studentGroupedPerformance.dfPractice['CreatedAt'].dt.date] )
-dfGroupedPracticeDB         = studentGroupedPerformance.dfPractice.groupby(  [studentGroupedPerformance.dfPractice[constants.GROUPBY_FEATURE]] )
+dfGroupedPracticeDB                     = studentGroupedPerformance.dfPractice.groupby(  [studentGroupedPerformance.dfPractice[constants.GROUPBY_FEATURE]] )
 
 
-dfRuns                      = studentGroupedPerformance.dfRuns
+dfRuns                                  = studentGroupedPerformance.dfRuns
+dfRuns[constants.featureTaskType]       = constants.TaskTypePractice
         
 
 dfPlayerStrategyTheory = pd.concat([studentGroupedPerformanceTheory.dfPlayerStrategyNN, studentGroupedPerformanceTheory.dfPlayerStrategyN], ignore_index=True, sort =False)
@@ -124,14 +125,14 @@ def getDescription(df) :
     df[featureDescription] = df[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Result')) + '</b>: ' + df['Result'].astype(str)
     df[featureDescription] = df[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Attempts')) + '</b>: ' + df['Attempts'].astype(str)
     
-    if df[constants.TASK_TYPE_FEATURE] == 'Theory':
+    if df[constants.TASK_TYPE_FEATURE] == constants.TaskTypeTheory :
         if constants.featureItemsCollectedCount in df.columns:
             df[featureDescription] = df[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get(constants.featureItemsCollectedCount)) + '</b>: ' + df[constants.featureItemsCollectedCount].astype(str)
         
         if constants.featurePlayerShootEndEnemyHitCount in df.columns:
             df[featureDescription] = df[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get(constants.featurePlayerShootEndEnemyHitCount)) + '</b>: ' + df[constants.featurePlayerShootEndEnemyHitCount].astype(str)
     
-    if df[constants.TASK_TYPE_FEATURE] == 'Practice':
+    if df[constants.TASK_TYPE_FEATURE] == constants.TaskTypePractice :
         if constants.featureConceptsUsedDetailsStr in df.columns:
             df[featureDescription] = df[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get(constants.featureConceptsUsedDetailsStr)) + '</b>: ' + df[constants.featureConceptsUsedDetailsStr].astype(str)
         if constants.featureLineOfCodeCount in df.columns:    
@@ -179,24 +180,6 @@ def getStudentsOfSchool(groupSelected):
         
     students = list(dfStudentDetails[dfStudentDetails['GroupId'] == groupSelected]['StudentId'].unique())
     
-#    try :
-#        studentWiseData = dfGroupedOriginal.get_group(groupSelected)
-#        students = studentWiseData['StudentId'].unique()
-#        students = list(students)   
-#    except Exception as e: 
-#        print(e)
-#    
-#    try :
-#        groupOriginalTheory = dfGroupedPlayerStrategyTheory.get_group(groupSelected)
-#        studentsTheory = groupOriginalTheory['StudentId'].unique()
-#        studentsTheory = list(studentsTheory)
-#        
-#        students = students + studentsTheory        
-#    except Exception as e: 
-#        print(e)
-#    
-#    students = list(set(students))
-    
     return students
 
 #get students DataFrame a group
@@ -204,8 +187,8 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
     
     if not(isOriginal) and groupSelected in dfGroupedPractice.groups.keys():
         schoolPractice = dfGroupedPractice.get_group(groupSelected)
-        schoolPractice['TaskId']        = 'Practice' + schoolPractice['PracticeTaskId'].astype(str)
-        schoolPractice[constants.TASK_TYPE_FEATURE]      = 'Practice'
+        schoolPractice['TaskId']        = constants.TaskTypePractice + schoolPractice['PracticeTaskId'].astype(str)
+        schoolPractice[constants.TASK_TYPE_FEATURE]      = constants.TaskTypePractice
     
         schoolPractice = schoolPractice.loc[:,~schoolPractice.columns.duplicated()]     
 
@@ -220,10 +203,9 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
     
     if groupSelected in dfGroupedPlayerStrategyTheory.groups.keys():
         schoolTheory = dfGroupedPlayerStrategyTheory.get_group(groupSelected)
-        schoolTheory['TaskId']      = 'Theory' + schoolTheory['TheoryTaskId'].astype(str)
-        schoolTheory[constants.TASK_TYPE_FEATURE]    = 'Theory' 
-        print('2 schoolTheory in studentGrouped')  
-        print(schoolTheory)   
+        schoolTheory['TaskId']      =  constants.TaskTypeTheory + schoolTheory['TheoryTaskId'].astype(str)
+        schoolTheory[constants.TASK_TYPE_FEATURE]    =  constants.TaskTypeTheory 
+        
         schoolTheory = schoolTheory.loc[:,~schoolTheory.columns.duplicated()]          
         schoolTheory[featureDescription] = getTheoryDescription(schoolTheory)    
         
@@ -240,11 +222,9 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
     
     
     if 'studentDF' in locals()     and    studentDF is not None :
-        print('getStudentsOfSchoolDF studentDF.columns')
-        print(studentDF.columns)
         
         if len(groupStudents) > 0:
-            studentDF[constants.GROUPBY_FEATURE]    =     groupSelected 
+            studentDF[constants.GROUPBY_FEATURE]            =     groupSelected 
             studentDF[constants.COUNT_STUDENT_FEATURE]      =     len(groupStudents) 
             
             if 'ConceptsUsedGroup' in studentDF.columns :

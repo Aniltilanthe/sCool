@@ -23,6 +23,7 @@ from app import app
 
 import studentGrouped
 import constants
+import util
 
 #--------------------- school selection START ----------------------
 GroupSelector_options = studentGrouped.GroupSelector_options 
@@ -242,9 +243,15 @@ layout = [
                     ],
                 ),
         ),
-    ]),
+    ])
 
-    html.Div(id='custom-main-container', className = "row custom-main-container" )
+    , html.Div(id='custom-main-container', className = "row custom-main-container" )
+    
+    , html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),
+                       "download data",], 
+                    id = "custom_download_main_link", className = "hidden" ,
+                                               href="", target="_blank",
+                                               download='data.csv' )
 ]
 
 
@@ -302,3 +309,21 @@ def update_bar(n_clicks, groupMain, selectedFeature, selectedAxis, selectedFigur
                 graphs = graphs + containerChildren.get('props').get('children')
 
     return  graphs
+
+
+
+
+
+@app.callback(
+    [ Output('custom_download_main_link', 'href'),
+     Output('custom_download_main_link', 'className'),
+     ],
+    [ Input("group-selector-main", "value") ],
+)
+def update_download_link_custom_group(groupMain):
+    if groupMain is None or not int(groupMain) >= 0 or groupMain == "":
+        return "", "hidden"
+    
+    csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfSchoolDF(int(groupMain)) )
+    return csv_string, ""
+

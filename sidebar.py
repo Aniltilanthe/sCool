@@ -30,8 +30,9 @@ keyClassName  = 'className'
 
 menuLink = {
      "menu-link-0" : { keyLabel : 'Home', keyHref : '/Home',
-                  keySubmenu : [ ],  keyClassName : 'fas fa-home m-right-small' }
-    , "menu-link-1" : { keyLabel : 'Groups', keyHref : '/Groups',
+                  keySubmenu : [ 
+                          ],  keyClassName : 'fas fa-home m-right-small' }
+    ,   "menu-link-1" : { keyLabel : 'Groups', keyHref : '/Groups',
                   keySubmenu : [
                           "menu-sub-link-0", "menu-sub-link-1", "menu-sub-link-2"
                           ],  keyClassName : 'fas fa-list m-right-small'   }
@@ -40,11 +41,12 @@ menuLink = {
                           "menu-sub-link-3", "menu-sub-link-7", "menu-sub-link-4"
                           ],  keyClassName : 'fas fa-clipboard m-right-small'   }
     ,   "menu-link-3" : { keyLabel : 'Students', keyHref : '/Students' ,
-                  keySubmenu : [ "menu-sub-link-5"  ],  keyClassName : 'fas fa-clipboard m-right-small'   }
+                  keySubmenu : [ "menu-sub-link-5"  
+                          ],  keyClassName : 'fas fa-user-graduate m-right-small'   }
     ,   "menu-link-4" : { keyLabel : 'Custom', 'href' : '/Custom' ,
                   keySubmenu : [
                           "menu-sub-link-6"
-                          ],  keyClassName : 'fas fa-user-graduate m-right-small'   }
+                          ],  keyClassName : 'fas fa-wrench m-right-small'   }
 }
 menuSubLink2Scroll = {
 		"menu-sub-link-0"  :  {keyLabel : "Overview", keyScrollTo: ''}

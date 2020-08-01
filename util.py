@@ -20,6 +20,132 @@ import plotly.figure_factory as ff
 
 import dash_table
 import math
+import constants
+
+
+
+
+
+#-----------------------------------
+
+def plotGroupOverview(groupSelected, groupStudents, studentDataDf):
+    plots = []
+    
+    plotRow = []
+    
+    plotRow.append( html.Div([],
+                            className="col-sm-3",
+                    ))
+    plotRow.append( html.Div([
+                                generateCardBase('No of Students', len(groupStudents))
+                            ],
+                            className="col-sm-6",
+                    ))
+    plots.append(
+            html.Div(children  = plotRow,                
+                     className = "row")
+    )
+
+    plotRow = []    
+    plotRow.append(
+            html.Div([
+                   generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
+                                        '' + seconds_2_dhms(studentDataDf[constants.featureSessionDuration].sum().round(decimals=2)), 
+                                        '' + str(studentDataDf[constants.featureSessionDuration].mean().round(decimals=2)) + 's', 
+                                        '' + str(studentDataDf[constants.featureSessionDuration].std().round(decimals=2)) + 's', 
+                                        'total',
+                                        'mean',
+                                        'std',
+                                        )
+                ],
+                className="col-sm-4",
+            ))
+    plotRow.append(
+            html.Div([
+                   generateCardDetail2([html.I(className="fas fa-clock m-right-small"),   'Game Time - Practice vs Theory'], 
+                                        '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice  ][
+                                                'SessionDuration'].sum().round(decimals=2)), 
+                                        '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypeTheory ][
+                                                'SessionDuration'].sum().round(decimals=2)), 
+                                        constants.TaskTypePractice,
+                                        constants.TaskTypeTheory
+                                        )
+                ],
+                className="col-sm-4",
+            ))
+    plotRow.append(
+            html.Div([
+                   generateCardDetail('Points', 
+                                        '' + millify(studentDataDf['Points'].sum().round(decimals=2)), 
+                                        '' + str(studentDataDf['Points'].mean().round(decimals=2)), 
+                                        '' + str(studentDataDf['Points'].std().round(decimals=2)), 
+                                        'total',
+                                        'mean',
+                                        'std',
+                                        )
+                ],            
+                className="col-sm-4",
+            ))
+            
+    plots.append(
+            html.Div(children  = plotRow,                
+                     className = "row")
+    )
+    
+    return plots
+
+
+def plotStudentOverview(studentDataDf):
+    plots = []
+    
+    plotRow = []    
+    plotRow.append(
+            html.Div([
+                   generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
+                                        '' + seconds_2_dhms(studentDataDf[constants.featureSessionDuration].sum().round(decimals=2)), 
+                                        '' + str(studentDataDf[constants.featureSessionDuration].mean().round(decimals=2)) + 's', 
+                                        '' + str(studentDataDf[constants.featureSessionDuration].std().round(decimals=2)) + 's', 
+                                        'total',
+                                        'mean',
+                                        'std',
+                                        )
+                ],
+                className="col-sm-4",
+            ))
+    plotRow.append(
+            html.Div([
+                   generateCardDetail2([html.I(className="fas fa-clock m-right-small"),   'Game Time - Practice vs Theory'], 
+                                        '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice  ][
+                                                constants.featureSessionDuration].sum().round(decimals=2)), 
+                                        '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypeTheory ][
+                                                constants.featureSessionDuration].sum().round(decimals=2)), 
+                                        constants.TaskTypePractice,
+                                        constants.TaskTypeTheory
+                                        )
+                ],
+                className="col-sm-4",
+            ))
+    plotRow.append(
+            html.Div([
+                   generateCardDetail('Points', 
+                                        '' + millify(studentDataDf['Points'].sum().round(decimals=2)), 
+                                        '' + str(studentDataDf['Points'].mean().round(decimals=2)), 
+                                        '' + str(studentDataDf['Points'].std().round(decimals=2)), 
+                                        'total',
+                                        'mean',
+                                        'std',
+                                        )
+                ],            
+                className="col-sm-4",
+            ))
+            
+    plots.append(
+            html.Div(children  = plotRow,                
+                     className = "row")
+    )
+    
+    return plots
+
 
 #---------------------------------- UI ------------------------------------
 def generateCardBase(label, value):
@@ -188,3 +314,10 @@ def is_valid_date(dateStr):
         return True
     except ValueError:
         return False
+    
+    
+    
+    
+    
+    
+    

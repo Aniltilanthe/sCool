@@ -180,9 +180,8 @@ def plotSingleClass( titleTextAdd, school ):
         
         graphs.append(html.Div(id='Task-Information',
                                children = [html.H2('Task Information')], 
-                    style = {'padding' : '20px',
-                             'padding-top' : '100px',
-                             'font-size' : 'initial'}))        
+                               className = "c-container p_medium p-top_xx-large", 
+                    ))        
 
 #---------------------------        Datatable task wise success fail    ---------------------------
         dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', 'Success', 'Others', 'Type', 'TaskId'])
@@ -485,6 +484,12 @@ def plotGroupConceptDetails(groupId):
     
     graphs = []
     
+    
+    
+    graphs.append(html.Div(id='Concept-Information',
+                           children = [html.H2('Concept Information')], 
+                           className = "c-container p_medium p-top_xx-large", 
+                ))   
       
     try :
         groupPractice = dfGroupedPractice.get_group(groupId)
@@ -557,9 +562,71 @@ def plotGroupConceptDetails(groupId):
     return graphs        
 
 
+def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False):
+    graphs = []
+#                            fig = px.scatter(studentWiseData
+#                                                , x             = featuresPractice[first]
+#                                                , y             = featuresPractice[second]
+#                                                , title         = '(Practice) Details of students ' + titleFirst
+#                                                , labels        = feature2UserNamesDict # customize axis label
+#                                                , template      = constants.graphTemplete                              
+#                                                , orientation   = 'h'
+#                                                , hover_name    =  "Name"
+#                                                , hover_data    =  hoverDataPractice
+#                                                , marginal_x    = "box"
+#                                                , height        =   constants.graphHeight 
+#                                )
+    
+    if isColored:
+        fig = px.bar( df
+            , x             =  featureX
+            , y             =  featureY
+            , title         = title
+            , labels        = feature2UserNamesDict # customize axis label
+            , template      = constants.graphTemplete                              
+            , orientation   = 'h'
+            , hover_name    =  "Name"
+            , hover_data    =  hoverData
+            , color         = constants.featureTaskType
+            , color_discrete_sequence = [constants.colorTheory, constants.colorPractice ]
+        )
+        
+    else:    
+        fig = px.bar( df
+            , x             =  featureX
+            , y             =  featureY
+            , title         = title
+            , labels        = feature2UserNamesDict # customize axis label
+            , template      = constants.graphTemplete                              
+            , orientation   = 'h'
+            , hover_name    =  "Name"
+            , hover_data    =  hoverData
+        )
+                    
+    
+    graphs.append(
+            dcc.Graph(
+                figure = fig
+        ))
+    figMean = df.mean().round(decimals=2)[featureX]
+    figStd = df.std().round(decimals=2)[featureX]
+    graphs.append(
+            html.Div(children=[
+                    html.P('Mean = ' + str(figMean) ),
+                    html.P('Std. = ' + str(figStd) ),
+                    ])
+    )
+    return graphs
+
+
 def plotSingleClassGeneral( titleTextAdd, school ):
     
     graphs = []
+    
+    graphs.append(html.Div(id='General-Information',
+                       children = [html.H2('General Information')], 
+                       className = "c-container p_medium p-top_xx-large", 
+            ))   
     
       
     featuresPractice            = dfPlayerStrategyPractice.columns
@@ -649,57 +716,35 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                         if ([featuresPractice[first], featuresPractice[second]] in  featurePairsToPlotTheory):  
                             
                             
-                            fig = px.bar( studentWiseData
-                                , x             =  featuresPractice[first]
-                                , y             =  featuresPractice[second]
-                                , title         = '(Practice) Details of students ' + titleFirst
-                                , labels        = feature2UserNamesDict # customize axis label
-                                , template      = constants.graphTemplete                              
-                                , orientation   = 'h'
-                                , hover_name    =  "Name"
-                                , hover_data    =  hoverDataPractice
-                                , marginal    =  "box" 
-                            )
                             graphs.append(
-                                    dcc.Graph(
-                                        figure = fig
-                                ))
+                                    html.Div(
+                                            children= 
+                                            getFeaturePlot(studentWiseData, featuresPractice[first], featuresPractice[second], 
+                                                                   '(Practice) Details of students ' + titleFirst,
+                                                                   hoverDataPractice)
+                                    )
+                            )                            
                             
-                            fig = px.bar( studentWiseDataTheory
-                                , x             =  featuresPractice[first]
-                                , y             =  featuresPractice[second]
-                                , title         = '(Theory) Details of students ' + titleFirst
-                                , labels        = feature2UserNamesDict # customize axis label
-                                , template      = constants.graphTemplete                              
-                                , orientation   = 'h'
-                                , hover_name    =  "Name"
-                                , hover_data    =  hoverDataTheory
-                                , color         = constants.featureTaskType
-                                , color_discrete_sequence = [constants.colorTheory]
-                                , marginal    =  "box" 
-                            )                                                       
+                            
                             graphs.append(
-                                    dcc.Graph(
-                                        figure = fig
-                                ))
+                                    html.Div(
+                                            children= 
+                                            getFeaturePlot(studentWiseDataTheory, featuresPractice[first], featuresPractice[second], 
+                                                                   '(Theory) Details of students ' + titleFirst,
+                                                                   hoverDataTheory, True)
+                                    )
+                            )
                          
 #    Graphs only for PRACTICE
-                        if ([featuresPractice[first], featuresPractice[second]] not in  featurePairsToPlotTheory):     
-                            fig = px.bar( studentWiseData
-                                , x             =  featuresPractice[first]
-                                , y             =  featuresPractice[second]
-                                , title         = '(Practice) Details of students ' + titleFirst
-                                , labels        = feature2UserNamesDict # customize axis label
-                                , template      = constants.graphTemplete                              
-                                , orientation   = 'h'
-                                , hover_name  =  "Name"
-                                , hover_data  =  hoverDataPractice
-                                , marginal    =  "box" 
-                            )
+                        if ([featuresPractice[first], featuresPractice[second]] not in  featurePairsToPlotTheory):    
                             graphs.append(
-                                    dcc.Graph(
-                                        figure = fig
-                                ))
+                                    html.Div(
+                                            children= 
+                                            getFeaturePlot(studentWiseData, featuresPractice[first], featuresPractice[second], 
+                                                                   '(Practice) Details of students ' + titleFirst,
+                                                                   hoverDataPractice)
+                                    )
+                            )
     
 #    Graphs only for THEORY
         for rowTheory in featurePairsToPlotTheory : 
@@ -711,23 +756,15 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                     if rowTheory[0] in feature2UserNamesDict:
                         titleFirst = feature2UserNamesDict.get(rowTheory[0])
                     
-                    fig = px.bar( studentWiseDataTheory
-                                , x             =  rowTheory[0]
-                                , y             =  rowTheory[1] 
-                                , title         = '(Theory) Details of students ' + titleFirst
-                                , labels        = feature2UserNamesDict # customize axis label
-                                , template      = constants.graphTemplete                              
-                                , orientation   = 'h'
-                                , hover_name  =  "Name"
-                                , hover_data   =  hoverDataTheory
-                                , color         = constants.featureTaskType
-                                , color_discrete_sequence = [constants.colorTheory]
-                                , marginal_x    =  "box" 
-                            )
                     graphs.append(
-                            dcc.Graph(
-                                figure = fig
-                        ))
+                                    html.Div(
+                                            children= 
+                                            getFeaturePlot(studentWiseDataTheory, rowTheory[0], rowTheory[1] , 
+                                                                   '(Theory) Details of students ' + titleFirst,
+                                                                   hoverDataTheory, True)
+                                    )
+                    )
+                    
                 except Exception as e: 
                     print(e)
 
@@ -806,6 +843,15 @@ def plotClassOverview(schoolKey):
     return graphs
 
 
+def plotGroupOverview(groupId):
+    
+    groupStudents     =  getStudentsOfSchool(groupId)
+    studentDataDf     =  studentGrouped.getStudentsOfSchoolDF(groupId)
+    
+    plots = util.plotGroupOverview(groupId, groupStudents, studentDataDf)
+    
+    return plots
+
 
 #-----------------------------------------
 # Layout-------------------------
@@ -831,25 +877,9 @@ layout = [
     
     , dbc.Row([
             dbc.Col( 
-                    html.Div(id='Concept-Information',
-                               children = [
-                                           html.H3('Concept Used'),
-                                           ], 
-                   className = "c-container p_medium p-top_xx-large", )
-       )])
-    , dbc.Row([
-            dbc.Col( 
                 html.Div(id='Details-Group-Concept-Container')
        )])
-    
-    , dbc.Row([
-            dbc.Col( 
-                    html.Div(id='General-Information',
-                               children = [
-                                           html.H3('General Information'),
-                                           ], 
-                   className = "c-container p_medium p-top_xx-large", )
-       )])
+                    
     , dbc.Row([
             dbc.Col( 
                 html.Div(id='Details-Group-General-Container')
@@ -902,13 +932,16 @@ def display_class_concept(schoolSelected):
 #----------------------------------------
 
 @app.callback(Output('Details-Group-Overview-Container', 'children'), [Input('group-selector-main', 'value')])
-def setClassOverview(schoolSelected):
+def setClassOverview(groupMain):
     graphs = []
 
-    if schoolSelected is None or not int(schoolSelected) >= 0:
+    if groupMain is None or not int(groupMain) >= 0:
         return html.Div(graphs)
     
-    graphs = plotClassOverview( int(schoolSelected) )    
+    graphs =    plotGroupOverview(int(groupMain))  
+    
+    graphs =  graphs + plotClassOverview( int(groupMain) )    
+    
 
     return  html.Div(graphs)
     

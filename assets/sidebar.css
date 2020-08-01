@@ -107,6 +107,15 @@ html {
 .m-right-large {
 	margin-right: 3rem;
 }
+.m_small {
+	margin: 1rem;	
+}
+.m_medium {
+	margin: 2rem;	
+}
+.m_large {
+	margin: 3rem;	
+}
 
 .font-size_small {
 	font-size: 1em;

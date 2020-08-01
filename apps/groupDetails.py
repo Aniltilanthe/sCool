@@ -576,74 +576,6 @@ def plotSingleClassGeneral( titleTextAdd, school ):
             print(e)
         
         
-        
-#    #        sum - to get count of students who used the concept
-#        studentWiseDataConcepts = groupPractice.sum()
-#               
-#        colY = hasFeatures
-#       
-#        studentWiseDataConcepts = pd.DataFrame(studentWiseDataConcepts)
-#        studentWiseDataConcepts[featureY] = studentWiseDataConcepts.index
-#        studentWiseDataConcepts = studentWiseDataConcepts.rename(columns={0: featureX})
-#        studentWiseDataConcepts.drop(studentWiseDataConcepts[~studentWiseDataConcepts[featureY].isin(colY)].index, inplace = True)
-#        
-#        studentWiseDataConcepts[featureY] = studentWiseDataConcepts[featureY].astype(str)
-#        studentWiseDataConcepts[featureY] = studentWiseDataConcepts[featureY].replace(
-#                feature2UserNamesDict, regex=True)
-#        
-#        
-#        figBar = px.bar(studentWiseDataConcepts
-#                            , x             =   featureX
-#                            , y             =   featureY
-#                            , orientation   =  'h'
-#                            , height        =   constants.graphHeight - 100
-#                            , template      =   constants.graphTemplete   
-#                            , title         =   "(Practice) Concepts used by students of this class (no. of times students used a concept in code)"
-#                            , labels        =   feature2UserNamesDict # customize axis label
-#            )
-#        graphs.append(
-#                dcc.Graph(
-#                    figure= figBar
-#            ))
-#        
-##        Task wise concepts used - grouped together
-#        try :
-#            figBar = plotGroupTaskWiseConcepts(school, True)
-#            graphs.append(
-#                    dcc.Graph(
-#                        figure= figBar
-#                ))
-#
-#            graphs.append(  html.Div([
-#                    dbc.Button(
-#                        "Show Task Wise Concept Used",
-#                        id          = "collapse-taskwise-concept-button",
-#                        color       = "primary",
-#                        n_clicks    = 0
-#                    ),
-#                    dbc.Tooltip(
-#                        "Click to View/Hide",
-#                        target      = "collapse-taskwise-concept-button",
-#                        style       = { 'font-size' : 'initial'  }
-#                    ),
-#                    dbc.Collapse(
-#                        children = [] ,
-#                        id = "collapse-taskwise-concept",
-#                        is_open = False
-#                    ),
-#                ] ,
-#                className = "c-container"
-#            ))
-#            
-#        except Exception as e: 
-#                print('Task Concepts used')
-#                print(e)
-#                
-#                
-                
-        
-        
-        
         #            2. other features    
         #   Combined Plots         
         
@@ -671,6 +603,7 @@ def plotSingleClassGeneral( titleTextAdd, school ):
         
         
         studentWiseData[featureDescription] = getPracticeDescription(studentWiseData)
+        studentWiseData[constants.featureTaskType] = constants.TaskTypePractice
         
         
         
@@ -690,6 +623,7 @@ def plotSingleClassGeneral( titleTextAdd, school ):
 #            studentWiseDataTheory['Attempts'] = studentWiseDataTheory['StudentId'].map(studentWiseDataTheoryMean.set_index('StudentId')['Attempts'])
             
             studentWiseDataTheory[featureDescription] = getTheoryDescription(studentWiseDataTheory)
+            studentWiseDataTheory[constants.featureTaskType] = constants.TaskTypeTheory
             
         except Exception as e: 
                 print(e)
@@ -722,8 +656,9 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                 , labels        = feature2UserNamesDict # customize axis label
                                 , template      = constants.graphTemplete                              
                                 , orientation   = 'h'
-                                , hover_name  =  "Name"
+                                , hover_name    =  "Name"
                                 , hover_data    =  hoverDataPractice
+                                , marginal    =  "box" 
                             )
                             graphs.append(
                                     dcc.Graph(
@@ -737,9 +672,12 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                 , labels        = feature2UserNamesDict # customize axis label
                                 , template      = constants.graphTemplete                              
                                 , orientation   = 'h'
-                                , hover_name  =  "Name"
-                                , hover_data   =  hoverDataTheory
-                            )
+                                , hover_name    =  "Name"
+                                , hover_data    =  hoverDataTheory
+                                , color         = constants.featureTaskType
+                                , color_discrete_sequence = [constants.colorTheory]
+                                , marginal    =  "box" 
+                            )                                                       
                             graphs.append(
                                     dcc.Graph(
                                         figure = fig
@@ -756,6 +694,7 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                 , orientation   = 'h'
                                 , hover_name  =  "Name"
                                 , hover_data  =  hoverDataPractice
+                                , marginal    =  "box" 
                             )
                             graphs.append(
                                     dcc.Graph(
@@ -781,6 +720,9 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                 , orientation   = 'h'
                                 , hover_name  =  "Name"
                                 , hover_data   =  hoverDataTheory
+                                , color         = constants.featureTaskType
+                                , color_discrete_sequence = [constants.colorTheory]
+                                , marginal_x    =  "box" 
                             )
                     graphs.append(
                             dcc.Graph(

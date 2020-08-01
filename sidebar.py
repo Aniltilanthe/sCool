@@ -10,8 +10,6 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State, ClientsideFunction
-import visdcc
-import dash_dangerously_set_inner_html
 
 
 from app import app
@@ -39,8 +37,7 @@ menuLink = {
                           ],  keyClassName : 'fas fa-list m-right-small'   }
     ,   "menu-link-2" : { keyLabel : 'Details', keyHref : '/Details' ,
                   keySubmenu : [
-                          "menu-sub-link-3", "menu-sub-link-4"
-#                          , "menu-sub-link-5"
+                          "menu-sub-link-3", "menu-sub-link-7", "menu-sub-link-4"
                           ],  keyClassName : 'fas fa-clipboard m-right-small'   }
     ,   "menu-link-3" : { keyLabel : 'Students', keyHref : '/Students' ,
                   keySubmenu : [ "menu-sub-link-5"  ],  keyClassName : 'fas fa-clipboard m-right-small'   }
@@ -55,6 +52,7 @@ menuSubLink2Scroll = {
 		,"menu-sub-link-2" :  {keyLabel : "Distribution", keyScrollTo: "Group-Distribution-Information"}
 		,"menu-sub-link-3" :  {keyLabel : "Tasks Info", keyScrollTo: 'Task-Information'}
 		,"menu-sub-link-4" :  {keyLabel : "General Info", keyScrollTo: 'General-Information'}
+		,"menu-sub-link-7" :  {keyLabel : "Concept Info", keyScrollTo: 'Concept-Information'}
 		,"menu-sub-link-5" :  {keyLabel : "Student Info", keyScrollTo: 'Student-Information'}
 		,"menu-sub-link-6" :  {keyLabel : "Custom", keyScrollTo: ''}
 	}

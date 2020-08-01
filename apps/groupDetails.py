@@ -71,6 +71,7 @@ featurePairsToPlotSingle = [
 
 featurePairsToPlotTheory = [
         ['playerShootEndEnemyHitCount', 'Name']
+        , ['Points', 'Name']  
         , ['SessionDuration', 'Name']  
         , ['Attempts', 'Name']  
         ]
@@ -307,19 +308,42 @@ def plotSingleClass( titleTextAdd, school ):
         
     #            CHECKED
     #            count of tasks completed by each student    
-        studentWiseDataOriginalTaskPerformed = groupOriginal
-        studentWiseDataOriginalTaskPerformed[featureTaskDesc] = studentWiseDataOriginalTaskPerformed['Title'] + ' (Id: ' + studentWiseDataOriginalTaskPerformed['PracticeTaskId'].astype(str) + ')' 
-        studentWiseDataOriginalTaskPerformed = studentWiseDataOriginalTaskPerformed [ studentWiseDataOriginalTaskPerformed['Result'] == 1][['StudentId', 'PracticeTaskId'
-                      , 'Result', 'Name', featureTaskDesc]].groupby(
-                      ['StudentId', 'Name']).agg({'PracticeTaskId': ['nunique'], featureTaskDesc: ['unique']})
-        studentWiseDataOriginalTaskPerformed = studentWiseDataOriginalTaskPerformed.reset_index()
-        studentWiseDataOriginalTaskPerformed.rename(columns={'PracticeTaskId': countTaskCompletedByStudentFeature}, inplace=True)
-        studentWiseDataOriginalTaskPerformed.columns = studentWiseDataOriginalTaskPerformed.columns.droplevel(1)
+        graphTitle = '(Practice) Count of tasks completed by students'
+        try: 
+            studentWiseDataOriginalTaskPerformed = groupOriginal
+            studentWiseDataOriginalTaskPerformed[featureTaskDesc] = studentWiseDataOriginalTaskPerformed['Title'] + ' (Id: ' + studentWiseDataOriginalTaskPerformed['PracticeTaskId'].astype(str) + ')' 
+            studentWiseDataOriginalTaskPerformed = studentWiseDataOriginalTaskPerformed [ studentWiseDataOriginalTaskPerformed['Result'] == 1][['StudentId', 'PracticeTaskId'
+                          , 'Result', 'Name', featureTaskDesc]].groupby(
+                          ['StudentId', 'Name']).agg({'PracticeTaskId': ['nunique'], featureTaskDesc: ['unique']})
+            studentWiseDataOriginalTaskPerformed = studentWiseDataOriginalTaskPerformed.reset_index()
+            studentWiseDataOriginalTaskPerformed.rename(columns={'PracticeTaskId': countTaskCompletedByStudentFeature}, inplace=True)
+            studentWiseDataOriginalTaskPerformed.columns = studentWiseDataOriginalTaskPerformed.columns.droplevel(1)
+            
+            studentWiseDataOriginalTaskPerformed[featureTaskDesc] = studentWiseDataOriginalTaskPerformed[featureTaskDesc].apply(convert_list_column_tostr_NL)
+            studentWiseDataOriginalTaskPerformed[featureTaskType] = TaskTypePractice
+            
+            
+            figStudents = px.bar( studentWiseDataOriginalTaskPerformed
+                                    , x             = countTaskCompletedByStudentFeature
+                                    , y             = 'Name'
+                                    , title         = graphTitle
+                                    , labels        = feature2UserNamesDict # customize axis label
+    #                                , height        = constants.graphHeight
+                                    , template      = constants.graphTemplete                              
+                                    , orientation   = 'h'
+                                    , hover_data    = [featureTaskDesc]
+                )
+            graphs.append(
+                    dcc.Graph(
+                        id='graphSchool-' + str(graphIndex),
+                        figure= figStudents
+                ))
+            graphIndex = graphIndex + 1
+        except Exception as e:             
+            print( 'ERROR - ' + graphTitle )   
+            print(e)
         
-        studentWiseDataOriginalTaskPerformed[featureTaskDesc] = studentWiseDataOriginalTaskPerformed[featureTaskDesc].apply(convert_list_column_tostr_NL)
-        studentWiseDataOriginalTaskPerformed[featureTaskType] = TaskTypePractice
-        
-        
+        graphTitle = '(Theory) Count of tasks completed by students'
         try: 
             studentWiseDataOriginalTaskPerformedTheory = groupOriginalTheory
             studentWiseDataOriginalTaskPerformedTheory = studentWiseDataOriginalTaskPerformedTheory.merge(right= dfTheoryTaskDetails
@@ -337,18 +361,18 @@ def plotSingleClass( titleTextAdd, school ):
             studentWiseDataOriginalTaskPerformedTheory[featureTaskType] = TaskTypeTheory
             
             
-            combinedDataframeTaskCount = pd.concat([studentWiseDataOriginalTaskPerformed, studentWiseDataOriginalTaskPerformedTheory], ignore_index=True)
-            figStudents = px.bar( combinedDataframeTaskCount
+#            combinedDataframeTaskCount = pd.concat([studentWiseDataOriginalTaskPerformed, studentWiseDataOriginalTaskPerformedTheory], ignore_index=True)
+            figStudents = px.bar( studentWiseDataOriginalTaskPerformedTheory
                                 , x             =  countTaskCompletedByStudentFeature
                                 , y             =  'Name'
-                                , title         = 'Count of tasks completed by students '
+                                , title         = graphTitle
                                 , labels        = feature2UserNamesDict # customize axis label
-                                , height        = constants.graphHeight
+#                                , height        = constants.graphHeight
                                 , template      = constants.graphTemplete                              
                                 , orientation   = 'h'
                                 , hover_data    = [featureTaskDesc]
-                                , color         = 'TaskType'
-                                , barmode       = 'group'
+#                                , color         = 'TaskType'
+#                                , barmode       = 'group'
             )
             graphs.append(
                     dcc.Graph(
@@ -359,27 +383,13 @@ def plotSingleClass( titleTextAdd, school ):
             
             
         except Exception as e: 
-            figStudents = px.bar( studentWiseDataOriginalTaskPerformed
-                                , x             = countTaskCompletedByStudentFeature
-                                , y             = 'Name'
-                                , title         = '(Practice) Count of tasks completed by students '
-                                , labels        = feature2UserNamesDict # customize axis label
-                                , height        = constants.graphHeight
-                                , template      = constants.graphTemplete                              
-                                , orientation   = 'h'
-                                , hover_data    = [featureTaskDesc]
-            )
-            graphs.append(
-                    dcc.Graph(
-                        id='graphSchool-' + str(graphIndex),
-                        figure= figStudents
-                ))
-            graphIndex = graphIndex + 1
+            print( 'ERROR - ' + graphTitle )  
             print(e)
         
         
 
     except Exception as e: 
+        print( 'ERROR - plotSingleClass ')  
         print(e)
 
 
@@ -391,31 +401,93 @@ def plotSingleClass( titleTextAdd, school ):
 #-------------------------------------------------
 #GENERAL INFORMATION SECTION
 #------------------------------------------------------
-def plotSingleClassGeneral( titleTextAdd, school ):
+
+#        CHECKED
+#            for concepts used
+featureX = 'Count (no. of times used)'
+featureY = 'Details'
+featurePracticeTaskGroup = 'Task-Id'            
+
+def plotGroupTaskWiseConcepts(groupId, isGrouped = True) :
     
-    graphIndex = 1
+    graphs = []
+    
+    try :
+        taskWiseConceptPracticeGrouped = dfGroupedPracticeTaskWise.get_group(groupId).groupby(['PracticeTaskId'])
+        
+        studentWiseTaskWiseConceptPractice = pd.DataFrame()    
+        
+        
+        for groupKeyTaskId, groupTask in taskWiseConceptPracticeGrouped:
+            
+            studentWiseDataConceptsTask = groupTask.sum()
+            
+            colY = hasFeatures
+           
+            studentWiseDataConceptsTask = pd.DataFrame(studentWiseDataConceptsTask)
+            studentWiseDataConceptsTask['PracticeTaskId'] = groupKeyTaskId
+            studentWiseDataConceptsTask['Title'] = dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == int(groupKeyTaskId) ]['Title'].astype(str).values[0]
+            studentWiseDataConceptsTask[featurePracticeTaskGroup] = constants.TaskTypePractice + '-' + str(groupKeyTaskId)
+            studentWiseDataConceptsTask[featureY] = studentWiseDataConceptsTask.index
+            studentWiseDataConceptsTask = studentWiseDataConceptsTask.rename(columns={0: featureX})
+            studentWiseDataConceptsTask.drop(studentWiseDataConceptsTask[~studentWiseDataConceptsTask[featureY].isin(colY)].index, inplace = True)
+            
+            studentWiseDataConceptsTask[featureY] = studentWiseDataConceptsTask[featureY].astype(str)
+            studentWiseDataConceptsTask[featureY] = studentWiseDataConceptsTask[featureY].replace(
+                    feature2UserNamesDict, regex=True)
+            
+            if studentWiseTaskWiseConceptPractice is None or studentWiseTaskWiseConceptPractice.empty:
+                studentWiseTaskWiseConceptPractice = studentWiseDataConceptsTask
+            else:
+                studentWiseTaskWiseConceptPractice = pd.concat([studentWiseTaskWiseConceptPractice, studentWiseDataConceptsTask], ignore_index=True)
+
+
+            taskTitle = str(groupKeyTaskId)
+            try :
+                taskTitle =  dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == int(groupKeyTaskId) ]['Title'].astype(str).values[0]
+            except Exception as e: 
+                print(e)
+                
+            figBar = px.bar(studentWiseDataConceptsTask
+                                , x             =   featureX
+                                , y             =   featureY
+                                , orientation   =  'h'
+                                , height        =   constants.graphHeight - 100
+                                , template      =   constants.graphTemplete   
+                                , title         =   "(Practice) Concepts used by students in task " + str(groupKeyTaskId) + '(TaskId)'+ "<br>" + str(taskTitle)  +   " (no. of times students used a concept in code)"
+                                , labels        =   feature2UserNamesDict # customize axis label
+                )
+            graphs.append(
+                    dcc.Graph(
+                        figure= figBar
+                )) 
+        
+        if isGrouped:
+            figGroupedTaskConcepts = px.bar(studentWiseTaskWiseConceptPractice
+                                , x             =   featureY
+                                , y             =   featureX
+                                , height        =   constants.graphHeight - 100
+                                , hover_data  =  [ 'Title', 'PracticeTaskId',  ]
+                                , template      =   constants.graphTemplete   
+                                , title         =   "(Practice) Concepts used by students in each task <br> (no. of times students used a concept in code for a task)"
+                                , labels        =   feature2UserNamesDict # customize axis label
+                                , color         =   featurePracticeTaskGroup
+                                , barmode       =   'group'
+                )
+            return figGroupedTaskConcepts
+                
+        return graphs
+    except Exception as e: 
+        print(e)               
+
+
+def plotGroupConceptDetails(groupId):
+    
     graphs = []
     
       
-    featuresPractice            = dfPlayerStrategyPractice.columns
-                             
-    
-        
     try :
-        groupPractice = dfGroupedPractice.get_group(school)
-        groupOriginal = dfGroupedOriginal.get_group(school)
-        
-        try :
-            groupOriginalTheory = dfGroupedPlayerStrategyTheory.get_group(school)
-        except Exception as e: 
-            print(e)
-        
-#        CHECKED
-    #            for concepts used
-        featureX = 'Count (no. of times used)'
-        featureY = 'Details'
-        
-        
+        groupPractice = dfGroupedPractice.get_group(groupId)
         
     #        sum - to get count of students who used the concept
         studentWiseDataConcepts = groupPractice.sum()
@@ -433,8 +505,8 @@ def plotSingleClassGeneral( titleTextAdd, school ):
         
         
         figBar = px.bar(studentWiseDataConcepts
-                            , x             =   studentWiseDataConcepts[featureX]
-                            , y             =   studentWiseDataConcepts[featureY]
+                            , x             =   featureX
+                            , y             =   featureY
                             , orientation   =  'h'
                             , height        =   constants.graphHeight - 100
                             , template      =   constants.graphTemplete   
@@ -443,53 +515,133 @@ def plotSingleClassGeneral( titleTextAdd, school ):
             )
         graphs.append(
                 dcc.Graph(
-                    id='graphSchool-' + str(graphIndex),
                     figure= figBar
             ))
-        graphIndex = graphIndex + 1
         
-        
-        
-        taskWiseConceptPracticeGrouped = dfGroupedPracticeTaskWise.get_group(school).groupby(['PracticeTaskId'])
-                
-        for groupKeyTaskId, groupTask in taskWiseConceptPracticeGrouped:
-            
-            
-            taskTitle = str(groupKeyTaskId)
-            try :
-                taskTitle =  '(' + str(groupKeyTaskId) + ') ' +  dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == int(groupKeyTaskId) ]['Title'].astype(str).values[0]
-            except Exception as e: 
-                print(e)
-            
-            studentWiseDataConceptsTask = groupTask.sum()
-                   
-            colY = hasFeatures
-           
-            studentWiseDataConceptsTask = pd.DataFrame(studentWiseDataConceptsTask)
-            studentWiseDataConceptsTask[featureY] = studentWiseDataConceptsTask.index
-            studentWiseDataConceptsTask = studentWiseDataConceptsTask.rename(columns={0: featureX})
-            studentWiseDataConceptsTask.drop(studentWiseDataConceptsTask[~studentWiseDataConceptsTask[featureY].isin(colY)].index, inplace = True)
-            
-            studentWiseDataConceptsTask[featureY] = studentWiseDataConceptsTask[featureY].astype(str)
-            studentWiseDataConceptsTask[featureY] = studentWiseDataConceptsTask[featureY].replace(
-                    feature2UserNamesDict, regex=True)
-            
-            
-            figBar = px.bar(studentWiseDataConceptsTask
-                                , x             =   studentWiseDataConceptsTask[featureX]
-                                , y             =   studentWiseDataConceptsTask[featureY]
-                                , orientation   =  'h'
-                                , height        =   constants.graphHeight - 100
-                                , template      =   constants.graphTemplete   
-                                , title         =   "(Practice) Concepts used by students in task " + str(taskTitle)  +   " (no. of times students used a concept in code)"
-                                , labels        =   feature2UserNamesDict # customize axis label
-                )
+#        Task wise concepts used - grouped together
+        try :
+            figBar = plotGroupTaskWiseConcepts(groupId, True)
             graphs.append(
                     dcc.Graph(
-                        id='graphSchool-' + str(graphIndex),
                         figure= figBar
                 ))
-            graphIndex = graphIndex + 1
+
+            graphs.append(  html.Div([
+                    dbc.Button(
+                        "Show Task Wise Concept Used",
+                        id          = "collapse-taskwise-concept-button",
+                        color       = "primary",
+                        n_clicks    = 0
+                    ),
+                    dbc.Tooltip(
+                        "Click to View/Hide",
+                        target      = "collapse-taskwise-concept-button",
+                        style       = { 'font-size' : 'initial'  }
+                    ),
+                    dbc.Collapse(
+                        children = [] ,
+                        id = "collapse-taskwise-concept",
+                        is_open = False
+                    ),
+                ] ,
+                className = "c-container"
+            ))
+            
+        except Exception as e: 
+                print('Task Concepts used')
+                print(e)                
+      
+    except Exception as e: 
+            print(e)  
+            
+    return graphs        
+
+
+def plotSingleClassGeneral( titleTextAdd, school ):
+    
+    graphs = []
+    
+      
+    featuresPractice            = dfPlayerStrategyPractice.columns
+                             
+    
+        
+    try :
+        groupPractice = dfGroupedPractice.get_group(school)
+        groupOriginal = dfGroupedOriginal.get_group(school)
+        
+        try :
+            groupOriginalTheory = dfGroupedPlayerStrategyTheory.get_group(school)
+        except Exception as e: 
+            print(e)
+        
+        
+        
+#    #        sum - to get count of students who used the concept
+#        studentWiseDataConcepts = groupPractice.sum()
+#               
+#        colY = hasFeatures
+#       
+#        studentWiseDataConcepts = pd.DataFrame(studentWiseDataConcepts)
+#        studentWiseDataConcepts[featureY] = studentWiseDataConcepts.index
+#        studentWiseDataConcepts = studentWiseDataConcepts.rename(columns={0: featureX})
+#        studentWiseDataConcepts.drop(studentWiseDataConcepts[~studentWiseDataConcepts[featureY].isin(colY)].index, inplace = True)
+#        
+#        studentWiseDataConcepts[featureY] = studentWiseDataConcepts[featureY].astype(str)
+#        studentWiseDataConcepts[featureY] = studentWiseDataConcepts[featureY].replace(
+#                feature2UserNamesDict, regex=True)
+#        
+#        
+#        figBar = px.bar(studentWiseDataConcepts
+#                            , x             =   featureX
+#                            , y             =   featureY
+#                            , orientation   =  'h'
+#                            , height        =   constants.graphHeight - 100
+#                            , template      =   constants.graphTemplete   
+#                            , title         =   "(Practice) Concepts used by students of this class (no. of times students used a concept in code)"
+#                            , labels        =   feature2UserNamesDict # customize axis label
+#            )
+#        graphs.append(
+#                dcc.Graph(
+#                    figure= figBar
+#            ))
+#        
+##        Task wise concepts used - grouped together
+#        try :
+#            figBar = plotGroupTaskWiseConcepts(school, True)
+#            graphs.append(
+#                    dcc.Graph(
+#                        figure= figBar
+#                ))
+#
+#            graphs.append(  html.Div([
+#                    dbc.Button(
+#                        "Show Task Wise Concept Used",
+#                        id          = "collapse-taskwise-concept-button",
+#                        color       = "primary",
+#                        n_clicks    = 0
+#                    ),
+#                    dbc.Tooltip(
+#                        "Click to View/Hide",
+#                        target      = "collapse-taskwise-concept-button",
+#                        style       = { 'font-size' : 'initial'  }
+#                    ),
+#                    dbc.Collapse(
+#                        children = [] ,
+#                        id = "collapse-taskwise-concept",
+#                        is_open = False
+#                    ),
+#                ] ,
+#                className = "c-container"
+#            ))
+#            
+#        except Exception as e: 
+#                print('Task Concepts used')
+#                print(e)
+#                
+#                
+                
+        
         
         
         #            2. other features    
@@ -543,6 +695,10 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                 print(e)
         
     #            2. other features        
+    
+        hoverDataPractice   = ["SessionDuration", "Points", "Attempts", "Result", "CollectedCoins", "robotCollisionsBoxCount", "ConceptsUsedDetailsStr", "lineOfCodeCount", 'StudentId']
+        hoverDataTheory     = ["SessionDuration", "Points", "Attempts", "Result", "itemsCollectedCount", "playerShootEndEnemyHitCount", 'StudentId']
+                                          
         for first in range(featuresPractice.size):
                 
             for second in  range(featuresPractice.size):
@@ -557,76 +713,54 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                         
                         #    Graphs for both THEORY & PRACTICE                        
                         if ([featuresPractice[first], featuresPractice[second]] in  featurePairsToPlotTheory):  
-
-                            fig = go.Figure()
-                            fig.add_trace(go.Scatter(
-                                 x              = studentWiseData[featuresPractice[first]] , y = studentWiseData[featuresPractice[second]] ,
-                                name            = 'Practice',
-                                text            = studentWiseData[featureDescription],
-                                marker_color    = 'rgba(152, 0, 0, .8)',
-                                marker_size     = 22
-                            ))
-                            fig.add_trace(go.Scatter(
-                                x               = studentWiseDataTheory[featuresPractice[first]] , y = studentWiseDataTheory[featuresPractice[second]] ,
-                                name            =  'Theory',
-                                text            = studentWiseDataTheory[featureDescription],
-                                marker_color    = 'rgb(73, 29, 29)',
-                                marker_size     = 16
-                            ))
-                            fig.update_traces(mode='markers', 
-                                    marker = dict(
-                                        showscale = False
-                            ))
-                            fig.update_layout(
-                                        height          =   constants.graphHeight, 
-                                        title_text      = 'Details of students ' + titleFirst
-                                             , yaxis = dict(
-                                                title = featuresPractice[second],
-                                                titlefont_size = 16,
-                                                tickfont_size = 14,
-                                            ), xaxis = dict(
-                                                title = featuresPractice[first],
-                                                titlefont_size = 16,
-                                                tickfont_size = 14,
-                            ))
                             
-                            fig.update_yaxes(automargin=True)
                             
+                            fig = px.bar( studentWiseData
+                                , x             =  featuresPractice[first]
+                                , y             =  featuresPractice[second]
+                                , title         = '(Practice) Details of students ' + titleFirst
+                                , labels        = feature2UserNamesDict # customize axis label
+                                , template      = constants.graphTemplete                              
+                                , orientation   = 'h'
+                                , hover_name  =  "Name"
+                                , hover_data    =  hoverDataPractice
+                            )
                             graphs.append(
                                     dcc.Graph(
-                                        id='graphSchool-' + str(graphIndex),
                                         figure = fig
                                 ))
-                            graphIndex = graphIndex + 1
-
+                            
+                            fig = px.bar( studentWiseDataTheory
+                                , x             =  featuresPractice[first]
+                                , y             =  featuresPractice[second]
+                                , title         = '(Theory) Details of students ' + titleFirst
+                                , labels        = feature2UserNamesDict # customize axis label
+                                , template      = constants.graphTemplete                              
+                                , orientation   = 'h'
+                                , hover_name  =  "Name"
+                                , hover_data   =  hoverDataTheory
+                            )
+                            graphs.append(
+                                    dcc.Graph(
+                                        figure = fig
+                                ))
                          
 #    Graphs only for PRACTICE
                         if ([featuresPractice[first], featuresPractice[second]] not in  featurePairsToPlotTheory):     
-                            figStudents = px.scatter(studentWiseData, x=featuresPractice[first], y=featuresPractice[second] 
-                                 , title  = ' (Practice)  Details of students ' + titleFirst
-                                 , labels  =  feature2UserNamesDict # customize axis label
-                                 , hover_name  =  "Name"
-                                 , hover_data  =  ["CollectedCoins", "Result", "SessionDuration", "Attempts", "robotCollisionsBoxCount", "Points", "ConceptsUsedDetailsStr", "lineOfCodeCount", 'StudentId']
-                                 , height       = constants.graphHeight
-#                                 , color        = "StudentId" 
-#                                 , color_continuous_scale=px.colors.sequential.Rainbow
-                                 , template     = constants.graphTemplete
-                                )
-                            figStudents.update_traces(marker=dict(size = 16
-                                                        , showscale    = False
-                                                        ,  line = dict(width=1,
-                                                                    color='DarkSlateGrey')),
-                                              selector=dict(mode='markers'))
-                            
-                            
+                            fig = px.bar( studentWiseData
+                                , x             =  featuresPractice[first]
+                                , y             =  featuresPractice[second]
+                                , title         = '(Practice) Details of students ' + titleFirst
+                                , labels        = feature2UserNamesDict # customize axis label
+                                , template      = constants.graphTemplete                              
+                                , orientation   = 'h'
+                                , hover_name  =  "Name"
+                                , hover_data  =  hoverDataPractice
+                            )
                             graphs.append(
                                     dcc.Graph(
-                                        id='graphSchool-' + str(graphIndex),
-                                        figure= figStudents
-                                ))            
-                            graphIndex = graphIndex + 1
-    
-    
+                                        figure = fig
+                                ))
     
 #    Graphs only for THEORY
         for rowTheory in featurePairsToPlotTheory : 
@@ -637,28 +771,21 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                     titleFirst = rowTheory[0]
                     if rowTheory[0] in feature2UserNamesDict:
                         titleFirst = feature2UserNamesDict.get(rowTheory[0])
-    
-                    figStudents = px.scatter ( studentWiseDataTheory, x = rowTheory[0], y = rowTheory[1] 
-                                         , title        = ' (Theory) Details of students ' + titleFirst
-                                         , labels       =  feature2UserNamesDict # customize axis label
-                                         , hover_name   =  "Name"
-                                         , hover_data   =  ["Points", "Result", "SessionDuration", "Attempts", "Points", "itemsCollectedCount", "playerShootEndEnemyHitCount", 'StudentId']
-                                         , height       = constants.graphHeight
-#                                         , color        = "StudentId" 
-#                                         , color_continuous_scale   = px.colors.sequential.Rainbow
-                                         , template     = constants.graphTemplete
-                                        )
-                    figStudents.update_traces(marker=dict(size = 16
-                                                        , showscale    = False
-                                                        ,  line = dict(width=1,
-                                                                    color='DarkSlateGrey')),
-                                              selector=dict(mode='markers'))
+                    
+                    fig = px.bar( studentWiseDataTheory
+                                , x             =  rowTheory[0]
+                                , y             =  rowTheory[1] 
+                                , title         = '(Theory) Details of students ' + titleFirst
+                                , labels        = feature2UserNamesDict # customize axis label
+                                , template      = constants.graphTemplete                              
+                                , orientation   = 'h'
+                                , hover_name  =  "Name"
+                                , hover_data   =  hoverDataTheory
+                            )
                     graphs.append(
                             dcc.Graph(
-                                id='graphSchool-' + str(graphIndex),
-                                figure= figStudents
+                                figure = fig
                         ))
-                    graphIndex = graphIndex + 1
                 except Exception as e: 
                     print(e)
 
@@ -760,6 +887,18 @@ layout = [
         )])
     
     
+    , dbc.Row([
+            dbc.Col( 
+                    html.Div(id='Concept-Information',
+                               children = [
+                                           html.H3('Concept Used'),
+                                           ], 
+                   className = "c-container p_medium p-top_xx-large", )
+       )])
+    , dbc.Row([
+            dbc.Col( 
+                html.Div(id='Details-Group-Concept-Container')
+       )])
     
     , dbc.Row([
             dbc.Col( 
@@ -806,6 +945,18 @@ def display_class_general(schoolSelected):
     graphs = plotSingleClassGeneral('School', int(schoolSelected) )
     
     return html.Div(graphs)
+
+
+@app.callback(Output('Details-Group-Concept-Container', 'children'), [Input('group-selector-main', 'value')])
+def display_class_concept(schoolSelected):
+    graphs = []
+    
+    if schoolSelected is None or not int(schoolSelected) >= 0 :
+        return html.Div(graphs)
+    
+    graphs = plotGroupConceptDetails(int(schoolSelected) )
+    
+    return html.Div(graphs)
 #----------------------------------------
 
 @app.callback(Output('Details-Group-Overview-Container', 'children'), [Input('group-selector-main', 'value')])
@@ -821,14 +972,32 @@ def setClassOverview(schoolSelected):
     
 
 @app.callback(
-    Output("collapse-task", "is_open"),
-    [Input("collapse-task-button", "n_clicks")],
-    [State("collapse-task", "is_open")],
+    [Output("collapse-taskwise-concept", "is_open") , 
+     Output("collapse-taskwise-concept", "children"),
+     ],
+    [Input("collapse-taskwise-concept-button", "n_clicks")],
+    [State("collapse-taskwise-concept", "is_open"),
+     State('group-selector-main', 'value'),
+     State('collapse-taskwise-concept', 'children'),
+     ],
 )
-def toggle_collapse(n, is_open):
-    if n:
-        return not is_open
-    return is_open
+def show_taskwise_concept(n, is_open, groupSelected, collapseCurrentChildren):
+    
+    print('taskwise concepts collapseCurrentChildren')
+    graphs = []
+    
+    if n  and groupSelected is not None and int(groupSelected) >= 0:
+        
+        if isinstance(collapseCurrentChildren, list):
+            graphs = plotGroupTaskWiseConcepts( int(groupSelected), isGrouped = False )  
+            graphs = graphs 
+        elif isinstance(collapseCurrentChildren, dict) and 'props' in collapseCurrentChildren.keys():
+                graphs = graphs + collapseCurrentChildren.get('props').get('children')
+                
+        
+        return not is_open,  html.Div(graphs)
+    
+    return is_open, graphs
 
 
 

@@ -39,12 +39,15 @@ menuLink = {
                           ],  keyClassName : 'fas fa-list m-right-small'   }
     ,   "menu-link-2" : { keyLabel : 'Details', keyHref : '/Details' ,
                   keySubmenu : [
-                          "menu-sub-link-3", "menu-sub-link-4", "menu-sub-link-5"
+                          "menu-sub-link-3", "menu-sub-link-4"
+#                          , "menu-sub-link-5"
                           ],  keyClassName : 'fas fa-clipboard m-right-small'   }
-    ,   "menu-link-3" : { keyLabel : 'Custom', 'href' : '/Custom' ,
+    ,   "menu-link-3" : { keyLabel : 'Students', keyHref : '/Students' ,
+                  keySubmenu : [ "menu-sub-link-5"  ],  keyClassName : 'fas fa-clipboard m-right-small'   }
+    ,   "menu-link-4" : { keyLabel : 'Custom', 'href' : '/Custom' ,
                   keySubmenu : [
                           "menu-sub-link-6"
-                          ],  keyClassName : 'fas fa-wrench m-right-small'   }
+                          ],  keyClassName : 'fas fa-user-graduate m-right-small'   }
 }
 menuSubLink2Scroll = {
 		"menu-sub-link-0"  :  {keyLabel : "Overview", keyScrollTo: ''}

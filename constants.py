@@ -88,6 +88,7 @@ featuresOverviewAvgNames = {
 
 countStudentCompletingTaskFeature   = "No. of Students Completing Task"
 countTaskCompletedByStudentFeature  = "No. of Tasks Completed"
+featureSessionDuration              = "SessionDuration"
 featurePracticeTaskDesc             = "PracticeTaskDesc"
 featureTheoryTaskDesc               = "TheoryTaskDesc"
 featureTaskDesc                     = "TaskDesc"
@@ -96,12 +97,13 @@ featureDescription                  = "Description"
 featureConceptsUsedDetails          = "ConceptsUsedDetails"
 featureConceptsUsedDetailsStr       = "ConceptsUsedDetailsStr"
 featureItemsCollectedCount          = "itemsCollectedCount"
+featureSolution                     = "Solution"
 featurePlayerShootEndEnemyHitCount  = "playerShootEndEnemyHitCount"
 featureRobotCollisionsBoxCount      = "robotCollisionsBoxCount"
 featureLineOfCodeCount              = "lineOfCodeCount"
 
 TaskTypePractice                    = "Practice"
-TaskTypeTheory                      = "Theory "
+TaskTypeTheory                      = "Theory"
 
 
 
@@ -169,10 +171,10 @@ feature2UserNamesDict = {
         
 		,"PracticeSessionDuration" : "Session D. Practice(s)"
 		,"TheorySessionDuration" : "Session D. Theory(s)"
-        ,"SessionDuration" : "Session Duration(s)"
+        ,featureSessionDuration : "Session Duration(s)"
         ,COUNT_STUDENT_FEATURE : "No. of Students"
         
-        ,"playerShootEndEnemyHitCount" : "Player Shoot Enemy Hit Count"
+        ,featurePlayerShootEndEnemyHitCount : "Player Shoot Enemy Hit Count"
 	}
 
 
@@ -202,4 +204,16 @@ StudentResultExplanation = '        (*has student completed this task in any run
 
 colorError = 'rgb(255,127,80)'
 colorSuccess = 'rgb(0,128,0)'
+colorPractice = 'rgb(0, 0, 255)'
+colorTheory = 'rgb(214,12,140)'
+
+
+sortOrderDescending = 'Desc'
+sortOrderAscending = 'Asc'
+sortOrder = {
+        'Desc' : 'Desc',
+        'Asc' : 'Asc'
+}
+
+
 #------------------- GRAPHS END ----------------------------------------------

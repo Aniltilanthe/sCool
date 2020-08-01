@@ -20,7 +20,7 @@ import plotly.figure_factory as ff
 from plotly import graph_objs as go
 
 from app import app
-from apps import groups, groupDetails, custom, home
+from apps import groups, groupDetails, groupStudents, custom, home
 
 from sidebar import sidebar
 
@@ -110,6 +110,8 @@ def render_page_content(pathname):
         return groupDetails.layout
     elif pathname == "/Custom":
         return custom.layout
+    elif pathname == "/Students":
+        return groupStudents.layout
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
         [

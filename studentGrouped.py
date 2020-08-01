@@ -56,8 +56,9 @@ dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrate
 
 #----------------------------------
 
-featureDescription = constants.featureDescription
-feature2UserNamesDict = constants.feature2UserNamesDict
+featureDescription      = constants.featureDescription
+feature2UserNamesDict   = constants.feature2UserNamesDict
+featureSessionDuration  = constants.featureSessionDuration
 
 hasFeatures =  studentGroupedPerformance.hasFeatures
 
@@ -85,9 +86,13 @@ def getTaskWiseSuccessFail(groupData, taskId, dfTaskDetails, featureTaskId, type
 
 
 
-def getPracticeDescription(dfPractice) :
-    dfPractice[featureDescription] = '<b>' + dfPractice['Name'].astype(str) + '</b>' + '<br>'
-    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('SessionDuration')) + '</b>: ' + dfPractice['SessionDuration'].astype(str)
+def getPracticeDescription(dfPractice, hasNameTitle = True) :
+    dfPractice[featureDescription] = ''
+    
+    if hasNameTitle:
+        dfPractice[featureDescription] = '<b>' + dfPractice['Name'].astype(str) + '</b>' + '<br>'
+
+    dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get(featureSessionDuration)) + '</b>: ' + dfPractice[featureSessionDuration].astype(str)
     dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Points')) + '</b>:' + dfPractice['Points'].astype(str)
     dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('CollectedCoins')) + '</b>: ' + dfPractice['CollectedCoins'].astype(str)
     dfPractice[featureDescription] = dfPractice[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Result')) + '</b>: ' + dfPractice['Result'].astype(str)
@@ -102,25 +107,32 @@ def getPracticeDescription(dfPractice) :
     return dfPractice[featureDescription]
 
 
-def getTheoryDescription(dfTheory) :    
-    dfTheory[featureDescription] = '<b>' + dfTheory['Name'].astype(str) + '</b>' + '<br>'
-    dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('SessionDuration')) + '</b>: ' + dfTheory['SessionDuration'].astype(str)
+def getTheoryDescription(dfTheory, hasNameTitle = True) :
+    dfTheory[featureDescription] = ''
+    
+    if hasNameTitle:
+        dfTheory[featureDescription] = '<b>' + dfTheory['Name'].astype(str) + '</b>' + '<br>'
+    
+    dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get(featureSessionDuration)) + '</b>: ' + dfTheory[featureSessionDuration].astype(str)
     dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Points')) + '</b>: ' + dfTheory['Points'].astype(str)
     dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Result')) + '</b>: ' + dfTheory['Result'].astype(str)
     dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Attempts')) + '</b>: ' + dfTheory['Attempts'].astype(str)
+    
+    if constants.featureSolution in dfTheory.columns:
+        dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>Solution</b>: ' +  dfTheory[constants.featureSolution].astype(str)
     if constants.featureItemsCollectedCount in dfTheory.columns:
         dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get(constants.featureItemsCollectedCount)) + '</b>: ' + dfTheory[constants.featureItemsCollectedCount].astype(str)
-    
     if constants.featurePlayerShootEndEnemyHitCount in dfTheory.columns:
         dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get(constants.featurePlayerShootEndEnemyHitCount)) + '</b>: ' + dfTheory[constants.featurePlayerShootEndEnemyHitCount].astype(str)
     dfTheory[featureDescription] = dfTheory[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('StudentId')) + '</b>: ' + dfTheory['StudentId'].astype(str)
+
     return dfTheory[featureDescription]
 
 
 
 def getDescription(df) :    
     df[featureDescription] = '<b>' + df['Name'].astype(str) + '</b>' + '<br>'
-    df[featureDescription] = df[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('SessionDuration')) + '</b>: ' + df['SessionDuration'].astype(str)
+    df[featureDescription] = df[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get(featureSessionDuration)) + '</b>: ' + df[featureSessionDuration].astype(str)
     df[featureDescription] = df[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Points')) + '</b>: ' + df['Points'].astype(str)
     df[featureDescription] = df[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Result')) + '</b>: ' + df['Result'].astype(str)
     df[featureDescription] = df[featureDescription] + '<br><b>' + str(feature2UserNamesDict.get('Attempts')) + '</b>: ' + df['Attempts'].astype(str)

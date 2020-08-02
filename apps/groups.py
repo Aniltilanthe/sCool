@@ -269,8 +269,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                                             , how='inner')
         
         studentDataDfFeaturesInterpreted2 = pd.DataFrame(columns = [constants.GROUPBY_FEATURE, 'ConceptsUsed'])
-        for groupKey, group in studentDataDfGrouped :     
-            print(group['ConceptsUsed'])
+        for groupKey, group in studentDataDfGrouped :    
             conceptsUsedStr = ' '
             if 'ConceptsUsed' in group.columns and  group[ group['ConceptsUsed'].notnull() & (group['ConceptsUsed']  !=  u'') ].shape[0] > 0 :
                 conceptsUsedStr = ', '.join(  util.get_unique_ConceptsUsed_items(group)  )

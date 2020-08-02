@@ -184,7 +184,6 @@ def getStudentData(StudentId, schoolKey, selectedDate = ''):
         
     
     if studentData is None         or     studentData.empty   :
-        print('   studentData is None         or     studentData.empty ')
         return studentData
     
     
@@ -194,10 +193,7 @@ def getStudentData(StudentId, schoolKey, selectedDate = ''):
     
     
     studentData['StartStr']         = '@' + studentData['Start'].dt.strftime('%Y-%m-%d %H:%M:%S') + '-' + studentData['IndexCol'].astype(str)
-    
-    print(studentData)
-    
-    
+        
     return studentData
 
 

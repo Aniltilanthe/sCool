@@ -214,8 +214,6 @@ def plotSingleClass( titleTextAdd, school ):
         dfTaskWiseSuccessFail["Success"] = pd.to_numeric(dfTaskWiseSuccessFail["Success"], downcast='integer')
         dfTaskWiseSuccessFail["Others"] = pd.to_numeric(dfTaskWiseSuccessFail["Others"], downcast='integer')
         
-        print(dfTaskWiseSuccessFail.info())
-        
         figStudents =  dash_table.DataTable(
                 id='datatable-taskwise-successfail',
                 columns=[

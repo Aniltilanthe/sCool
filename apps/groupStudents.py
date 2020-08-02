@@ -116,27 +116,35 @@ def convert_list_column_tostr_NL(val) :
     
 
 def getStudentData(StudentId, schoolKey, selectedDate = ''):
-    school                            = dfGroupedOriginal.get_group(schoolKey)
-    studentData                       = school[school['StudentId'] == StudentId]
-    studentData['Finish']             = studentData['CreatedAt'] 
-    studentData['Start']              = studentData['Finish'] - pd.to_timedelta(studentData[featureSessionDuration], unit='s')
     
-    studentData['CodeDesc']           = studentData['Code'].str.replace('\n','<br>')
+    print('getStudentData')
     
-    studentData[featureDescription]   = getPracticeDescription(studentData, False)   
-    studentData[featureDescription]   = '<b>Title</b>:' + studentData['Title'].astype(str)  + '<br>'+ studentData[featureDescription].astype(str)
-    studentData[featureDescription]   = studentData[featureDescription].astype(str) + '<br><b>Code</b>:' + studentData['CodeDesc'].astype(str) 
+    studentData = pd.DataFrame()
     
-    studentData = studentData.sort_values(by='Start')
-    
-    studentData['Task']       = constants.TaskTypePractice + '-' + studentData['PracticeTaskId'].astype(str) 
-    studentData['IndexCol']   = studentData['Task'] + '-' + studentData['Result'].astype('Int64').astype(str) 
-    
-    studentData['Finish'] = np.where(studentData['Finish'].isnull(), studentData['Start'].shift(-1), studentData['Finish'])
-    
-    studentData['Difference'] = (studentData['Finish'] - studentData['Start']).astype('timedelta64[s]')
-    
-    studentData[constants.featureTaskType] = constants.TaskTypePractice
+    try :
+        school                            = dfGroupedOriginal.get_group(schoolKey)
+        studentData                       = school[school['StudentId'] == StudentId]
+        studentData['Finish']             = studentData['CreatedAt'] 
+        studentData['Start']              = studentData['Finish'] - pd.to_timedelta(studentData[featureSessionDuration], unit='s')
+        
+        studentData['CodeDesc']           = studentData['Code'].str.replace('\n','<br>')
+        
+        studentData[featureDescription]   = getPracticeDescription(studentData, False)   
+        studentData[featureDescription]   = '<b>Title</b>:' + studentData['Title'].astype(str)  + '<br>'+ studentData[featureDescription].astype(str)
+        studentData[featureDescription]   = studentData[featureDescription].astype(str) + '<br><b>Code</b>:' + studentData['CodeDesc'].astype(str) 
+        
+        studentData = studentData.sort_values(by='Start')
+        
+        studentData['Task']       = constants.TaskTypePractice + '-' + studentData['PracticeTaskId'].astype(str) 
+        studentData['IndexCol']   = studentData['Task'] + '-' + studentData['Result'].astype('Int64').astype(str) 
+        
+        studentData['Finish'] = np.where(studentData['Finish'].isnull(), studentData['Start'].shift(-1), studentData['Finish'])
+        
+        studentData['Difference'] = (studentData['Finish'] - studentData['Start']).astype('timedelta64[s]')
+        
+        studentData[constants.featureTaskType] = constants.TaskTypePractice
+    except Exception as e: 
+        print(e)
 
 
     try :
@@ -175,12 +183,20 @@ def getStudentData(StudentId, schoolKey, selectedDate = ''):
         print(e)
         
     
+    if studentData is None         or     studentData.empty   :
+        print('   studentData is None         or     studentData.empty ')
+        return studentData
+    
+    
     if     None is not selectedDate         and         not selectedDate == ''     and   util.is_valid_date(selectedDate) :
         studentDataGroupedDate  = studentData.groupby(  [studentData['Start'].dt.date] )
         studentData = studentDataGroupedDate.get_group(selectedDate)
     
     
     studentData['StartStr']         = '@' + studentData['Start'].dt.strftime('%Y-%m-%d %H:%M:%S') + '-' + studentData['IndexCol'].astype(str)
+    
+    print(studentData)
+    
     
     return studentData
 
@@ -189,7 +205,7 @@ def getStudentData(StudentId, schoolKey, selectedDate = ''):
 def isStudentInGroup(StudentId, groupId) :
     groupStudents = getStudentsOfSchool(groupId)
     
-    if not StudentId in groupStudents:
+    if  not StudentId in groupStudents:
         return False
     
     return True
@@ -215,6 +231,7 @@ def plotStudentOverview(StudentId, groupId):
         return graphs
     
     
+    studentDataDf.fillna(0, inplace=True)
     graphs = util.plotStudentOverview(studentDataDf , classes = "c-card-small" )
     
     
@@ -228,14 +245,14 @@ def plotStudentOverview(StudentId, groupId):
     groupOriginal['ConceptsUsed']           = groupOriginal['Code'].apply( studentGrouped.getAllNodeTypesUsefull )
     groupOriginal["ConceptsUsedDetails"]    = groupOriginal['ConceptsUsed'].replace(
                                                     studentGrouped.ProgramConceptsUsefull2UserNames, regex=True )
-    ConceptsUsedUnique                      = util.get_unique_list_items(groupOriginal[groupOriginal['StudentId'] == StudentId]['ConceptsUsedDetails'])
+    
     
     studentWiseData                         = groupOriginal.groupby(['StudentId'], as_index=False).sum()
     studentDataDfPractice                   = studentWiseData[studentWiseData['StudentId'] == StudentId]
     
     
     
-    studentDataDfSuccess =     studentDataDf[studentDataDf['Result'].astype('Int64') > 0 ]
+    studentDataDfSuccess                    =     studentDataDf[studentDataDf['Result'].astype('Int64') > 0 ]
     
     if studentDataDfSuccess is not None and studentDataDfSuccess.empty is False  and 'Task' in studentDataDfSuccess.columns:        
         plotRow.append( html.Div([  
@@ -272,17 +289,21 @@ def plotStudentOverview(StudentId, groupId):
                                 ],
                                 className="col-sm-4",
                         ))
-
-    if     ConceptsUsedUnique is not None          and         not ConceptsUsedUnique == '':        
-        plotRow.append( html.Div([
-                                    util.generateCardBase(
-                                             [html.I(className="fas fa-code m-right-small"),   'Concepts Used', ], 
-                                            ', '.join(ConceptsUsedUnique) ,
-                                            classes = "c-card-small" )
-                                ],
-                                className="col-sm-6",
-                        ))
-
+    
+    if groupOriginal[groupOriginal['StudentId'] == StudentId] is not None  and groupOriginal[groupOriginal['StudentId'] == StudentId]['ConceptsUsedDetails'].shape[0] > 0 :
+        ConceptsUsedUnique                      = util.get_unique_ConceptsUsed_items(groupOriginal[groupOriginal['StudentId'] == StudentId], 'ConceptsUsedDetails')
+    #    ConceptsUsedUnique                      = util.get_unique_list_items(groupOriginal[groupOriginal['StudentId'] == StudentId]['ConceptsUsedDetails'])
+        
+        if     ConceptsUsedUnique is not None          and         not ConceptsUsedUnique == '':        
+            plotRow.append( html.Div([
+                                        util.generateCardBase(
+                                                 [html.I(className="fas fa-code m-right-small"),   'Concepts Used', ], 
+                                                ', '.join(ConceptsUsedUnique) ,
+                                                classes = "c-card-small" )
+                                    ],
+                                    className="col-sm-6",
+                            ))
+    
     
     
         
@@ -543,7 +564,14 @@ def setStudentDateOptions(studentSelected, groupSelected):
 
     dfStudentData                     = getStudentData(int(studentSelected), int(groupSelected))
     
+    
+    if dfStudentData is None        or     dfStudentData.empty == True :
+        return defaultValue
+    
+    
     return [{'label': d, 'value': d } for d  in dfStudentData['Start'].dt.date.unique() ]
+
+
 
 @app.callback(
          Output('StudentSelector-Date-Dropdown', 'value'), 

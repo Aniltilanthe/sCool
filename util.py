@@ -102,49 +102,81 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = "")
 def plotStudentOverview(studentDataDf, classes = ""):
     plots = []
     
+    print(studentDataDf)
+    print(studentDataDf[constants.featureSessionDuration])
+    print(studentDataDf['Points'])
+    print(studentDataDf.std())
+    print(studentDataDf.std()[constants.featureSessionDuration])
+    print(studentDataDf.std().round(decimals=2)[constants.featureSessionDuration])
+    print(studentDataDf[constants.featureSessionDuration].std())
+    
+    if studentDataDf is None or studentDataDf.empty :
+        return plots
+    
+    
+    try:
+        studentDataDfMean    = studentDataDf.mean().round(decimals=2)
+        studentDataDfStd    = studentDataDf.std().round(decimals=2)
+        
+        studentDataDfMean.fillna(0, inplace=True)
+        studentDataDfStd.fillna(0, inplace=True)
+    except Exception as e: 
+        print(e)
+    
+    
     plotRow = []    
-    plotRow.append(
-            html.Div([
-                   generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
-                                        '' + seconds_2_dhms(studentDataDf[constants.featureSessionDuration].sum().round(decimals=2)), 
-                                        '' + str(studentDataDf[constants.featureSessionDuration].mean().round(decimals=2)) + 's', 
-                                        '' + str(studentDataDf[constants.featureSessionDuration].std().round(decimals=2)) + 's', 
-                                        'total',
-                                        'mean',
-                                        'std',
-                                        classes = classes
-                                        )
-                ],
-                className="col-sm-4",
-            ))
-    plotRow.append(
-            html.Div([
-                   generateCardDetail2([html.I(className="fas fa-clock m-right-small"),   'Game Time - Practice vs Theory'], 
-                                        '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice  ][
-                                                constants.featureSessionDuration].sum().round(decimals=2)), 
-                                        '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypeTheory ][
-                                                constants.featureSessionDuration].sum().round(decimals=2)), 
-                                        constants.TaskTypePractice,
-                                        constants.TaskTypeTheory,
-                                        classes = classes
-                                        )
-                ],
-                className="col-sm-4",
-            ))
-    plotRow.append(
-            html.Div([
-                   generateCardDetail('Points', 
-                                        '' + millify(studentDataDf['Points'].sum().round(decimals=2)), 
-                                        '' + str(studentDataDf['Points'].mean().round(decimals=2)), 
-                                        '' + str(studentDataDf['Points'].std().round(decimals=2)), 
-                                        'total',
-                                        'mean',
-                                        'std',
-                                        classes = classes
-                                        )
-                ],            
-                className="col-sm-4",
-            ))
+
+    try:
+        plotRow.append(
+                html.Div([
+                       generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
+                                            '' + seconds_2_dhms(studentDataDf[constants.featureSessionDuration].sum().round(decimals=2)), 
+                                            '' + str(studentDataDfMean[constants.featureSessionDuration]) + 's', 
+                                            '' + str( studentDataDfStd[constants.featureSessionDuration] ) + 's', 
+                                            'total',
+                                            'mean',
+                                            'std',
+                                            classes = classes
+                                            )
+                    ],
+                    className="col-sm-4",
+                ))
+    except Exception as e: 
+        print(e)
+    try:
+        plotRow.append(
+                html.Div([
+                       generateCardDetail2([html.I(className="fas fa-clock m-right-small"),   'Game Time - Practice vs Theory'], 
+                                            '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice  ][
+                                                    constants.featureSessionDuration].sum().round(decimals=2)), 
+                                            '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypeTheory ][
+                                                    constants.featureSessionDuration].sum().round(decimals=2)), 
+                                            constants.TaskTypePractice,
+                                            constants.TaskTypeTheory,
+                                            classes = classes
+                                            )
+                    ],
+                    className="col-sm-4",
+                ))
+    except Exception as e: 
+        print(e)
+    try:
+        plotRow.append(
+                html.Div([
+                       generateCardDetail('Points', 
+                                            '' + millify(studentDataDf['Points'].sum().round(decimals=2)), 
+                                            '' + str(studentDataDfMean['Points']), 
+                                            '' + str( studentDataDfStd['Points'] ), 
+                                            'total',
+                                            'mean',
+                                            'std',
+                                            classes = classes
+                                            )
+                    ],            
+                    className="col-sm-4",
+                ))
+    except Exception as e: 
+        print(e)
             
     plots.append(
             html.Div(children  = plotRow,                
@@ -329,6 +361,10 @@ def get_unique_list_items(dfFeature):
     return set(dfFeature.sum())
     
     
-def get_unique_ConceptsUsed_items(dfData):
-    return set(dfData[ dfData['ConceptsUsed'].notnull() & (dfData['ConceptsUsed']  !=  u'')  ]['ConceptsUsed'].sum())
+def get_unique_ConceptsUsed_items(dfData, feature = 'ConceptsUsed'):
+    return set(dfData[ dfData[feature].notnull() & (dfData[feature]  !=  u'')  ][feature].sum())
     
+
+
+def checkIsFeatureNumeric(df, feature):
+    return pd.to_numeric(df[feature], errors='coerce').notnull().all()

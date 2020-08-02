@@ -248,18 +248,40 @@ def plotSingleClass( titleTextAdd, school ):
     
     #       if a student passed a task once, then he is Successfull OR Result = 1    
     
-        pieData = groupOriginal.groupby(['PracticeTaskId', 'StudentId'], as_index=False).sum()
+        try :
+            pieData = groupOriginal.groupby(['PracticeTaskId', 'StudentId'], as_index=False).sum()
+            
+            pieData.loc[pieData['Result'] > 0, 'Result'] = 1
         
-        pieData.loc[pieData['Result'] > 0, 'Result'] = 1
-    
-        taskData = pieData.groupby(['PracticeTaskId'], as_index=False).sum()
-        taskData = taskData.rename(columns={"Result": countStudentCompletingTaskFeature})
-        taskData = taskData.merge(right= dfPracticeTaskDetails
-                                          , left_on='PracticeTaskId', right_on='PracticeTaskId'
-                                            , left_index=False, right_index=False
-                                            , how='inner')
-        taskData[featurePracticeTaskDesc] = taskData['Title'] + ' (Id: ' + taskData['PracticeTaskId'].astype(str) + ')' 
-    
+            taskData = pieData.groupby(['PracticeTaskId'], as_index=False).sum()
+            taskData = taskData.rename(columns={"Result": countStudentCompletingTaskFeature})
+            taskData = taskData.merge(right= dfPracticeTaskDetails
+                                              , left_on='PracticeTaskId', right_on='PracticeTaskId'
+                                                , left_index=False, right_index=False
+                                                , how='inner')
+#            taskData[featurePracticeTaskDesc] = taskData['Title'].astype(str).str[10] + '... (Id: ' + taskData['PracticeTaskId'].astype(str) + ')' 
+            taskData[featurePracticeTaskDesc] = 'Id: ' + taskData['PracticeTaskId'].astype(str) 
+        
+        
+            figStudents = px.bar(taskData
+                                , x             =  countStudentCompletingTaskFeature
+                                , y             =  featurePracticeTaskDesc
+                                , title         = "(Practice)" +  ' No. of students completing a Task '
+                                , labels        = feature2UserNamesDict # customize axis label
+    #                            , height       = graphHeight
+                                , template      = constants.graphTemplete
+                                , hover_data    = ['Title', 'PracticeTaskId']                             
+                                , orientation   = 'h'
+            )
+            graphs.append(
+                    dcc.Graph(
+                        id='graphSchool-' + str(graphIndex),
+                        figure= figStudents
+                ))
+            graphIndex = graphIndex + 1
+        except Exception as e: 
+                print(e)
+                
         try :
             pieDataTheory = groupOriginalTheory.groupby(['TheoryTaskId', 'StudentId'], as_index=False).sum()
         
@@ -271,44 +293,30 @@ def plotSingleClass( titleTextAdd, school ):
                                               , left_on='TheoryTaskId', right_on='TheoryTaskId'
                                                 , left_index=False, right_index=False
                                                 , how='inner')
-            taskDataTheory[featureTheoryTaskDesc] = taskDataTheory['Title'] + ' (Id: ' + taskDataTheory['TheoryTaskId'].astype(str) + ')' 
+#            taskDataTheory[featureTheoryTaskDesc] = taskDataTheory['Title'].astype(str).str[10] + '... (Id: ' + taskDataTheory['TheoryTaskId'].astype(str) + ')' 
+            taskDataTheory[featureTheoryTaskDesc] = 'Id: ' + taskDataTheory['TheoryTaskId'].astype(str) 
+        
+        
+            figStudents = px.bar(taskDataTheory
+                                , x             =  countStudentCompletingTaskFeature
+                                , y             =  featureTheoryTaskDesc
+                                , title         = "(Theory)" + ' No. of students completing a Task '
+                                , labels        = feature2UserNamesDict # customize axis label
+    #                            , height       = graphHeight
+                                , template      = constants.graphTemplete
+                                , hover_data    = ['Title', 'TheoryTaskId']                             
+                                , orientation   = 'h'
+            )
+            graphs.append(
+                    dcc.Graph(
+                        id='graphSchool-' + str(graphIndex),
+                        figure= figStudents
+                ))
+            graphIndex = graphIndex + 1
+        
         except Exception as e: 
                 print(e)
-    
-        figStudents = px.bar(taskData
-                            , x=  countStudentCompletingTaskFeature
-                            , y=  featurePracticeTaskDesc
-                            , title  = "(Practice)" +  ' No. of students completing a Task '
-                            ,  labels= feature2UserNamesDict # customize axis label
-#                            , height       = graphHeight
-                            , template     = constants.graphTemplete
-                            , hover_data = ['Title']                             
-                            , orientation   = 'h'
-        )
-        graphs.append(
-                dcc.Graph(
-                    id='graphSchool-' + str(graphIndex),
-                    figure= figStudents
-            ))
-        graphIndex = graphIndex + 1
         
-        
-        figStudents = px.bar(taskDataTheory
-                            , x=  countStudentCompletingTaskFeature
-                            , y=  featureTheoryTaskDesc
-                            , title  = "(Theory)" + ' No. of students completing a Task '
-                            ,  labels= feature2UserNamesDict # customize axis label
-#                            , height       = graphHeight
-                            , template     = constants.graphTemplete
-                            , hover_data = ['Title']                             
-                            , orientation   = 'h'
-        )
-        graphs.append(
-                dcc.Graph(
-                    id='graphSchool-' + str(graphIndex),
-                    figure= figStudents
-            ))
-        graphIndex = graphIndex + 1
         
         
     #            CHECKED
@@ -618,8 +626,8 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False):
     figStd = df.std().round(decimals=2)[featureX]
     graphs.append(
             html.Div(children=[
-                    html.P('Mean = ' + str(figMean) ),
-                    html.P('Std. = ' + str(figStd) ),
+                    html.P('Mean ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figMean) ),
+                    html.P('Std. ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figStd) ),
                     ])
     )
     return graphs

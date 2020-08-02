@@ -431,10 +431,10 @@ def generateControlCard():
                 className   = "radio-items-inline"
             ), 
             html.Button(children=[
-                    'Add Plot',
-                    html.I(className="fas fa-plus font-size_medium p-left_xx-small")], 
+                    html.I(className="fas fa-plus font-size_medium p-right_xx-small"),
+                    'Add Plot',  ], 
                         id='form-submit-btn-custom', 
-                        className="button w3-btn w3-xlarge", n_clicks=0),
+                        className="c-button button w3-btn w3-xlarge", n_clicks=0),
             html.Br(),
         ],
         className = "form"

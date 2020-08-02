@@ -28,25 +28,31 @@ keyValue    = 'value'
 keyScrollTo  = 'scrollTo'
 keyClassName  = 'className'
 
+iconNameHome = "fa-home"
+iconNameGroups = "fa-list"
+iconNameDetails = "fa-clipboard"
+iconNameStudents = "fa-user-graduate"
+iconNameCustom = "fa-wrench"
+
 menuLink = {
      "menu-link-0" : { keyLabel : 'Home', keyHref : '/Home',
                   keySubmenu : [ 
-                          ],  keyClassName : 'fas fa-home m-right-small' }
+                          ],  keyClassName : 'fas ' + iconNameHome + ' m-right-small' }
     ,   "menu-link-1" : { keyLabel : 'Groups', keyHref : '/Groups',
                   keySubmenu : [
                           "menu-sub-link-0", "menu-sub-link-1", "menu-sub-link-2"
-                          ],  keyClassName : 'fas fa-list m-right-small'   }
+                          ],  keyClassName : 'fas ' + iconNameGroups + ' m-right-small'   }
     ,   "menu-link-2" : { keyLabel : 'Details', keyHref : '/Details' ,
                   keySubmenu : [
                           "menu-sub-link-3", "menu-sub-link-7", "menu-sub-link-4"
-                          ],  keyClassName : 'fas fa-clipboard m-right-small'   }
+                          ],  keyClassName : 'fas ' + iconNameDetails + ' m-right-small'   }
     ,   "menu-link-3" : { keyLabel : 'Students', keyHref : '/Students' ,
                   keySubmenu : [ "menu-sub-link-5"  
-                          ],  keyClassName : 'fas fa-user-graduate m-right-small'   }
+                          ],  keyClassName : 'fas ' + iconNameStudents + ' m-right-small'   }
     ,   "menu-link-4" : { keyLabel : 'Custom', 'href' : '/Custom' ,
                   keySubmenu : [
                           "menu-sub-link-6"
-                          ],  keyClassName : 'fas fa-wrench m-right-small'   }
+                          ],  keyClassName : 'fas ' + iconNameCustom + ' m-right-small'   }
 }
 menuSubLink2Scroll = {
 		"menu-sub-link-0"  :  {keyLabel : "Overview", keyScrollTo: ''}
@@ -140,33 +146,118 @@ def getMenu():
     return menus
 
 
+def getModalHelpBody():
+    content = []
+    
+    
+    content.append(html.H3( children = [ html.I(className="fas " + iconNameHome + " p-right_xx-small"),   "Home"  ] ))
+    content.append(html.P("Information about the game data"))
+    
+    content.append(html.Br())
+    
+    content.append(html.H3( children = [ html.I(className="fas " + iconNameGroups + " p-right_xx-small"),   "Groups"  ] ))
+    content.append(html.P("Compare groups for quick informations"))
+    content.append(html.P("Main group is highlighted with application theme"))
+    content.append(html.P("The minimum values of other groups are highlighted"))
+    content.append(html.P("Distribution : distribution of various features"))
+    
+    content.append(html.Br())
+    
+    
+    content.append(html.H3( children = [ html.I(className="fas " + iconNameDetails + " p-right_xx-small"),   "Details"  ] ))
+    content.append(html.P("Group details"))
+    
+    content.append(html.Br())
+    
+    content.append(html.H3( children = [ html.I(className="fas " + iconNameStudents + " p-right_xx-small"),   "Students"  ] ))
+    content.append(html.P("Group Student details"))
+    
+    content.append(html.Br())    
+    
+    content.append(html.H3( children = [ html.I(className="fas " + iconNameCustom + " p-right_xx-small"),   "Custom"  ] ))
+    content.append(html.P("Create custom figures specifying various parameters"))
+    content.append(html.P( children = [ html.I(className="fas fa-chart-bar font-size_medium p-right_xx-small"),   "Bar"  ]))
+    content.append(html.P( children = [ html.I(className="fas fa-circle font-size_medium p-right_xx-small"),   "Scatter"  ] ))
+    content.append(html.P( children = [ html.I(className="fas fa-chart-pie font-size_medium p-right_xx-small"),   "Pie"  ] ))
+    content.append(html.P( children = [ html.I(className="fas fa-ellipsis-h font-size_medium p-right_xx-small"),   "Bubble" ] ))
+    content.append(html.P( children = [ html.I(className="fas fa-chart-line font-size_medium p-right_xx-small"),   "Line" ] ))
+    
+       
+    content.append(html.Br())
+        
+    
+    content.append(html.H3("Programming concepts"))
+    content.append(  
+            dcc.Link(children       = ['Python programming concepts']
+                     , href         = "https://docs.python.org/dev/library/ast.html"
+                     , className    = "c-link"
+            )
+    )
+    content.append(html.P("The ast module helps Python applications to process trees of the Python abstract syntax grammar. The abstract syntax itself might change with each Python release; this module helps to find out programmatically what the current grammar looks like."))
+    content.append(html.P("expr   =   BoolOp , NamedExpr, BinOp, UnaryOp"))
+    content.append(html.P("operator    =   Add , Sub , Mult , MatMult , Div , Mod , Pow , LShift , RShift , BitOr , BitXor , BitAnd , FloorDiv"))
+    
+       
+    content.append(html.Br())
+
+
+    return content
 
 sidebar = html.Div(
     [
+
         html.H2("sCool", className="display-4"),
+
         html.P(
             "Student perfomance in sCool", className="lead"
         ),
+
         html.Hr(),
-#        dbc.Nav(submenu_1 + br + submenu_2 + br + submenu_3, vertical=True),
+
         dbc.Nav( getMenu(), vertical=True),
                 
 #        for menu link click output
         html.Div(id='menu-link-output-hidden', style={'display':'none'}),
+
         html.Div(id='menu-link-output-prevent-default', style={'display':'none'}),
+
         dcc.Input(
                 id="menu-link-input",
                 type="text", 
                 style={'display':'none'},
                 value="Groups"
             ),
+
         html.Div(id='menu-sub-link-output-hidden', style={'display':'none'}),
+
         dcc.Input(
                 id="menu-sub-link-input",
                 type="text", 
                 style={'display':'none'},
                 value="Groups"
             )
+        
+        , html.Div(
+            [
+                html.Button(children=[
+                    html.I(className="fas fa-info-circle font-size_medium p-right_xx-small"),
+                    'Help',], 
+                        id='menu-modal-help-open', 
+                        className="c-button button w3-btn w3-xlarge", n_clicks=0),
+                dbc.Modal(
+                    [
+                        dbc.ModalHeader("Help sCool Data Analysis Tool"),
+                        dbc.ModalBody(  children = getModalHelpBody()  ),
+                        dbc.ModalFooter(
+                            dbc.Button("Close", id="menu-modal-help-close", className="ml-auto")
+                        ),
+                    ],
+                    id="menu-modal-help",
+                    className = "c-modal-large"
+                ),
+            ],
+            className = "menu-modal-help"
+        )
     
     
     ],
@@ -244,6 +335,17 @@ def changeMenuSetInput(*args):
         
     return newValue    
     
+
+@app.callback(
+    Output("menu-modal-help", "is_open"),
+    [Input("menu-modal-help-open", "n_clicks"), Input("menu-modal-help-close", "n_clicks")],
+    [State("menu-modal-help", "is_open")],
+)
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
 
 
 app.clientside_callback(

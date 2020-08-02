@@ -116,25 +116,27 @@ def convert_list_column_tostr_NL(val) :
     
 
 def getStudentData(StudentId, schoolKey, selectedDate = ''):
-    school                              = dfGroupedOriginal.get_group(schoolKey)
-    schoolStudent                       = school[school['StudentId'] == StudentId]
-    schoolStudent['Finish']             = schoolStudent['CreatedAt'] 
-    schoolStudent['Start']              = schoolStudent['Finish'] - pd.to_timedelta(schoolStudent[featureSessionDuration], unit='s')
-    schoolStudent[featureDescription]   = getPracticeDescription(schoolStudent, False)   
-    schoolStudent[featureDescription]   = '<b>Title</b>:' + schoolStudent['Title'].astype(str)  + '<br><br>'+ schoolStudent[featureDescription].astype(str)
+    school                            = dfGroupedOriginal.get_group(schoolKey)
+    studentData                       = school[school['StudentId'] == StudentId]
+    studentData['Finish']             = studentData['CreatedAt'] 
+    studentData['Start']              = studentData['Finish'] - pd.to_timedelta(studentData[featureSessionDuration], unit='s')
     
-    schoolStudent = schoolStudent.sort_values(by='Start')
+    studentData['CodeDesc']           = studentData['Code'].str.replace('\n','<br>')
     
-    schoolStudent['IndexCol']  = 'Practice-' + schoolStudent['PracticeTaskId'].astype(str) + '-' + schoolStudent['Result'].astype('Int64').astype(str) 
-
+    studentData[featureDescription]   = getPracticeDescription(studentData, False)   
+    studentData[featureDescription]   = '<b>Title</b>:' + studentData['Title'].astype(str)  + '<br>'+ studentData[featureDescription].astype(str)
+    studentData[featureDescription]   = studentData[featureDescription].astype(str) + '<br><b>Code</b>:' + studentData['CodeDesc'].astype(str) 
     
-    schoolStudent['Finish'] = np.where(schoolStudent['Finish'].isnull(), schoolStudent['Start'].shift(-1), schoolStudent['Finish'])
+    studentData = studentData.sort_values(by='Start')
     
-    schoolStudent['Difference'] = (schoolStudent['Finish'] - schoolStudent['Start']).astype('timedelta64[s]')
+    studentData['Task']       = constants.TaskTypePractice + '-' + studentData['PracticeTaskId'].astype(str) 
+    studentData['IndexCol']   = studentData['Task'] + '-' + studentData['Result'].astype('Int64').astype(str) 
     
-    studentData         = schoolStudent
+    studentData['Finish'] = np.where(studentData['Finish'].isnull(), studentData['Start'].shift(-1), studentData['Finish'])
     
-    studentData[constants.featureTaskType] = [  constants.TaskTypePractice ] * studentData.shape[0]
+    studentData['Difference'] = (studentData['Finish'] - studentData['Start']).astype('timedelta64[s]')
+    
+    studentData[constants.featureTaskType] = constants.TaskTypePractice
 
 
     try :
@@ -157,12 +159,12 @@ def getStudentData(StudentId, schoolKey, selectedDate = ''):
                                             , left_index=False, right_index=False
                                             , how='inner')
         schoolTheoryStudent.rename(columns={'Description': 'TheoryTaskDescription'}, inplace=True)
-        schoolTheoryStudent['Task'] = constants.TaskTypeTheory + '-' + schoolTheoryStudent['TheoryTaskId'].astype(str) 
         
         schoolTheoryStudent[featureDescription] = getTheoryDescription(schoolTheoryStudent, False)  
-        schoolTheoryStudent[featureDescription] = '<b>Title</b>:' + schoolTheoryStudent['Title'].astype(str)  + '<br><br>'+ schoolTheoryStudent[featureDescription].astype(str) 
+        schoolTheoryStudent[featureDescription] = '<b>Title</b>:' + schoolTheoryStudent['Title'].astype(str)  + '<br>'+ schoolTheoryStudent[featureDescription].astype(str) 
     
-        schoolTheoryStudent['IndexCol'] = 'Theory-' + schoolTheoryStudent['TheoryTaskId'].astype(str) + '-' + schoolTheoryStudent['Result'].astype(str)
+        schoolTheoryStudent['Task'] = constants.TaskTypeTheory + '-' + schoolTheoryStudent['TheoryTaskId'].astype(str) 
+        schoolTheoryStudent['IndexCol'] = schoolTheoryStudent['Task'] + '-' + schoolTheoryStudent['Result'].astype(str)
         
         schoolTheoryStudent[constants.featureTaskType] = [  constants.TaskTypeTheory ] * schoolTheoryStudent.shape[0]
         
@@ -206,7 +208,6 @@ def plotStudentOverview(StudentId, groupId):
 
     studentDataDf                     = getStudentData(StudentId, groupId)
     
-    
     if studentDataDf is None or studentDataDf.empty == True :
         graphs.append(
                 html.H2('Has no game interactions')
@@ -214,7 +215,83 @@ def plotStudentOverview(StudentId, groupId):
         return graphs
     
     
-    graphs = util.plotStudentOverview(studentDataDf)
+    graphs = util.plotStudentOverview(studentDataDf , classes = "c-card-small" )
+    
+    
+    
+    plotRow = []
+    
+    
+    
+    groupOriginal                           = dfGroupedOriginal.get_group(groupId)
+    
+    groupOriginal['ConceptsUsed']           = groupOriginal['Code'].apply( studentGrouped.getAllNodeTypesUsefull )
+    groupOriginal["ConceptsUsedDetails"]    = groupOriginal['ConceptsUsed'].replace(
+                                                    studentGrouped.ProgramConceptsUsefull2UserNames, regex=True )
+    ConceptsUsedUnique                      = util.get_unique_list_items(groupOriginal[groupOriginal['StudentId'] == StudentId]['ConceptsUsedDetails'])
+    
+    studentWiseData                         = groupOriginal.groupby(['StudentId'], as_index=False).sum()
+    studentDataDfPractice                   = studentWiseData[studentWiseData['StudentId'] == StudentId]
+    
+    
+    
+    studentDataDfSuccess =     studentDataDf[studentDataDf['Result'].astype('Int64') > 0 ]
+    
+    if studentDataDfSuccess is not None and studentDataDfSuccess.empty is False  and 'Task' in studentDataDfSuccess.columns:        
+        plotRow.append( html.Div([  
+                
+                                    util.generateCardDetail([html.I(className="fas fa-cubes m-right-small"),   'No. of Tasks completed'], 
+                                        '' + util.millify(len(studentDataDfSuccess['Task'].unique())), 
+                                        '' + str(  len(studentDataDfSuccess[studentDataDfSuccess[constants.featureTaskType] == constants.TaskTypePractice ]['Task'].unique()) ), 
+                                        '' + str(  len(studentDataDfSuccess[studentDataDfSuccess[constants.featureTaskType] == constants.TaskTypeTheory ]['Task'].unique()) ), 
+                                        'total',
+                                        constants.TaskTypePractice,
+                                        constants.TaskTypeTheory ,
+                                        classes = "c-card-small" 
+                                        )
+                                ],
+                                className="col-sm-4",
+                        ))
+    
+    if studentDataDfPractice is not None and studentDataDfPractice.empty is False:        
+        plotRow.append( html.Div([
+                                    util.generateCardBase(
+                                            [html.I(className="fas fa-coins m-right-small"),   'Coins Collected'], 
+                                            studentDataDfPractice['CollectedCoins'].sum() ,
+                                            classes = "c-card-small" )
+                                ],
+                                className="col-sm-4",
+                        ))
+    
+    if studentDataDf is not None and studentDataDf.empty is False  and constants.featureItemsCollectedCount in studentDataDf.columns:        
+        plotRow.append( html.Div([  
+                                    util.generateCardBase(
+                                            [html.I(className="fas fa-memory m-right-small"),   'Items Collected'], 
+                                            studentDataDf[constants.featureItemsCollectedCount].sum()  ,
+                                            classes = "c-card-small" )
+                                ],
+                                className="col-sm-4",
+                        ))
+
+    if     ConceptsUsedUnique is not None          and         not ConceptsUsedUnique == '':        
+        plotRow.append( html.Div([
+                                    util.generateCardBase(
+                                             [html.I(className="fas fa-code m-right-small"),   'Concepts Used', ], 
+                                            ', '.join(ConceptsUsedUnique) ,
+                                            classes = "c-card-small" )
+                                ],
+                                className="col-sm-6",
+                        ))
+
+    
+    
+        
+        
+    graphs.append(
+            html.Div(children  = plotRow,                
+                     className = "row")
+    )
+
     
     return graphs
 

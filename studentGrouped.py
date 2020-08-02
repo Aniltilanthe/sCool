@@ -54,6 +54,14 @@ dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrate
 #------------------ Database interactions END --------------------------------------------
 
 
+#-----------------------functions from Main -------------------------------------------------
+
+getAllNodeTypesUsefull                  = main.getAllNodeTypesUsefull
+ProgramConceptsUsefull2UserNames        = main.ProgramConceptsUsefull2UserNames
+            
+#----------------------------functions from Main  END ---------------------------------------
+
+
 #----------------------------------
 
 featureDescription      = constants.featureDescription
@@ -208,9 +216,25 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
         
         studentDF['ConceptsUsedGroup'] =  [ studentDF.ConceptsUsed.agg(get_merge_list) ] * studentDF.shape[0]
         studentDF['ConceptsUsedDetailsGroup'] = [  studentDF.ConceptsUsedDetails.agg(get_merge_list) ] * studentDF.shape[0]
-        studentDF[constants.featureConceptsUsedDetailsStr]     = getPracticeConceptsUsedDetailsStr(studentDF)
+        studentDF[constants.featureConceptsUsedDetailsStr]     = studentDF['ConceptsUsedDetailsGroup']
         
-        studentDF[featureDescription] = getPracticeDescription(studentDF)    
+        studentDF[featureDescription] = getPracticeDescription(studentDF)  
+    
+    elif isOriginal and groupSelected in dfGroupedOriginal.groups.keys():
+        schoolPractice = dfGroupedOriginal.get_group(groupSelected)
+        schoolPractice['TaskId']        = constants.TaskTypePractice + schoolPractice['PracticeTaskId'].astype(str)
+        schoolPractice[constants.TASK_TYPE_FEATURE]      = constants.TaskTypePractice
+    
+        schoolPractice = schoolPractice.loc[:,~schoolPractice.columns.duplicated()]     
+
+        studentDF = schoolPractice
+        
+        studentDF['ConceptsUsed']    = studentDF['Code'].apply(main.getAllNodeTypesUsefull)
+        studentDF["ConceptsUsedDetails"] = studentDF['ConceptsUsed'].replace(
+                main.ProgramConceptsUsefull2UserNames, regex=True)
+        
+        studentDF[featureDescription] = getPracticeDescription(studentDF)  
+        
 
     
     if groupSelected in dfGroupedPlayerStrategyTheory.groups.keys():

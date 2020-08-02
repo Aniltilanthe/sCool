@@ -28,7 +28,7 @@ import constants
 
 #-----------------------------------
 
-def plotGroupOverview(groupSelected, groupStudents, studentDataDf):
+def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = ""):
     plots = []
     
     plotRow = []
@@ -37,7 +37,8 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf):
                             className="col-sm-3",
                     ))
     plotRow.append( html.Div([
-                                generateCardBase('No of Students', len(groupStudents))
+                                generateCardBase([html.I(className="fas fa-users m-right-small"),   'No of Students'], len(groupStudents),
+                                        classes = classes)
                             ],
                             className="col-sm-6",
                     ))
@@ -56,6 +57,7 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf):
                                         'total',
                                         'mean',
                                         'std',
+                                        classes = classes
                                         )
                 ],
                 className="col-sm-4",
@@ -68,7 +70,8 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf):
                                         '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypeTheory ][
                                                 'SessionDuration'].sum().round(decimals=2)), 
                                         constants.TaskTypePractice,
-                                        constants.TaskTypeTheory
+                                        constants.TaskTypeTheory,
+                                        classes = classes
                                         )
                 ],
                 className="col-sm-4",
@@ -82,6 +85,7 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf):
                                         'total',
                                         'mean',
                                         'std',
+                                        classes = classes
                                         )
                 ],            
                 className="col-sm-4",
@@ -95,7 +99,7 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf):
     return plots
 
 
-def plotStudentOverview(studentDataDf):
+def plotStudentOverview(studentDataDf, classes = ""):
     plots = []
     
     plotRow = []    
@@ -108,6 +112,7 @@ def plotStudentOverview(studentDataDf):
                                         'total',
                                         'mean',
                                         'std',
+                                        classes = classes
                                         )
                 ],
                 className="col-sm-4",
@@ -120,7 +125,8 @@ def plotStudentOverview(studentDataDf):
                                         '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypeTheory ][
                                                 constants.featureSessionDuration].sum().round(decimals=2)), 
                                         constants.TaskTypePractice,
-                                        constants.TaskTypeTheory
+                                        constants.TaskTypeTheory,
+                                        classes = classes
                                         )
                 ],
                 className="col-sm-4",
@@ -134,6 +140,7 @@ def plotStudentOverview(studentDataDf):
                                         'total',
                                         'mean',
                                         'std',
+                                        classes = classes
                                         )
                 ],            
                 className="col-sm-4",
@@ -148,7 +155,7 @@ def plotStudentOverview(studentDataDf):
 
 
 #---------------------------------- UI ------------------------------------
-def generateCardBase(label, value):
+def generateCardBase(label, value, classes = ""):
     return html.Div(
         [
             html.Span(
@@ -160,15 +167,14 @@ def generateCardBase(label, value):
                 className="card_label"
             ),
         ],
-        className="c-card card-base",
+        className="c-card card-base " + classes,
     )
         
   
 def generateCardDetail(label, valueMain = '', value1 = '', value2 = '', 
                        valueMainLabel = '', value1Label = '', value2Label = '',
-                       
-                       
-                       description = '', ):
+                       description = '',
+                       classes = '' ):
     return html.Div(
         [
             html.Div(
@@ -201,13 +207,13 @@ def generateCardDetail(label, valueMain = '', value1 = '', value2 = '',
                 className="card_description"
             ),
         ],
-        className="c-card card-detail",
+        className="c-card card-detail " + classes,
     )
               
 
 def generateCardDetail2(label, value1 = '', value2 = '',
                         value1Label = '', value2Label = '',
-                        description = '', ):
+                        description = '', classes = ''):
     return html.Div(
         [
             html.Div(
@@ -233,7 +239,7 @@ def generateCardDetail2(label, value1 = '', value2 = '',
                 className="card_description"
             ),
         ],
-        className="c-card card-detail-2",
+        className="c-card card-detail-2 " + classes,
     )
                 
                 
@@ -318,6 +324,11 @@ def is_valid_date(dateStr):
     
     
     
+
+def get_unique_list_items(dfFeature):
+    return set(dfFeature.sum())
     
     
+def get_unique_ConceptsUsed_items(dfData):
+    return set(dfData[ dfData['ConceptsUsed'].notnull() & (dfData['ConceptsUsed']  !=  u'')  ]['ConceptsUsed'].sum())
     

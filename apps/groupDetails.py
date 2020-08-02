@@ -225,12 +225,18 @@ def plotSingleClass( titleTextAdd, school ):
                 editable        =   True,
                 filter_action   =   "native",
                 sort_action     =   "native",
-                sort_mode       =   "multi"
+                sort_mode       =   "multi",
+                style_data_conditional = ([
+                            {
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': constants.THEME_TABLE_ODDROW_COLOR_STYLE
+                            },
+                 ]) 
             )
             
         graphs.append(  
-                html.Div([ figStudents ] ,
-                    style = { 'font-size' : '1rem'  })
+                html.Div([ figStudents ],
+                         className = "c-table ")
         )
         graphIndex = graphIndex + 1
         
@@ -653,7 +659,9 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                                 , left_index=False, right_index=False
                                                 , how='inner')
         
-        studentWiseData['ConceptsUsedDetailsStr']= studentWiseData['ConceptsUsedDetails'].apply(lambda x: x[1:-1])
+#        studentWiseData['ConceptsUsedDetailsStr']= studentWiseData['ConceptsUsedDetails'].apply(lambda x: x[1:-1])
+        studentWiseData['ConceptsUsedDetailsStr']= studentWiseData['ConceptsUsedDetails']
+        
         studentWiseData.reset_index(drop=True, inplace=True)
         
         studentWiseData[countTaskCompletedByStudentFeature] = studentWiseData['Result']
@@ -821,17 +829,17 @@ def plotClassOverview(schoolKey):
         filter_action       = "native",
         sort_action         = "native",
         sort_mode           = "multi",
-        style_data_conditional=([
-            {
-                'if': {'row_index': 'odd'},
-                'backgroundColor': 'rgb(248, 248, 248)'
-            },
-         ] 
-        ),
-        style_header = constants.THEME_TABLE_HEADER_STYLE
+        style_data_conditional = ([ 
+                {
+                    'if': {'row_index': 'odd'},
+                    'backgroundColor': constants.THEME_TABLE_ODDROW_COLOR_STYLE
+                },
+         ]) 
     )
     columns.append(dbc.Col(
-                    fig1Table , align="center"
+                    fig1Table 
+                    , align ="center"                    
+                    , className = "c-table "
     ))
     rows.append( dbc.Row( columns ) )
     
@@ -871,18 +879,18 @@ layout = [
     
     , dbc.Row([
             dbc.Col( 
-                    html.Div(id='Details-Group-Container')
+                    html.Div(id='Details-Group-Container', className = "c-table ")
         )])
     
     
     , dbc.Row([
             dbc.Col( 
-                html.Div(id='Details-Group-Concept-Container')
+                html.Div(id='Details-Group-Concept-Container', className = "c-table ")
        )])
                     
     , dbc.Row([
             dbc.Col( 
-                html.Div(id='Details-Group-General-Container')
+                html.Div(id='Details-Group-General-Container', className = "c-table ")
        )])
     
     

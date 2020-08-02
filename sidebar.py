@@ -170,7 +170,7 @@ sidebar = html.Div(
     
     
     ],
-    style= constants.SIDEBAR_STYLE,
+    className = " page-sidebar ",
     id="sidebar",
 )
 

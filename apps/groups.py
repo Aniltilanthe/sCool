@@ -88,14 +88,14 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
             filter_action       = "native",
             sort_action             = "native",
             sort_mode           = "multi",
-            style_data_conditional=([
-                {
-                    'if': {'row_index': 'odd'},
-                    'backgroundColor': 'rgb(248, 248, 248)'
-                },
-             ] +  
-            
-    
+            style_data_conditional=(   
+            [
+                        {
+                            'if': {'row_index': 'odd'},
+                            'backgroundColor': constants.THEME_TABLE_ODDROW_COLOR_STYLE
+                        },
+            ] +
+                    
             ( []  if ( isMinNotHighlight ) else   [
                 {
                     'if': {
@@ -199,10 +199,10 @@ def getGroupData(schoolKey, schoolKeys2Compare):
     if (None == schoolKeys2Compare) :
         schoolKeys2Compare = []
     
-    studentDataDf = studentGrouped.getStudentsOfSchoolDF(schoolKey)
+    studentDataDf = studentGrouped.getStudentsOfSchoolDF(schoolKey, isOriginal = True)
     
     for sckoolKey2Com in schoolKeys2Compare:
-        studentDataDf2Com = studentGrouped.getStudentsOfSchoolDF(sckoolKey2Com)
+        studentDataDf2Com = studentGrouped.getStudentsOfSchoolDF(sckoolKey2Com, isOriginal = True)
         
         if 'studentDataDf2Com' in locals()    and    studentDataDf2Com is not None :
             studentDataDf = pd.concat([studentDataDf, studentDataDf2Com], ignore_index=True, sort=False)
@@ -268,11 +268,14 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                                             , left_index=False, right_index=False
                                             , how='inner')
         
-        studentDataDfFeaturesInterpreted2 = pd.DataFrame(columns = ['StudentId', 'ConceptsUsed'])
+        studentDataDfFeaturesInterpreted2 = pd.DataFrame(columns = [constants.GROUPBY_FEATURE, 'ConceptsUsed'])
         for groupKey, group in studentDataDfGrouped :     
+            print(group['ConceptsUsed'])
             conceptsUsedStr = ' '
-            if 'ConceptsUsed' in group.columns and  group[ group['ConceptsUsed'].notnull() ].shape[0] > 0 :
-                conceptsUsedStr = ', '.join( group[ group['ConceptsUsed'].notnull() ].iloc[0]['ConceptsUsed'] )
+            if 'ConceptsUsed' in group.columns and  group[ group['ConceptsUsed'].notnull() & (group['ConceptsUsed']  !=  u'') ].shape[0] > 0 :
+                conceptsUsedStr = ', '.join(  util.get_unique_ConceptsUsed_items(group)  )
+                
+                
                 
             studentDataDfFeaturesInterpreted2 = studentDataDfFeaturesInterpreted2.append({constants.GROUPBY_FEATURE : groupKey,
                                                                                         'ConceptsUsed' : conceptsUsedStr },  
@@ -585,7 +588,7 @@ layout = [
                     [ generateControlCard() ]
                     + [
                         html.Div(
-                            ["initial child"], id="row-control-main-output-clientside-overview", style={"display": "none"}
+                            ["initial child"], id="row-control-main-output-clientside-overview", className="hidden"
                         )
                     ],
                 ),
@@ -594,7 +597,7 @@ layout = [
         
                     
 
-    html.Div(id='group-comparision-container', className = "row group-comparision-container" )
+    html.Div(id='group-comparision-container', className = "row group-comparision-container c-table" )
     
     
 ]
@@ -640,7 +643,7 @@ def update_bar(groupMain, groupComparision ):
     graphs = plotClassOverview( int(groupMain), groupComparision )    
     
     return  html.Div(graphs,
-                     className = "width-100")
+                     className = "col")
     
 
 # Update bar plot

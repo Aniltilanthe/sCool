@@ -6,6 +6,22 @@ html {
 	font-family: sans-serif;
 }
 
+.page-main {
+	margin-left: 16rem;
+    padding: 2rem 1rem;
+	overflow-x: scroll;
+	min-height: 100vh;
+	
+}
+.page-sidebar {
+	position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 16rem;
+    padding: 2rem 1rem;
+    background-color: #f8f9fa;
+}
 .page-content {
 	margin-top: 2rem;
 }
@@ -21,6 +37,14 @@ html {
     background-color: #0069d9;
     border-color: #0062cc;
     box-shadow: 0 0 0 0.2rem rgba(38,143,255,.5);
+}
+
+.row {
+	margin-right: 0 !important;
+	margin-left: 0 !important;
+}
+.btn {
+	text-transform: initial;
 }
 
 .p_small {
@@ -138,12 +162,14 @@ html {
     font-size: 11px;
     font-weight: 600;
     letter-spacing: .1rem;
-    text-transform: uppercase;
     background-color: transparent;
     border-radius: 5px;
     border: 1px solid #bbb;
     cursor: pointer;
     box-sizing: border-box;
+}
+.form .button:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 }
 
 .form .radio-items-inline label, .radio-items-inline label input{
@@ -159,24 +185,33 @@ html {
   text-align: center;
   padding: 1rem;
 }
+.c-card.c-card-small {
+  margin: 0.5rem;
+  padding: 0.5rem;
+} 
 .c-card:hover {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 }
 .c-card .card_label {
 	font-size: 1.5rem;
 }
+.c-card.c-card-small .card_label {
+    font-size: 1rem;
+} 
 .c-card .card_value {
 	font-weight: bold;
     font-size: 3rem;
 }
+.c-card.c-card-small .card_value {
+	font-weight: bold;
+    font-size: 1.8rem;
+} 
 .c-card .card_value1, .c-card .card_value2 {
 	width: 50%;
     display: inline-block;
 	font-size: 1.5rem;
 	font-weight: bold;
 }
-
-
 .c-card .card-detail .card_value,  .c-card .card-detail-2 .card_value {
     display: inline-block;	
 	font-size: 1.5rem;
@@ -206,10 +241,6 @@ html {
 	color : black;
 }
 
-.table-comparision td:nth-child(1) {  
-  font-weight: bold;
-}
-
 .theme-cyan .navbar-main {
 	z-index : 5;
 }
@@ -222,45 +253,30 @@ html {
 	margin-top: 2rem;
 }
 
-
-.group-comparision-container .dash-table-container {
-	font-size : 15px;
-}
-
-
-.group-comparision-container  .dash-table-container td:nth-child(1) {  
-  font-weight: bold;
-}
-
 .width-100 {
 	width: 100%;
 }
 
-.theme-cyan .table tr:nth-child(2) {
-	background-color   : rgb(230, 230, 230);
-    font-weight        : bold;
+.c-table {
+	font-size : 1.2em;
 }
-
-.theme-cyan .table th {
+.c-table tr:nth-child(1)  {
 	background-color: rgb(230, 230, 230);
     font-weight: bold;
     border-width: 1px;
     border-style: solid;
     border-color: rgb(211, 211, 211);
 }
-
-.table tr:nth-child(2) {
-	background-color   : rgb(230, 230, 230);
-    font-weight        : bold;
+.c-table tr:nth-child(1) .column-header-name {
+	font-weight: bold;
+}
+.c-table .c-table-oddeven tr:nth-child(odd) {
+	background: rgb(248, 248, 248);
+}
+.table-comparision td:nth-child(1) {  
+  font-weight: bold;
 }
 
-.table tr:nth-child(1) th  {
-	background-color: rgb(230, 230, 230);
-    font-weight: bold;
-    border-width: 1px;
-    border-style: solid;
-    border-color: rgb(211, 211, 211);
-}
 
 .theme-cyan .graph-small {
 	padding: 2rem;

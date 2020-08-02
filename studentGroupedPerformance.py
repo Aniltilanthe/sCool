@@ -458,7 +458,7 @@ for feature in hasFeatures:
 dfPlayerStrategyPracticeTask = dfPlayerStrategyPracticeTask.loc[:,~dfPlayerStrategyPracticeTask.columns.duplicated()]
 
 
-
+#---------------------------------------------------------------------------------------------
                           
 
 def getGroupedData(df):
@@ -472,52 +472,6 @@ def getGroupedData(df):
 dfGrouped = getGroupedData(dfPlayerStrategyPractice)
 
 dfGroupedPracticeTaskWise = getGroupedData(dfPlayerStrategyPracticeTask)
-
-
-rowlength = dfGrouped.ngroups/2                         # fix up if odd number of groups
-
-countSubPlots = 0
-
-for groupKey, group in dfGrouped:
-    entries = group.size
-    columns = len(group.columns)
-    groupSize = entries/columns
-
-    if int(groupSize) > MIN_STUDENT_COUNT :    
-        countSubPlots = countSubPlots + 1
-        
-
-#*************************************************************
-#STEP 1 : Plot of varios features with information
-#*************************************************************
-#    [  X ,  Y   ]
-#featurePairsToPlot = [
-#        ['studentTaskCount', 'Name']
-#        , ['studentAttemptsTotal', 'Name']
-#        , ['Points', 'Name']
-#        , ['robotCollisionsBoxCount', 'Name']
-#        , ['CollectedCoins', 'Name']
-#        , ['SessionDuration', 'Name']
-#        ]
-
-
-#------------------------------------------------------------------------------------
-
-
-
-#plots for each school (not combined all schools)
-#    [  X ,  Y   ]
-#featurePairsToPlotSingle = [
-#        ['studentAttemptsTotal', 'Name']
-#        , ['Points', 'Name']
-#        , ['robotCollisionsBoxCount', 'Name']
-#        , ['CollectedCoins', 'Name']
-#        , ['SessionDuration', 'Name']    
-#        ]
-
-
-                            
-
 
 
 

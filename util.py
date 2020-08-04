@@ -66,9 +66,9 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = "")
             html.Div([
                    generateCardDetail2([html.I(className="fas fa-clock m-right-small"),   'Game Time - Practice vs Theory'], 
                                         '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice  ][
-                                                'SessionDuration'].sum().round(decimals=2)), 
+                                                constants.featureSessionDuration ].sum().round(decimals=2)), 
                                         '' + seconds_2_dhms(studentDataDf[studentDataDf[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypeTheory ][
-                                                'SessionDuration'].sum().round(decimals=2)), 
+                                                constants.featureSessionDuration ].sum().round(decimals=2)), 
                                         constants.TaskTypePractice,
                                         constants.TaskTypeTheory,
                                         classes = classes
@@ -98,6 +98,11 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = "")
     
     return plots
 
+
+
+
+
+studentOverviewFeaturesDefault = [ constants.featureSessionDuration, constants.featurePoints ]
 
 def plotStudentOverview(studentDataDf, classes = ""):
     plots = []
@@ -163,10 +168,12 @@ def plotStudentOverview(studentDataDf, classes = ""):
     try:
         plotRow.append(
                 html.Div([
-                       generateCardDetail('Points', 
-                                            '' + millify(studentDataDf['Points'].sum().round(decimals=2)), 
-                                            '' + str(studentDataDfMean['Points']), 
-                                            '' + str( studentDataDfStd['Points'] ), 
+                       generateCardDetail( 
+                               ((constants.feature2UserNamesDict.get(constants.featurePoints)) if constants.featurePoints in constants.feature2UserNamesDict.keys() else constants.featurePoints ) 
+                                , 
+                                            '' + millify(studentDataDf[ constants.featurePoints ].sum().round(decimals=2)), 
+                                            '' + str(studentDataDfMean[ constants.featurePoints ]), 
+                                            '' + str( studentDataDfStd[ constants.featurePoints ] ), 
                                             'total',
                                             'mean',
                                             'std',
@@ -278,7 +285,7 @@ def generateCardDetail2(label, value1 = '', value2 = '',
 #----------------------------- UI END ----------------------------------------
                 
 
-#-------------------------------------------------------------------------
+#------------------------------GENERIC START-------------------------------------------
                       
 
 millnames = ["", " K", " M", " B", " T"] # used to convert numbers
@@ -354,17 +361,36 @@ def is_valid_date(dateStr):
         return False
     
     
-    
-    
 
 def get_unique_list_items(dfFeature):
     return set(dfFeature.sum())
     
     
-def get_unique_ConceptsUsed_items(dfData, feature = 'ConceptsUsed'):
-    return set(dfData[ dfData[feature].notnull() & (dfData[feature]  !=  u'')  ][feature].sum())
-    
-
 
 def checkIsFeatureNumeric(df, feature):
     return pd.to_numeric(df[feature], errors='coerce').notnull().all()
+
+
+
+def getNumericFeatures(df):
+    return df.select_dtypes(include=np.number).columns.tolist()
+
+
+#------------------------------ GENERIC END --------------------------------------------
+    
+
+
+#---------------------------- App Specific ---------------------------------------------
+    
+    
+def BuildOptionsFeatures(options):  
+    return [{ constants.keyLabel : constants.feature2UserNamesDict.get(i) if i in constants.feature2UserNamesDict.keys() else i , 
+             constants.keyValue : i} for i in options]
+
+
+
+
+def get_unique_list_feature_items(dfData, feature =    constants.featureConceptsUsed  ):
+    return set(dfData[ dfData[feature].notnull() & (dfData[feature]  !=  u'')  ][feature].sum())
+    
+

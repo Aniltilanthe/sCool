@@ -23,7 +23,7 @@ html {
     background-color: #f8f9fa;
 }
 .page-content {
-	margin-top: 2rem;
+	margin-top: 0.5rem;
 }
 
 .highlight {
@@ -61,6 +61,14 @@ html {
 	display: none;
 }
 
+.disabled  {
+	pointer-events: none;
+	opacity: 0.5;
+}
+.disabled label, .disabled .Select-control {
+	background-color: #dddddd;
+}
+
 .c-button {
 	height: 38px;
     padding: 0 2rem;
@@ -74,13 +82,16 @@ html {
     cursor: pointer;
     box-sizing: border-box;
 }
-.c-button:hover {
+.c-button:hover, a:hover, .Select .Select-control:hover {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 }
 
+
 .form .radio-items-inline label, .radio-items-inline label input{
-	margin: 1em;
+	margin: 0.5em;
+	padding: 0.5em;
 }
+
 
 
 .c-card {

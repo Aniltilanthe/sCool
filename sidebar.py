@@ -21,18 +21,20 @@ import constants
 
 #-------------------------------------------------------------------------
 
-keyLabel    = 'label'
-keyHref     = 'href'
-keySubmenu  = 'submenu'
-keyValue    = 'value'
-keyScrollTo  = 'scrollTo'
-keyClassName  = 'className'
+keyLabel            = constants.keyLabel
+keyHref             = constants.keyHref
+keySubmenu          = constants.keySubmenu
+keyValue            = constants.keyValue
+keyScrollTo         = constants.keyScrollTo
+keyClassName        = constants.keyClassName
 
-iconNameHome = "fa-home"
-iconNameGroups = "fa-list"
-iconNameDetails = "fa-clipboard"
-iconNameStudents = "fa-user-graduate"
-iconNameCustom = "fa-wrench"
+iconNameHome        = constants.iconNameHome
+iconNameGroups      = constants.iconNameGroups
+iconNameDetails     = constants.iconNameDetails
+iconNameStudents    = constants.iconNameStudents
+iconNameCustom      = constants.iconNameCustom
+
+
 
 menuLink = {
      "menu-link-0" : { keyLabel : 'Home', keyHref : '/Home',

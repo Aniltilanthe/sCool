@@ -63,7 +63,7 @@ TaskTypeTheory                      = constants.TaskTypeTheory
 sortOrderDescending                 = constants.sortOrderDescending
 sortOrderAscending                  = constants.sortOrderAscending
 
-hasFeatures =  studentGrouped.hasFeatures
+hasFeatures                         =  studentGrouped.hasFeatures
 
 #--------------------------------- Const values END ----------------------------
 
@@ -77,7 +77,7 @@ dfPracticeTaskDetails                   = studentGrouped.dfPracticeTaskDetails
 dfTheoryTaskDetails                     = studentGrouped.dfTheoryTaskDetails
 
 
-dfGroupedPractice                       = studentGrouped.dfGroupedPractice
+#dfGroupedPractice                       = studentGrouped.dfGroupedPractice
 dfGroupedOriginal                       = studentGrouped.dfGroupedOriginal
 dfPlayerStrategyPractice                = studentGrouped.dfPlayerStrategyPractice  
 dfGroupedPracticeTaskWise               = studentGrouped.dfGroupedPracticeTaskWise
@@ -113,7 +113,7 @@ def convert_list_column_tostr_NL(val) :
 
 #------------------------------------
 
-    
+
 
 def getStudentData(StudentId, schoolKey, selectedDate = ''):
     
@@ -207,6 +207,23 @@ def isStudentInGroup(StudentId, groupId) :
     return True
 
 
+studentOverviewFeaturesDefault =   {
+        constants.featureCollectedCoins : {
+                constants.keyClassName : 'fas fa-coins ',
+                constants.keyHasMeanStd : False,                
+        }
+        , constants.featureItemsCollectedCount : {
+                constants.keyClassName : 'fas fa-memory ',
+                constants.keyHasMeanStd : False,                
+        }
+        , constants.featureLineOfCodeCount : {
+                constants.keyClassName : 'fas list-ol ',
+                constants.keyHasMeanStd : False,                
+        }
+}
+
+
+
 def plotStudentOverview(StudentId, groupId):
     
     graphs = []
@@ -222,7 +239,7 @@ def plotStudentOverview(StudentId, groupId):
     
     if studentDataDf is None or studentDataDf.empty == True :
         graphs.append(
-                html.H2('Has no game interactions')
+                html.H2(  constants.labelNoData  )
         )
         return graphs
     
@@ -257,7 +274,7 @@ def plotStudentOverview(StudentId, groupId):
                                         '' + util.millify(len(studentDataDfSuccess['Task'].unique())), 
                                         '' + str(  len(studentDataDfSuccess[studentDataDfSuccess[constants.featureTaskType] == constants.TaskTypePractice ]['Task'].unique()) ), 
                                         '' + str(  len(studentDataDfSuccess[studentDataDfSuccess[constants.featureTaskType] == constants.TaskTypeTheory ]['Task'].unique()) ), 
-                                        'total',
+                                        constants.labelTotal  ,
                                         constants.TaskTypePractice,
                                         constants.TaskTypeTheory ,
                                         classes = "c-card-small" 
@@ -266,29 +283,53 @@ def plotStudentOverview(StudentId, groupId):
                                 className="col-sm-4",
                         ))
     
-    if studentDataDfPractice is not None and studentDataDfPractice.empty is False:        
-        plotRow.append( html.Div([
-                                    util.generateCardBase(
-                                            [html.I(className="fas fa-coins m-right-small"),   'Coins Collected'], 
-                                            studentDataDfPractice['CollectedCoins'].sum() ,
-                                            classes = "c-card-small" )
-                                ],
-                                className="col-sm-4",
-                        ))
+        
+    for feature2OKey in studentOverviewFeaturesDefault.keys():
+        currentFeatureO = studentOverviewFeaturesDefault.get(feature2OKey)
+        
+        if constants.keyHasMeanStd in currentFeatureO.keys() and   currentFeatureO.get(constants.keyHasMeanStd):
+            plotRow.append( html.Div([
+                                    util.generateCardDetail(
+                                                [html.I(className =  html.I(className=  currentFeatureO.get(constants.keyClassName)) +  " m-right-small"), 
+                                                 ((constants.feature2UserNamesDict.get(feature2OKey)) if feature2OKey in constants.feature2UserNamesDict.keys() else feature2OKey ) ], 
+                                                studentDataDf[feature2OKey].sum().round(decimals=2) ,
+                                                studentDataDf[feature2OKey].mean().round(decimals=2) , 
+                                                studentDataDf[feature2OKey].std().round(decimals=2) , 
+                                                constants.labelTotal  ,
+                                                constants.labelMean ,
+                                                constants.labelStd ,
+                                                classes = "c-card-small" )
+                                    ],
+                                    className="col-sm-4",
+                            ))
+
+
+            
+        else :
+            if feature2OKey in studentDataDfPractice.columns :
+                plotRow.append( html.Div([
+                                            util.generateCardBase(
+                                                    [   html.I(className=  currentFeatureO.get(constants.keyClassName) +  " m-right-small"), 
+                                                         ((constants.feature2UserNamesDict.get(feature2OKey)) if feature2OKey in constants.feature2UserNamesDict.keys() else feature2OKey ) ], 
+                                                    studentDataDfPractice[feature2OKey].sum() ,
+                                                    classes = "c-card-small" )
+                                        ],
+                                        className="col-sm-4",
+                                ))
+            elif feature2OKey in studentDataDf.columns :
+                plotRow.append( html.Div([
+                                            util.generateCardBase(
+                                                    [   html.I(className=  currentFeatureO.get(constants.keyClassName) +  " m-right-small"), 
+                                                         ((constants.feature2UserNamesDict.get(feature2OKey)) if feature2OKey in constants.feature2UserNamesDict.keys() else feature2OKey ) ], 
+                                                    studentDataDf[feature2OKey].sum() ,
+                                                    classes = "c-card-small" )
+                                        ],
+                                        className="col-sm-4",
+                                ))
     
-    if studentDataDf is not None and studentDataDf.empty is False  and constants.featureItemsCollectedCount in studentDataDf.columns:        
-        plotRow.append( html.Div([  
-                                    util.generateCardBase(
-                                            [html.I(className="fas fa-memory m-right-small"),   'Items Collected'], 
-                                            studentDataDf[constants.featureItemsCollectedCount].sum()  ,
-                                            classes = "c-card-small" )
-                                ],
-                                className="col-sm-4",
-                        ))
-    
+        
     if groupOriginal[groupOriginal['StudentId'] == StudentId] is not None  and groupOriginal[groupOriginal['StudentId'] == StudentId]['ConceptsUsedDetails'].shape[0] > 0 :
-        ConceptsUsedUnique                      = util.get_unique_ConceptsUsed_items(groupOriginal[groupOriginal['StudentId'] == StudentId], 'ConceptsUsedDetails')
-    #    ConceptsUsedUnique                      = util.get_unique_list_items(groupOriginal[groupOriginal['StudentId'] == StudentId]['ConceptsUsedDetails'])
+        ConceptsUsedUnique                      = util.get_unique_list_feature_items(groupOriginal[groupOriginal['StudentId'] == StudentId], 'ConceptsUsedDetails')
         
         if     ConceptsUsedUnique is not None          and         not ConceptsUsedUnique == '':        
             plotRow.append( html.Div([
@@ -301,7 +342,6 @@ def plotStudentOverview(StudentId, groupId):
                             ))
     
     
-    
         
         
     graphs.append(
@@ -312,6 +352,73 @@ def plotStudentOverview(StudentId, groupId):
     
     return graphs
 
+
+
+
+def plotStudentOverviewFeatures( StudentId, groupId, features2Overview ):
+    if (None == groupId) :
+        return html.Div()
+    
+    if (None == features2Overview) :
+        features2Overview = [] 
+        
+    
+    graphs = []
+    plotRow = []    
+    
+#    the student is not in the group
+    if not isStudentInGroup(StudentId, groupId) :
+        return graphs
+    
+    
+
+    studentDataDf                     = getStudentData(StudentId, groupId)
+    
+    if studentDataDf is None or studentDataDf.empty == True :
+        graphs.append(
+                html.H2(  constants.labelNoData  )
+        )
+        return graphs
+    
+    
+    studentDataDf.fillna(0, inplace=True)
+    
+    try:
+        studentDataDfMean    = studentDataDf.mean().round(decimals=2)
+        studentDataDfStd    = studentDataDf.std().round(decimals=2)
+        
+        studentDataDfMean.fillna(0, inplace=True)
+        studentDataDfStd.fillna(0, inplace=True)
+    
+        for feature2O in features2Overview :
+            
+            plotRow.append(
+                html.Div([
+                       util.generateCardDetail( 
+                               ((constants.feature2UserNamesDict.get(feature2O)) if feature2O in constants.feature2UserNamesDict.keys() else feature2O ) 
+                                , 
+                                            '' + util.millify( studentDataDf[ feature2O ].sum().round(decimals=2) ), 
+                                            '' + str( studentDataDfMean[ feature2O ] ), 
+                                            '' + str( studentDataDfStd[ feature2O ] ), 
+                                            'total',
+                                            'mean',
+                                            'std',
+                                            classes = "c-card-small"
+                                            )
+                    ],            
+                    className="col-sm-4",
+                ))
+    except Exception as e: 
+        print(e)
+        
+      
+    graphs.append(
+            html.Div(children  = plotRow,                
+                     className = "row")
+    )
+    
+    return graphs
+        
 
 #Student Interaction with Game - TIMELINE
 def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDirection = sortOrderDescending ):
@@ -329,7 +436,7 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
 
     if studentData is None or studentData.empty == True :
         graphs.append(
-                html.H2('Has no game interactions')
+                html.H2(  constants.labelNoData  )
         )
         return graphs
     
@@ -442,6 +549,71 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
 
 
 
+featureOptionsOverview = [
+     'Result',
+     'Points',
+     'SessionDuration',
+     'Attempts',
+     'CollectedCoins',
+     'Difficulty',
+     'NumberOfCoins',
+     'NumberOfHidden',
+     'lineOfCodeCount',
+     'runsCount',
+     'runsErrorCount',
+     'runsSuccessCount',
+     'runsErrorSyntaxCount',
+     'runsErrorNameCount',
+     'runsErrorTypeCount',
+     'runsErrorAttribiteCount',
+     'runsHasLoopCount',
+     'runsHasNestedLoopCount',
+     'runsHasConditionCount',
+     'runsHasVariableCount',
+     'runsHasExpressionsCount',
+     'runsHasAsyncOrAwaitCount',
+     'runsHasFunctionClassCount',
+     'runsHasControlFlowCount',
+     'runsHasImportsCount',
+     'runsHasStatementsCount',
+     'runsHasComprehensionsCount',
+     'runsHasSubscriptingCount',
+     'runsLineOfCodeCountAvg',
+     'draggedCount',
+     'tabsSwitchedCount',
+     'tabsSwitchedDescriptionCount',
+     'tabsSwitchedCodeCount',
+     'tabsSwitchedOutputCount',
+     'deletedCodesCount',
+     'robotCollisionsBoxCount',
+     'coinCollectedCount',
+     'keyboardKeyPressedCount',
+     'studentAttemptsTotal',
+     'enemiesCount',
+     'playerShootCount',
+     'playerShootEndCount',
+     'playerShootEndEnemyHitCount',
+     'playerShootEndEnemyMissedHitCount',
+     'enemysShootEndPlayerHitCount',
+     'enemysShootEndPlayerNotHitCount',
+     'itemsCollectedCount'
+ ]
+
+def getFeatureOptions():
+    
+#    numericFeaturesPracticeS = set(util.getNumericFeatures(dfGroupedOriginal.median()))
+#    numericFeaturesTheoryS = set(util.getNumericFeatures(dfPlayerStrategyTheory))
+#    
+#    print('get feature options')
+#    print( numericFeaturesPracticeS  )
+#    print( numericFeaturesTheoryS )
+#    
+#    return util.BuildOptionsFeatures( numericFeaturesPracticeS.union(numericFeaturesTheoryS) )
+    
+    return util.BuildOptionsFeatures( featureOptionsOverview )
+    
+
+
 
 #-----------------------------------------
 # Layout-------------------------
@@ -452,39 +624,72 @@ layout = [
 
      dbc.Row([
             dbc.Col(
-                html.Div(id='Student-Information', children = [
+                html.Div(id='student-information', children = [
                     html.H3('Student Information'),
                         ], 
-                               className = "c-container p_medium", 
+                               className = "c-container", 
                 )
       )])
     , dbc.Row([
             dbc.Col(
               html.Div([
                     dcc.Dropdown(
-                            id ='StudentSelector-Dropdown', 
+                            id ='student-selector-dropdown', 
                             placeholder = "Select Student", 
                         )
                     ],
-                    className = "c-container"
+                    className = " "
                )
-                , width=8
-            ),
+                , width = 12
+            ),  
+    ])
+
+    , dbc.Row([
+            dbc.Col(
+                html.Div(id='student-overview-container', 
+                           className = "c-container m_small")
+      )])
+             
+
+    , dbc.Row([
             dbc.Col(
                 html.Div([
                     dcc.Dropdown(
-                            id='StudentSelector-Date-Dropdown', 
+                            id='student-feature-overview-dropdown', 
+                            placeholder = "Select Overview Features",
+                            options = getFeatureOptions(),
+                            multi   = True,
+                        )
+                    ],
+                    className = "  "
+                )
+                , width = 12
+            ),
+    ])
+                
+    , dbc.Row([
+            dbc.Col(
+                html.Div(id='student-features-overview-container', 
+                           className = "c-container m_small")
+      )])
+             
+            
+    , dbc.Row([
+            dbc.Col(
+                html.Div([
+                    dcc.Dropdown(
+                            id='student-date-dropdown', 
                             placeholder = "Select Date",
                         )
                     ],
                     className = "c-container"
                 )
-                , width=3
+                , width = 6
             ),
             dbc.Col(
                 html.Div([
                     dcc.Dropdown(
-                            id = 'StudentSelector-Direction-Dropdown',
+                            id = 'student-sort-order-dropdown',
                             options=[
                                 {'label': sortOrderAscending, 'value': sortOrderAscending},
                                 {'label': sortOrderDescending, 'value': sortOrderDescending},
@@ -495,25 +700,18 @@ layout = [
                 ], 
                 className = "c-container", 
                 )
-                , width=1
+                , width  =  6
             )
     ])
-
-    , dbc.Row([
-            dbc.Col(
-                html.Div(id='Student-Overview-Container', 
-                           className = "c-container m_medium")
-      )])
-                
-            
+                    
     , dbc.Row([
             dbc.Col( 
                     html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),
-                       "download data : Student",],  id = "details_download_student_link", className = "hidden" ,
+                       "download data : Student",],  id = "student_details_download_link", className = "hidden" ,
                                                href="", target="_blank",
                                                download='student.csv' )
         )])    
-                    
+     
     , dbc.Row([
             dbc.Col(
                 html.Div(id='Student-Container', 
@@ -533,7 +731,7 @@ layout = [
 
 
 #-------- Students-------------
-@app.callback(Output('StudentSelector-Dropdown', 'options'), [Input('group-selector-main', 'value')])
+@app.callback(Output('student-selector-dropdown', 'options'), [Input('group-selector-main', 'value')])
 def setStudentOptions(schoolSelected):
         
     if schoolSelected is None or not int(schoolSelected) >= 0:
@@ -542,10 +740,11 @@ def setStudentOptions(schoolSelected):
     students = getStudentsOfSchool(int(schoolSelected))
     
     return [{'label': row['Name'], 'value': row['StudentId'] } for index, row  in dfStudentDetails[dfStudentDetails['StudentId'].isin( students)][['StudentId', 'Name']].iterrows() ]
+    
 
 @app.callback(
-         Output('StudentSelector-Date-Dropdown', 'options'), 
-              [ Input('StudentSelector-Dropdown', 'value') ],
+         Output('student-date-dropdown', 'options'), 
+              [ Input('student-selector-dropdown', 'value') ],
         state = [ State(component_id='group-selector-main', component_property='value') ]   
 )
 def setStudentDateOptions(studentSelected, groupSelected):
@@ -570,8 +769,8 @@ def setStudentDateOptions(studentSelected, groupSelected):
 
 
 @app.callback(
-         Output('StudentSelector-Date-Dropdown', 'value'), 
-         [  Input('StudentSelector-Dropdown', 'value') , ],
+         Output('student-date-dropdown', 'value'), 
+         [  Input('student-selector-dropdown', 'value') , ],
         state = [ State(component_id='group-selector-main', component_property='value') ] 
 )
 def setStudentDateOptionsClear(studentSelected, groupSelected):        
@@ -585,9 +784,9 @@ def setStudentDateOptionsClear(studentSelected, groupSelected):
 
 
 @app.callback(Output('Student-Container', 'children'),               
-              [Input('StudentSelector-Dropdown', 'value') , 
-               Input('StudentSelector-Date-Dropdown', 'value') ,
-               Input('StudentSelector-Direction-Dropdown', 'value') ,
+              [Input('student-selector-dropdown', 'value') , 
+               Input('student-date-dropdown', 'value') ,
+               Input('student-sort-order-dropdown', 'value') ,
                ],               
         state=[ State(component_id='group-selector-main', component_property='value')
                 ]             
@@ -609,8 +808,8 @@ def display_graphs_student(studentSelected, studentSelectedDate, studentGraphDir
 
 
 @app.callback(
-         Output('Student-Overview-Container', 'children'), 
-         [  Input('StudentSelector-Dropdown', 'value') , ],
+         Output('student-overview-container', 'children'), 
+         [  Input('student-selector-dropdown', 'value') , ],
         state = [ State(component_id='group-selector-main', component_property='value') ] 
 )
 def display_graphs_student_overview(studentSelected, groupSelected):        
@@ -629,21 +828,83 @@ def display_graphs_student_overview(studentSelected, groupSelected):
     
 
 
+# Update bar plot
+@app.callback(
+    Output("student-features-overview-container", "children"),
+    [
+        Input("student-feature-overview-dropdown", "value"),
+        Input("student-selector-dropdown", "value"),
+    ],
+     state = [ 
+        State(component_id='group-selector-main', component_property='value'),
+    ]
+)
+def onSelectFeatureOverview(selectedFeatures, studentSelected, groupSelected ):
+    graphs = []
+
+    if groupSelected is None or not int(groupSelected) >= 0    or   studentSelected is None   or not int(studentSelected) >= 0:
+        return html.Div(graphs)
+ 
+    graphs = plotStudentOverviewFeatures( int( studentSelected ) , int(groupSelected), selectedFeatures )    
+    
+    return  html.Div(graphs)
+    
+
+
+
+@app.callback(
+    [    Output("student-date-dropdown", "className"),  
+         Output("student-sort-order-dropdown", "className"),
+         Output("student-feature-overview-dropdown", "className"), 
+     ],
+    [
+        Input("student-selector-dropdown", "value")
+    ],
+    state=[ State(component_id='student-date-dropdown', component_property='className'),
+           State(component_id='student-sort-order-dropdown', component_property='className'),
+           State(component_id='student-feature-overview-dropdown', component_property='className'),
+           ]
+)
+def update_no_student_selectors_class_disabled(studentSelected, initialClassDate, initialClassDir, initialClassFeatures, ):  
+    initialClassDateS = set()
+    initialClassDirS = set()
+    initialClassFeaturesS = set()
+    
+    if not None is initialClassDate:
+        initialClassDateS = set(initialClassDate.split(' ')) 
+    if not None is initialClassDir:
+        initialClassDirS = set(initialClassDir.split(' ')) 
+    if not None is initialClassFeatures:
+        initialClassFeaturesS = set(initialClassFeatures.split(' ')) 
+
+    
+    if   studentSelected is None   or not int(studentSelected) >= 0:
+        initialClassDateS.add('disabled') 
+        initialClassDirS.add('disabled') 
+        initialClassFeaturesS.add('disabled') 
+
+    else:
+        initialClassDateS.discard('disabled') 
+        initialClassDirS.discard('disabled') 
+        initialClassFeaturesS.discard('disabled') 
+
+    return ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS)
+
 
 
 
 
 #--------------------- data download callbacks 
 @app.callback(
-    [ Output('details_download_student_link', 'href'),
-     Output('details_download_student_link', 'className'),
+    [ Output('student_details_download_link', 'href'),
+     Output('student_details_download_link', 'className'),
      ],
-    [ Input('StudentSelector-Dropdown', 'value')  , Input('StudentSelector-Date-Dropdown', 'value') ],               
+    [ Input('student-selector-dropdown', 'value')  , Input('student-date-dropdown', 'value') ],               
     state=[ State(component_id='group-selector-main', component_property='value')
             ]   
 )
 def update_download_link__details_student( studentSelected, studentSelectedDate, groupMain ):
-    defaultValues = ["", "hidden"]
+    defaultValues = ["", "disabled"]
     
     if (groupMain is None or not int(groupMain) >= 0 or groupMain == "" ) or ( 
             studentSelected is None or not int(studentSelected) >= 0 or studentSelected == "" ):

@@ -62,13 +62,16 @@ THEME_TABLE_ODDROW_COLOR_STYLE = 'rgb(248, 248, 248)'
 #--------------------------------------------------------------------------------
 
 
+
+#------------------- feature related START -----------------------------------------------
+
 GROUPBY_FEATURE         =  'GroupId'
 COUNT_STUDENT_FEATURE   =  'CountOfStudents'
 STUDENT_ID_FEATURE      =  'StudentId'
 TASK_TYPE_FEATURE       =  'TaskType'
 
 
-#------------------- feature related START -----------------------------------------------
+
 featureAdderGroup = "GroupId-"
 featureAdderAvg = ' Avg.'
 
@@ -95,6 +98,7 @@ featureTheoryTaskDesc               = "TheoryTaskDesc"
 featureTaskDesc                     = "TaskDesc"
 featureTaskType                     = "TaskType"
 featureDescription                  = "Description"
+featureConceptsUsed                 = "Concept Used"
 featureConceptsUsedDetails          = "ConceptsUsedDetails"
 featureConceptsUsedDetailsStr       = "ConceptsUsedDetailsStr"
 featureItemsCollectedCount          = "itemsCollectedCount"
@@ -102,6 +106,8 @@ featureSolution                     = "Solution"
 featurePlayerShootEndEnemyHitCount  = "playerShootEndEnemyHitCount"
 featureRobotCollisionsBoxCount      = "robotCollisionsBoxCount"
 featureLineOfCodeCount              = "lineOfCodeCount"
+featurePoints                       = "Points"
+featureCollectedCoins               = "CollectedCoins"
 
 TaskTypePractice                    = "Practice"
 TaskTypeTheory                      = "Theory"
@@ -115,12 +121,12 @@ TaskTypeTheory                      = "Theory"
 feature2UserNamesDict = {
 		"Attempts" : "Attempts"
 		,"PracticeTaskId" : "Practice Task Id"
-		,"Points" : "Points"
-		,"ConceptsUsed" : 'Concept Used'
+		,featurePoints : "Points"
+		,featureConceptsUsed : 'Concept Used'
 		,"studentTaskCount" : "No. of Tasks performed"
 		,"studentAttemptsTotal" : "Attempts (total)"
 		,featureRobotCollisionsBoxCount : "Robot Collision Box (No. of times)"
-		,"CollectedCoins" :  "Coins Collected"
+		,featureCollectedCoins :  "Coins Collected"
 		,"coinCollectedCount" : "Coins Collected"
 		,"keyboardKeyPressedCount" : "Keyboard Key Pressed (No. of times)"
 		,"deletedCodesCount" : "Deleted Codes (No. of times)"
@@ -218,3 +224,71 @@ sortOrder = {
 
 
 #------------------- GRAPHS END ----------------------------------------------
+
+
+
+#--------------------------------- General ---------------------------------------
+labelNoData                 = "Has no game interactions"
+
+iconNameHome                = "fa-home"
+iconNameGroups              = "fa-list"
+iconNameDetails             = "fa-clipboard"
+iconNameStudents            = "fa-user-graduate"
+iconNameCustom              = "fa-wrench"
+
+
+keyLabel                    = 'label'
+keyHref                     = 'href'
+keySubmenu                  = 'submenu'
+keyValue                    = 'value'
+keyScrollTo                 = 'scrollTo'
+keyClassName                = 'className'
+keyHasMeanStd               = 'hasMeanStd'
+keyIsAxisEnabled            = 'isAxisEnabled'
+keyIsFeature3Enabled        = 'isFeature3Enabled'
+
+
+labelMean                   = 'mean'
+labelStd                    = 'std'
+labelTotal                  = 'total'
+
+
+FigureTypeScatter           = 'Scatter'
+FigureTypePie               = 'Pie'
+FigureTypeBar               = 'Bar'
+FigureTypeLine              = 'Line'
+FigureTypeBubble            = 'Bubble'
+     
+AxisV                       = 'v'
+AxisH                       = 'h'
+MarginalPlotDefault         = 'box'
+
+FigureTypes                 = {
+     FigureTypeBar      : { keyLabel      : FigureTypeBar, 
+                   keyValue     : FigureTypeBar,
+                  keyIsAxisEnabled : True,
+                  keyIsFeature3Enabled : False }
+    ,   
+     FigureTypeScatter : { keyLabel           : FigureTypeScatter, 
+                  keyValue      : FigureTypeScatter,
+                  keyIsAxisEnabled : True,
+                  keyIsFeature3Enabled : False  }
+#    ,   
+#     FigureTypePie      : { keyLabel      : FigureTypePie, 
+#                   keyValue     : FigureTypePie,
+#                  keyIsAxisEnabled : False,
+#                  keyIsFeature3Enabled : False  }
+    ,   
+     FigureTypeBubble     : { keyLabel       : FigureTypeBubble, 
+                   keyValue     : FigureTypeBubble,
+                  keyIsAxisEnabled : True,
+                  keyIsFeature3Enabled : True  }
+    ,   
+     FigureTypeLine     : { keyLabel       : FigureTypeLine, 
+                   keyValue     : FigureTypeLine,
+                  keyIsAxisEnabled : True,
+                  keyIsFeature3Enabled : False  }
+}
+     
+def getFigureTypesOptions():
+    return [{keyLabel: FigureTypes.get(i).get(keyLabel) , keyValue: FigureTypes.get(i).get(keyValue)} for i in FigureTypes]

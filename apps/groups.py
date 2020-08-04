@@ -102,8 +102,10 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                         'filter_query'  : '{SessionDuration}' + ' = {}'.format(i) ,
                         'column_id'     : 'SessionDuration',
                     },
-                    'backgroundColor': constants.ERROR_COLOR,
-                    'color': 'white'
+                    'color': constants.ERROR_COLOR,
+#                    'color': 'white',
+#                    'backgroundColor': constants.ERROR_COLOR,
+#                    'color': 'white',
                 }
                 for i in  df['SessionDuration'].nsmallest(1)
             ] ) + 
@@ -113,8 +115,10 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                         'filter_query'  : '{PracticeSessionDuration}' + ' = {}'.format(i) ,
                         'column_id'     : 'PracticeSessionDuration',
                     },
-                    'backgroundColor': constants.ERROR_COLOR,
-                    'color': 'white'
+                    'color': constants.ERROR_COLOR,
+#                    'color': 'white',
+#                    'backgroundColor': constants.ERROR_COLOR,
+#                    'color': 'white',
                 }
                 for i in  df['PracticeSessionDuration'].nsmallest(1)
             ] ) +
@@ -124,8 +128,10 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                         'filter_query'  : '{TheorySessionDuration}' + ' = {}'.format(i) ,
                         'column_id'     : 'TheorySessionDuration',
                     },
-                    'backgroundColor': constants.ERROR_COLOR,
-                    'color': 'white'
+                    'color': constants.ERROR_COLOR,
+#                    'color': 'white',
+#                    'backgroundColor': constants.ERROR_COLOR,
+#                    'color': 'white',
                 }
                 for i in  df['TheorySessionDuration'].nsmallest(1)
             ] ) +
@@ -135,8 +141,10 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                         'filter_query'  : '{Points}' + ' = {}'.format(i) ,
                         'column_id'     : 'Points',
                     },
-                    'backgroundColor': constants.ERROR_COLOR,
-                    'color': 'white'
+                    'color': constants.ERROR_COLOR,
+#                    'color': 'white',
+#                    'backgroundColor': constants.ERROR_COLOR,
+#                    'color': 'white',
                 }
                 for i in  df['Points'].nsmallest(1)     
             ] ) + 
@@ -146,8 +154,10 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                         'filter_query'  : '{Attempts}' + (' = {}'.format(i)),
                         'column_id'     : 'Attempts',
                     },
-                    'backgroundColor': constants.ERROR_COLOR,
-                    'color': 'white'
+                    'color': constants.ERROR_COLOR,
+#                    'color': 'white',
+#                    'backgroundColor': constants.ERROR_COLOR,
+#                    'color': 'white',
                 }
                 for i in     df['Attempts'].nsmallest(1)   
             ] ) + 
@@ -157,8 +167,10 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                         'filter_query'  : '{itemsCollectedCount}' + ' = {}'.format(i),
                         'column_id'     : 'itemsCollectedCount',
                     },
-                    'backgroundColor': constants.ERROR_COLOR,
-                    'color': 'white'
+                    'color': constants.ERROR_COLOR,
+#                    'color': 'white',
+#                    'backgroundColor': constants.ERROR_COLOR,
+#                    'color': 'white',
                 }
                 for i in   df['itemsCollectedCount'].nsmallest(1)
             ] ) + 
@@ -167,8 +179,11 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                     'if': {
                         'filter_query': '{{GroupId}} = {}'.format(i),
                     },
-                    'backgroundColor': constants.THEME_CYAN_COLOR,
-                    'color': 'white'
+                    'color': constants.THEME_COLOR,
+                    'backgroundColor': constants.THEME_COLOR_LIGHT,
+#                    'color': 'white',
+#                    'backgroundColor': constants.THEME_COLOR,
+#                    'color': 'white',
                 }
                 for i in [ featureAdderGroup + str(groupKey) ]
             ] )
@@ -272,7 +287,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         for groupKey, group in studentDataDfGrouped :    
             conceptsUsedStr = ' '
             if 'ConceptsUsed' in group.columns and  group[ group['ConceptsUsed'].notnull() & (group['ConceptsUsed']  !=  u'') ].shape[0] > 0 :
-                conceptsUsedStr = ', '.join(  util.get_unique_ConceptsUsed_items(group)  )
+                conceptsUsedStr = ', '.join(  util.get_unique_list_feature_items(group, 'ConceptsUsed' )  )
                 
                 
                 
@@ -436,7 +451,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                              hover_data=[constants.STUDENT_ID_FEATURE, "Name", "SessionDuration", "Attempts", "Points"]
 #                             , marker_color = 'rgb(214,12,140)'
                              )   
-        figQuantile.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)         
+        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)         
         columns3 = []
         columns3.append(dbc.Col(
                 dcc.Graph(
@@ -450,7 +465,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                              title="Distribution of Attempts",
                              hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
                              )       
-        figQuantile.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)            
+        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)            
         columns3 = []
         columns3.append(dbc.Col(
                 dcc.Graph(
@@ -464,7 +479,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                              title="Distribution of Points",
                              hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
                              )     
-        figQuantile.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)                      
+        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)                      
         columns3 = []
         columns3.append(dbc.Col(
                 dcc.Graph(
@@ -478,7 +493,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                              title="Distribution of Items Collected",
                              hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
                              )    
-        figQuantile.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)                           
+        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)                           
         columns3 = []
         columns3.append(dbc.Col(
                 dcc.Graph(

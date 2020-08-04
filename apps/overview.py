@@ -151,7 +151,7 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                     'if': {
                         'filter_query': '{{GroupId}} = {}'.format(i),
                     },
-                    'backgroundColor': constants.THEME_CYAN_COLOR,
+                    'backgroundColor': constants.THEME_COLOR,
                     'color': 'white'
                 }
                 for i in [ featureAdderGroup + str(groupKey) ]
@@ -401,7 +401,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                              hover_data=[constants.STUDENT_ID_FEATURE, "Name", "SessionDuration", "Attempts", "Points"]
 #                             , marker_color = 'rgb(214,12,140)'
                              )   
-        figQuantile.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)         
+        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)         
         columns3 = []
         columns3.append(dbc.Col(
                 dcc.Graph(
@@ -415,7 +415,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                              title="Distribution of Attempts",
                              hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
                              )       
-        figQuantile.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)            
+        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)            
         columns3 = []
         columns3.append(dbc.Col(
                 dcc.Graph(
@@ -429,7 +429,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                              title="Distribution of Points",
                              hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
                              )     
-        figQuantile.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)                      
+        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)                      
         columns3 = []
         columns3.append(dbc.Col(
                 dcc.Graph(
@@ -443,7 +443,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                              title="Distribution of Items Collected",
                              hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
                              )    
-        figQuantile.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)                           
+        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)                           
         columns3 = []
         columns3.append(dbc.Col(
                 dcc.Graph(

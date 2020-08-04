@@ -16,16 +16,24 @@ CONTENT_STYLE = {
     "padding": "2rem 1rem",
 }
 
-THEME = "theme-cyan"
+THEME           = "theme-cyan"
 
 THEME_COLOR_MAP = {
-        "theme-cyan": '#3aaab2'
+	"theme-cyan": {
+		"color" : '#3aaab2',
+		"light" 	: "rgb(232 252 253)",
+		"express"	: {
+			"plot_bgcolor"      : 'rgb(243, 243, 243)',
+			"paper_bgcolor"     : 'rgb(243, 243, 243)',
+		}
+	}
 }
-THEME_CYAN_COLOR = ''
+THEME_COLOR = 'white'
+THEME_COLOR_LIGHT  = 'white'
+
 if THEME in THEME_COLOR_MAP.keys():    
-    THEME_CYAN_COLOR = THEME_COLOR_MAP.get(THEME)
-else :
-    THEME_CYAN_COLOR = "white"
+    THEME_COLOR = THEME_COLOR_MAP.get(THEME)
+    THEME_COLOR_LIGHT = THEME_COLOR_MAP.get(THEME).get('light')
 
 
 ERROR_COLOR = "#FF4136"
@@ -46,17 +54,15 @@ MENU_BUTTON_STYLE = {
     'width': '100%'
 }
 
+THEME_EXPRESS_LAYOUT = THEME_COLOR_MAP.get(THEME).get('express')
 
-#-------------------------------- STYLES END -----------------------------------
-THEME_CYAN_EXPRESS_LAYOUT = {
-    "plot_bgcolor"      : 'rgb(243, 243, 243)',
-    "paper_bgcolor"     : 'rgb(243, 243, 243)',
-}
 THEME_TABLE_HEADER_STYLE = {
     'backgroundColor'   : 'rgb(230, 230, 230)',
     'fontWeight'        : 'bold'
 }
 THEME_TABLE_ODDROW_COLOR_STYLE = 'rgb(248, 248, 248)'
+
+#-------------------------------- STYLES END -----------------------------------
 
 #---------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------

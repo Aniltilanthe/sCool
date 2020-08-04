@@ -176,7 +176,7 @@ def plotClassOverview(schoolKey, featureToPlot, selectedAxis, selectedFigureType
                                             ,  line = dict(width=1,
                                                         color='DarkSlateGrey')),
                                   selector=dict(mode='markers'))
-                figStudents.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)
+                figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
                 print('Scatter Chart figure   Made Success ! ' )
            
         
@@ -196,7 +196,7 @@ def plotClassOverview(schoolKey, featureToPlot, selectedAxis, selectedFigureType
 #                                     , template     =   constants.graphTemplete
 #                                     )
 #                figStudents.update_traces(textposition='inside', textinfo='percent+label+value')
-#                figStudents.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)
+#                figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
 #                    
 #                print('Pie Chart figure   Made Success ' )
                 
@@ -219,7 +219,7 @@ def plotClassOverview(schoolKey, featureToPlot, selectedAxis, selectedFigureType
                     , hover_data    =   hoverData
                     , height        =   graphHeight
                 )
-                figStudents.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)
+                figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
                 print('Baar Chart figure   Made Success ! ' )
             
             
@@ -240,7 +240,7 @@ def plotClassOverview(schoolKey, featureToPlot, selectedAxis, selectedFigureType
                      , height       =   graphHeight
                      , template     =   constants.graphTemplete
                     )
-                figStudents.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)
+                figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
                 
                 rows.append( html.Div(children=[
                                 html.P('Size is based on ' + ((constants.feature2UserNamesDict.get(feature3)) if feature3 in constants.feature2UserNamesDict.keys() else feature3 ) ),
@@ -262,7 +262,7 @@ def plotClassOverview(schoolKey, featureToPlot, selectedAxis, selectedFigureType
                     , height        =   graphHeight
                     , template      =   constants.graphTemplete                              
                 )
-                figStudents.update_layout(constants.THEME_CYAN_EXPRESS_LAYOUT)
+                figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
             
             
             

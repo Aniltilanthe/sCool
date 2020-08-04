@@ -267,8 +267,8 @@ def plotClassOverview(schoolKey, featureToPlot, selectedAxis, selectedFigureType
             
             
             
-            rows.append( dbc.Row( dcc.Graph(
-                    figure= figStudents,
+            rows.append( html.Div( dcc.Graph(
+                    figure = figStudents,
                     className = "graph-small"
             ) ) )
             

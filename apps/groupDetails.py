@@ -260,21 +260,16 @@ def plotSingleClass( titleTextAdd, school ):
 #            taskData[featurePracticeTaskDesc] = taskData['Title'].astype(str).str[10] + '... (Id: ' + taskData['PracticeTaskId'].astype(str) + ')' 
             taskData[featurePracticeTaskDesc] = 'Id: ' + taskData['PracticeTaskId'].astype(str) 
         
-        
-            figStudents = px.bar(taskData
-                                , x             =  countStudentCompletingTaskFeature
-                                , y             =  featurePracticeTaskDesc
-                                , title         = "(Practice)" +  ' No. of students completing a Task '
-                                , labels        = feature2UserNamesDict # customize axis label
-    #                            , height       = graphHeight
-                                , template      = constants.graphTemplete
-                                , hover_data    = ['Title', 'PracticeTaskId']                             
-                                , orientation   = 'h'
-            )
+            figStudents = getFeaturePlot(taskData, 
+                           countStudentCompletingTaskFeature, 
+                           featurePracticeTaskDesc ,
+                           "(Practice)" +  ' No. of students completing a Task ', 
+                           ['Title', 'PracticeTaskId'], 
+                           isColored = False, hasMeanStd = False, hoverName = featurePracticeTaskDesc )
+            
             graphs.append(
-                    dcc.Graph(
-                        id='graphSchool-' + str(graphIndex),
-                        figure= figStudents
+                    html.Div(
+                        children = figStudents
                 ))
             graphIndex = graphIndex + 1
         except Exception as e: 
@@ -293,22 +288,21 @@ def plotSingleClass( titleTextAdd, school ):
                                                 , how='inner')
 #            taskDataTheory[featureTheoryTaskDesc] = taskDataTheory['Title'].astype(str).str[10] + '... (Id: ' + taskDataTheory['TheoryTaskId'].astype(str) + ')' 
             taskDataTheory[featureTheoryTaskDesc] = 'Id: ' + taskDataTheory['TheoryTaskId'].astype(str) 
+            taskDataTheory[featureTaskType] = constants.TaskTypeTheory
+            
         
-        
-            figStudents = px.bar(taskDataTheory
-                                , x             =  countStudentCompletingTaskFeature
-                                , y             =  featureTheoryTaskDesc
-                                , title         = "(Theory)" + ' No. of students completing a Task '
-                                , labels        = feature2UserNamesDict # customize axis label
-    #                            , height       = graphHeight
-                                , template      = constants.graphTemplete
-                                , hover_data    = ['Title', 'TheoryTaskId']                             
-                                , orientation   = 'h'
-            )
+            figStudents = getFeaturePlot(taskDataTheory, 
+                           countStudentCompletingTaskFeature, 
+                           featureTheoryTaskDesc, 
+                           "(Theory)" + ' No. of students completing a Task ', 
+                           ['Title', 'TheoryTaskId'], 
+                           isColored = True, hasMeanStd = False, hoverName = featureTheoryTaskDesc )
+                     
+            
+            
             graphs.append(
-                    dcc.Graph(
-                        id='graphSchool-' + str(graphIndex),
-                        figure= figStudents
+                    html.Div(
+                        children = figStudents
                 ))
             graphIndex = graphIndex + 1
         
@@ -334,21 +328,16 @@ def plotSingleClass( titleTextAdd, school ):
             studentWiseDataOriginalTaskPerformed[featureTaskType] = TaskTypePractice
             
             
-            figStudents = px.bar( studentWiseDataOriginalTaskPerformed
-                                    , x             = countTaskCompletedByStudentFeature
-                                    , y             = 'Name'
-                                    , title         = graphTitle
-                                    , labels        = feature2UserNamesDict # customize axis label
-    #                                , height        = constants.graphHeight
-                                    , template      = constants.graphTemplete                              
-                                    , orientation   = 'h'
-                                    , hover_data    = [featureTaskDesc]
-                )
+            figStudents = getFeaturePlot(studentWiseDataOriginalTaskPerformed, 
+                           countTaskCompletedByStudentFeature, 
+                           'Name', graphTitle, [featureTaskDesc], isColored = False, hasMeanStd = False)
+                       
+            
             graphs.append(
-                    dcc.Graph(
-                        id='graphSchool-' + str(graphIndex),
-                        figure= figStudents
+                    html.Div(
+                        children = figStudents
                 ))
+
             graphIndex = graphIndex + 1
         except Exception as e:             
             print( 'ERROR - ' + graphTitle )   
@@ -371,24 +360,14 @@ def plotSingleClass( titleTextAdd, school ):
             studentWiseDataOriginalTaskPerformedTheory[featureTaskDesc] = studentWiseDataOriginalTaskPerformedTheory[featureTaskDesc].apply(convert_list_column_tostr_NL)
             studentWiseDataOriginalTaskPerformedTheory[featureTaskType] = TaskTypeTheory
             
+            figStudents = getFeaturePlot(studentWiseDataOriginalTaskPerformedTheory, 
+                           countTaskCompletedByStudentFeature, 
+                           'Name', graphTitle, [featureTaskDesc], isColored = True, hasMeanStd = False)
+                        
             
-#            combinedDataframeTaskCount = pd.concat([studentWiseDataOriginalTaskPerformed, studentWiseDataOriginalTaskPerformedTheory], ignore_index=True)
-            figStudents = px.bar( studentWiseDataOriginalTaskPerformedTheory
-                                , x             =  countTaskCompletedByStudentFeature
-                                , y             =  'Name'
-                                , title         = graphTitle
-                                , labels        = feature2UserNamesDict # customize axis label
-#                                , height        = constants.graphHeight
-                                , template      = constants.graphTemplete                              
-                                , orientation   = 'h'
-                                , hover_data    = [featureTaskDesc]
-#                                , color         = 'TaskType'
-#                                , barmode       = 'group'
-            )
             graphs.append(
-                    dcc.Graph(
-                        id='graphSchool-' + str(graphIndex),
-                        figure= figStudents
+                    html.Div(
+                        children = figStudents
                 ))
             graphIndex = graphIndex + 1
             
@@ -415,7 +394,7 @@ def plotSingleClass( titleTextAdd, school ):
 
 #        CHECKED
 #            for concepts used
-featureX = 'Count (no. of times used)'
+featureX = 'Count (no. of students used)'
 featureY = 'Details'
 featurePracticeTaskGroup = 'Task-Id'            
 
@@ -426,7 +405,7 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True) :
     try :
         taskWiseConceptPracticeGrouped = dfGroupedPracticeTaskWise.get_group(groupId).groupby(['PracticeTaskId'])
         
-        studentWiseTaskWiseConceptPractice = pd.DataFrame()    
+        studentWiseTaskWiseConceptPractice = pd.DataFrame()
         
         
         for groupKeyTaskId, groupTask in taskWiseConceptPracticeGrouped:
@@ -465,9 +444,10 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True) :
                                 , orientation   =  'h'
                                 , height        =   constants.graphHeight - 100
                                 , template      =   constants.graphTemplete   
-                                , title         =   "(Practice) Concepts used by students in task " + str(groupKeyTaskId) + '(TaskId)'+ "<br>" + str(taskTitle)  +   " (no. of times students used a concept in code)"
+                                , title         =   "(Practice) Concepts used by students in task " + str(groupKeyTaskId) + '(TaskId)'+ "<br>" + str(taskTitle)  +   " (no. of students used a concept in code)"
                                 , labels        =   feature2UserNamesDict # customize axis label
                 )
+            
             graphs.append(
                     dcc.Graph(
                         figure= figBar
@@ -480,7 +460,7 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True) :
                                 , height        =   constants.graphHeight - 100
                                 , hover_data  =  [ 'Title', 'PracticeTaskId',  ]
                                 , template      =   constants.graphTemplete   
-                                , title         =   "(Practice) Concepts used by students in each task <br> (no. of times students used a concept in code for a task)"
+                                , title         =   "(Practice) Concepts used by students in each task <br> (no. of students used a concept in code for a task)"
                                 , labels        =   feature2UserNamesDict # customize axis label
                                 , color         =   featurePracticeTaskGroup
                                 , barmode       =   'group'
@@ -496,12 +476,10 @@ def plotGroupConceptDetails(groupId):
     
     graphs = []
     
-    
-    
     graphs.append(html.Div(id='Concept-Information',
                            children = [html.H2('Concept Information')], 
                            className = "c-container p_medium p-top_xx-large", 
-                ))   
+                ))
       
     try :
         groupPractice = dfGroupedPractice.get_group(groupId)
@@ -520,6 +498,11 @@ def plotGroupConceptDetails(groupId):
         studentWiseDataConcepts[featureY] = studentWiseDataConcepts[featureY].replace(
                 feature2UserNamesDict, regex=True)
         
+        print( ' concept used by students of this class ' )
+        print( ' x     ' + featureX + '     -  y     ' +  featureY)
+        print( studentWiseDataConcepts[[featureX ,featureY ]] )
+        print( studentWiseDataConcepts.columns )
+        
         
         figBar = px.bar(studentWiseDataConcepts
                             , x             =   featureX
@@ -527,7 +510,7 @@ def plotGroupConceptDetails(groupId):
                             , orientation   =  'h'
                             , height        =   constants.graphHeight - 100
                             , template      =   constants.graphTemplete   
-                            , title         =   "(Practice) Concepts used by students of this class (no. of times students used a concept in code)"
+                            , title         =   "(Practice) Concepts used by students of this class (no. of students using a concept in code)"
                             , labels        =   feature2UserNamesDict # customize axis label
             )
         graphs.append(
@@ -574,20 +557,8 @@ def plotGroupConceptDetails(groupId):
     return graphs        
 
 
-def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False):
+def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, hasMeanStd = True, hoverName = "Name"):
     graphs = []
-#                            fig = px.scatter(studentWiseData
-#                                                , x             = featuresPractice[first]
-#                                                , y             = featuresPractice[second]
-#                                                , title         = '(Practice) Details of students ' + titleFirst
-#                                                , labels        = feature2UserNamesDict # customize axis label
-#                                                , template      = constants.graphTemplete                              
-#                                                , orientation   = 'h'
-#                                                , hover_name    =  "Name"
-#                                                , hover_data    =  hoverDataPractice
-#                                                , marginal_x    = "box"
-#                                                , height        =   constants.graphHeight 
-#                                )
     
     if isColored:
         fig = px.bar( df
@@ -597,7 +568,7 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False):
             , labels        = feature2UserNamesDict # customize axis label
             , template      = constants.graphTemplete                              
             , orientation   = 'h'
-            , hover_name    =  "Name"
+            , hover_name    =  hoverName
             , hover_data    =  hoverData
             , color         = constants.featureTaskType
             , color_discrete_sequence = [constants.colorTheory, constants.colorPractice ]
@@ -611,7 +582,7 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False):
             , labels        = feature2UserNamesDict # customize axis label
             , template      = constants.graphTemplete                              
             , orientation   = 'h'
-            , hover_name    =  "Name"
+            , hover_name    =  hoverName
             , hover_data    =  hoverData
         )
                     
@@ -620,14 +591,17 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False):
             dcc.Graph(
                 figure = fig
         ))
-    figMean = df.mean().round(decimals=2)[featureX]
-    figStd = df.std().round(decimals=2)[featureX]
-    graphs.append(
-            html.Div(children=[
-                    html.P('Mean ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figMean) ),
-                    html.P('Std. ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figStd) ),
-                    ])
-    )
+    
+    if hasMeanStd :
+        figMean = df.mean().round(decimals=2)[featureX]
+        figStd = df.std().round(decimals=2)[featureX]
+        graphs.append(
+                html.Div(children=[
+                        html.P('Mean ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figMean) ),
+                        html.P('Std. ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figStd) ),
+                        ])
+        )
+
     return graphs
 
 
@@ -745,7 +719,7 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                             children= 
                                             getFeaturePlot(studentWiseDataTheory, featuresPractice[first], featuresPractice[second], 
                                                                    '(Theory) Details of students ' + titleFirst,
-                                                                   hoverDataTheory, True)
+                                                                   hoverDataTheory, isColored = True)
                                     )
                             )
                          
@@ -775,7 +749,7 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                             children= 
                                             getFeaturePlot(studentWiseDataTheory, rowTheory[0], rowTheory[1] , 
                                                                    '(Theory) Details of students ' + titleFirst,
-                                                                   hoverDataTheory, True)
+                                                                   hoverDataTheory, isColored = True)
                                     )
                     )
                     

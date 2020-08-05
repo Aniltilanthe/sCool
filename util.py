@@ -26,7 +26,7 @@ import constants
 
 
 
-#-----------------------------------
+#-----------------------------------  DATA INFO  START ----------------------------
 
 def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = ""):
     plots = []
@@ -192,8 +192,10 @@ def plotStudentOverview(studentDataDf, classes = ""):
     
     return plots
 
+#----------------------------------- DATA INFO END -----------------------------------------
 
-#---------------------------------- UI ------------------------------------
+
+#---------------------------------- UI HTML START------------------------------------
 def generateCardBase(label, value, classes = ""):
     return html.Div(
         [
@@ -283,6 +285,285 @@ def generateCardDetail2(label, value1 = '', value2 = '',
                 
                 
 #----------------------------- UI END ----------------------------------------
+                
+
+#----------------------------- UI CONTROLS START ------------------------------
+                
+                
+
+feature2Default            = "Name"
+feature3SizeDefault        = "SessionDuration"
+def generateControlCardCustomPlotForm(idApp, feature1Options, feature2Options, feature3Options, 
+                                      feature1ValueDefault = "",
+                                      feature2ValueDefault = feature2Default,
+                                      feature3ValueDefault = feature3SizeDefault,
+                                      figureTypeDefault     = constants.FigureTypeBar,
+                                      featureAxisDefault    = constants.AxisH
+                                      ):
+    """
+    :return: A Div containing controls for feature selection for plotting graphs.
+    """
+    return html.Div(
+        id = idApp + "-control-card-custom-plot-form",
+        children=[
+
+            html.P("Select Features")
+            
+            , dbc.Row([
+                    dbc.Col(
+                      html.Div([
+                                dcc.Dropdown(
+                                    id              = idApp + "-form-feature-1",
+                                    placeholder     = "Select feature X",
+                                    options         = BuildOptionsFeatures( feature1Options ),
+                                    value           = feature1ValueDefault
+                                )
+                            ],
+                            className = "c-container"
+                       )
+                        , width=6
+                    ),
+                    dbc.Col(
+                        html.Div([
+                            dcc.Dropdown(
+                                    id              = idApp + "-form-feature-2", 
+                                    placeholder     = "Select feature Y",
+                                    options         = BuildOptionsFeatures( feature2Options ),
+                                    value           = feature2ValueDefault
+                                )
+                            ],
+                            className = "c-container"
+                        )
+                        , width=3
+                    ),
+                    dbc.Col(
+                        html.Div([
+                            dcc.Dropdown(
+                                    id              = idApp + "-form-feature-3", 
+                                    placeholder     = "Select Size",
+                                    options         = BuildOptionsFeatures( feature3Options ),
+                                    value           = feature3ValueDefault
+                                )
+                            ],
+                            className = "c-container"
+                        )
+                        , width=3
+                    )
+            ])
+            
+            , dcc.RadioItems(
+                id          = idApp + "-form-figure-type",
+                options     = constants.getFigureTypesOptions(),
+                value       = figureTypeDefault ,
+                className   = "radio-items-inline"
+            ), 
+            dcc.RadioItems(
+                id      =   idApp + "-form-feature-axis",
+                options = [
+                    {'label': 'Horizontal (x-axis)', 'value': constants.AxisH},
+                    {'label': 'Vertical (y-axis)', 'value': constants.AxisV},
+                ],
+                value       = featureAxisDefault ,
+                className   = "radio-items-inline"
+            ), 
+            html.Button(children=[
+                    html.I(className="fas fa-plus font-size_medium p-right_xx-small"),
+                    'Add Plot',  ], 
+                        id  =   idApp + "-form-submit-btn", 
+                        className="c-button button w3-btn w3-xlarge", n_clicks=0),
+            html.Br(),
+        ],
+        className = "form"
+    )
+                
+                
+
+def getCustomPlot( df, 
+                  featureX, featureY, feature3, 
+                  selectedFigureType = constants.FigureTypeBar, 
+                  selectedAxis = constants.AxisH, 
+                  plotTitle = '',
+                  hoverName = "Name",
+                  marginalX = '',
+                  marginalY = '',
+                  hoverData = [],
+                  color     = "Name"
+    ):
+    
+    rows = []
+    
+    
+    if df is None  or df.empty   or    featureX == None     or     featureY == None :
+        return rows
+    
+    
+    featureX2Plot = featureX
+    featureY2Plot = featureY
+
+    orientation = constants.AxisH
+
+    if not None == selectedAxis and selectedAxis == constants.AxisV:
+        featureX2Plot   = featureY
+        featureY2Plot   = featureX
+        orientation     = constants.AxisV
+
+    
+    plotTitle = ' Details of ' 
+    plotTitle = plotTitle + str( constants.feature2UserNamesDict.get(featureX2Plot) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot )
+    plotTitle = plotTitle + ' vs ' + str( constants.feature2UserNamesDict.get(featureY2Plot) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot )
+    
+    try:
+        if selectedFigureType == constants.FigureTypeScatter:
+            
+            if checkIsFeatureNumeric(df, featureX2Plot):
+                 marginalX = constants.MarginalPlotDefault
+                 
+            if checkIsFeatureNumeric(df, featureY2Plot):
+                 marginalY = constants.MarginalPlotDefault
+            
+            
+            figStudents = px.scatter(df, x = featureX2Plot, y = featureY2Plot
+                 , title        =   plotTitle
+                 , labels       =   constants.feature2UserNamesDict # customize axis label
+                 , hover_name   =   hoverName
+                 , hover_data   =   hoverData
+                 , marginal_x   =   marginalX
+                 , marginal_y   =   marginalY
+#                     , height       =   constants.graphHeight
+                 , template     =   constants.graphTemplete
+                )
+            figStudents.update_traces(marker=dict(size = 16
+                                        , showscale    = False
+                                        ,  line = dict(width=1,
+                                                    color='DarkSlateGrey')),
+                              selector=dict(mode='markers'))
+            figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
+            print('Scatter Chart figure   Made Success ! ' )
+       
+    
+    
+#            Error when plotting pie charts !!!
+        elif selectedFigureType == constants.FigureTypePie:
+            
+            print('Pie Chart figure   featureX2Plot  ' + str(featureX) + '   plotTitle   ' + str(plotTitle)  )
+
+            figStudents = px.pie(df
+                                 , values       = featureX
+#                                 , names        =  'Name'
+                                 , title        =   plotTitle
+                                 , labels       =   constants.feature2UserNamesDict # customize axis label
+                                 , hover_name   =   hoverName
+                                 , hover_data   =   hoverData
+                                 , height       =   constants.graphHeight
+                                 , template     =   constants.graphTemplete
+                                 )
+            figStudents.update_traces(textposition='inside', textinfo='percent+label+value')
+            figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
+                
+            print('Pie Chart figure   Made Success ' )
+            
+            
+        elif selectedFigureType == constants.FigureTypeBar :
+            
+            figStudents = px.bar( df
+                , x             =   featureX2Plot
+                , y             =   featureY2Plot
+                , title         =   plotTitle
+                , labels        =   constants.feature2UserNamesDict # customize axis label
+                , template      =   constants.graphTemplete                              
+                , orientation   =   orientation
+                , hover_name    =   hoverName
+                , hover_data    =   hoverData
+#                    , height        =   constants.graphHeight
+            )
+            figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
+            print('Baar Chart figure   Made Success ! ' )
+        
+        
+        elif selectedFigureType == constants.FigureTypeBubble :
+            
+            figStudents = px.scatter(df
+                 , x            =   featureX2Plot
+                 , y            =   featureY2Plot
+                 , title        =   plotTitle
+                 , labels       =   constants.feature2UserNamesDict # customize axis label
+                 , hover_name   =   hoverName
+                 , hover_data   =   hoverData
+                 , size         =   feature3
+                 , color        =   color
+                 , size_max     =   60
+#                     , height       =   constants.graphHeight
+                 , template     =   constants.graphTemplete
+                )
+            figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
+            
+            rows.append( html.Div(children=[
+                            html.P('Size is based on ' + ((constants.feature2UserNamesDict.get(feature3)) if feature3 in constants.feature2UserNamesDict.keys() else feature3 ) ),
+                            ]) )
+            
+            
+        elif selectedFigureType == constants.FigureTypeLine :
+
+            if not None == selectedAxis and selectedAxis == constants.AxisV:
+                featureX2Plot   = featureY
+                featureY2Plot   = featureX
+            
+            figStudents = px.line(df
+                , x             =   featureX2Plot
+                , y             =   featureY2Plot
+                , color         =   color
+                , hover_name    =   hoverName
+                , hover_data    =   hoverData
+#                    , height        =   constants.graphHeight
+                , template      =   constants.graphTemplete                              
+            )
+            figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
+        
+        
+        
+        
+        rows.append( html.Div( dcc.Graph(
+                figure = figStudents,
+                className = "  "
+        ) ) )
+        
+        print('Before Mean and Std calculation ! ' )
+
+        
+        studentDataDfSumMean    = df.mean().round(decimals=2)
+        studentDataDfSumStd     = df.std().round(decimals=2)
+
+        print('After Mean and Std calculation ! ' )
+        
+        try :
+            if   not 'Name' == featureX2Plot   and  featureX2Plot is not None and featureX2Plot in studentDataDfSumMean:
+                rows.append( html.Div(children=[
+                            html.P(constants.labelMean + ' ' + ((constants.feature2UserNamesDict.get(featureX2Plot)) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot )  + ' = ' + str(studentDataDfSumMean[featureX2Plot]) ),
+                            html.P(constants.labelStd + ' ' + ((constants.feature2UserNamesDict.get(featureX2Plot)) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot ) + ' = ' + str(studentDataDfSumStd[featureX2Plot]) ),
+                            ]) )
+        except Exception as e: 
+            print(e)
+        try :
+            if  not 'Name' == featureY2Plot   and   featureY2Plot is not None and featureY2Plot in studentDataDfSumMean:
+                rows.append( html.Div(children=[
+                                html.P(constants.labelMean + ' ' + ((constants.feature2UserNamesDict.get(featureY2Plot)) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot )  + ' = ' + str(studentDataDfSumMean[featureY2Plot]) ),
+                                html.P(constants.labelStd + ' ' + ((constants.feature2UserNamesDict.get(featureY2Plot)) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot ) + ' = ' + str(studentDataDfSumStd[featureY2Plot]) ),
+                                ]) )
+        except Exception as e: 
+            print('Exception Mean and Std calculation for 2 ! ' )
+            print(e)
+    
+    except Exception as e: 
+        print('Add Graph exception ! ' )
+        print(e)
+        
+                
+    return rows         
+                
+                
+                
+#---------------------------- UI CONTROLS END ---------------------------------
+                
                 
 
 #------------------------------GENERIC START-------------------------------------------

@@ -33,6 +33,10 @@ dfStudentDetails = main.getStudentDetails()
 dfPracticeTaskDetails = studentGroupedPerformance.dfPracticeTaskDetails
 dfTheoryTaskDetails   = studentGroupedPerformanceTheory.dfTheoryTaskDetails
 
+dfPlayerStrategyPracticeOriginal        = studentGroupedPerformance.dfPlayerStrategyPracticeOriginal
+dfPlayerStrategyPracticeOriginal[constants.featureTaskType] = constants.TaskTypePractice
+
+
 dfPracticeDB                            = studentGroupedPerformance.dfPractice
 dfGroupedPractice                       = studentGroupedPerformance.dfGrouped
 dfGroupedOriginal                       = studentGroupedPerformance.dfGroupedOriginal
@@ -47,6 +51,7 @@ dfRuns[constants.featureTaskType]       = constants.TaskTypePractice
         
 
 dfPlayerStrategyTheory = pd.concat([studentGroupedPerformanceTheory.dfPlayerStrategyNN, studentGroupedPerformanceTheory.dfPlayerStrategyN], ignore_index=True, sort =False)
+dfPlayerStrategyTheory[constants.featureTaskType]   = constants.TaskTypeTheory
 #dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrategyTheory['CreatedAt'].dt.date] )
 dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrategyTheory[constants.GROUPBY_FEATURE]] )
 
@@ -171,7 +176,7 @@ def getPracticeConceptsUsedDetailsStr(dfPractice):
 
 def getStudentWiseData(df):
     if "Name" in df.columns:
-        return df.groupby([constants.STUDENT_ID_FEATURE, "Name"], as_index=False).sum()    
+        return df.groupby([constants.STUDENT_ID_FEATURE, "Name"], as_index=False).sum()
     else :
         return df.groupby([constants.STUDENT_ID_FEATURE], as_index=False).sum()
 

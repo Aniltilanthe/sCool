@@ -298,3 +298,17 @@ FigureTypes                 = {
      
 def getFigureTypesOptions():
     return [{keyLabel: FigureTypes.get(i).get(keyLabel) , keyValue: FigureTypes.get(i).get(keyValue)} for i in FigureTypes]
+
+
+
+
+
+FeaturesCustom          = ['SessionDuration', 'Points', 'Attempts', 'CollectedCoins', 'Difficulty']
+
+FeaturesCustomPractice  = ['NumberOfCoins', 'runsCount', 'runsErrorCount', 'runsSuccessCount', 'runsErrorSyntaxCount',
+                                           'runsErrorNameCount', 'runsErrorTypeCount', 'runsLineOfCodeCountAvg',
+                                           'tabsSwitchedCount', 'tabsSwitchedDescriptionCount', 'deletedCodesCount', 'robotCollisionsBoxCount']
+FeaturesCustomTheory    = ['playerShootCount', 'playerShootEndCount', 'playerShootEndEnemyHitCount',
+                                         'playerShootEndEnemyMissedHitCount', 'enemysShootEndPlayerHitCount']
+hoverData               = ["CollectedCoins", "Result", "SessionDuration", "Attempts", "robotCollisionsBoxCount", "Points", "lineOfCodeCount", 'StudentId']
+

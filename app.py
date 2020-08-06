@@ -19,9 +19,6 @@ from dash.dependencies import Input, Output, State
 
 import numpy as np
 import pandas as pd
-import dash_table
-#import flask
-import math
 
 
 FA = "https://use.fontawesome.com/releases/v5.8.1/css/all.css"
@@ -40,5 +37,3 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.config.suppress_callback_exceptions = True
 
 
-
-#server = flask.Flask(__name__)

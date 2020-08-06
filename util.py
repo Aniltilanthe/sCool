@@ -293,10 +293,13 @@ def generateCardDetail2(label, value1 = '', value2 = '',
 
 feature2Default            = "Name"
 feature3SizeDefault        = "SessionDuration"
-def generateControlCardCustomPlotForm(idApp, feature1Options, feature2Options, feature3Options, 
-                                      feature1ValueDefault = "",
-                                      feature2ValueDefault = feature2Default,
-                                      feature3ValueDefault = feature3SizeDefault,
+def generateControlCardCustomPlotForm(idApp                 = "", 
+                                      feature1Options       = [], 
+                                      feature2Options       = [], 
+                                      feature3Options       = [], 
+                                      feature1ValueDefault  = "",
+                                      feature2ValueDefault  = feature2Default,
+                                      feature3ValueDefault  = feature3SizeDefault,
                                       figureTypeDefault     = constants.FigureTypeBar,
                                       featureAxisDefault    = constants.AxisH
                                       ):
@@ -379,15 +382,17 @@ def generateControlCardCustomPlotForm(idApp, feature1Options, feature2Options, f
                 
 
 def getCustomPlot( df, 
-                  featureX, featureY, feature3, 
-                  selectedFigureType = constants.FigureTypeBar, 
-                  selectedAxis = constants.AxisH, 
-                  plotTitle = '',
-                  hoverName = "Name",
-                  marginalX = '',
-                  marginalY = '',
-                  hoverData = [],
-                  color     = "Name"
+                  featureX              = "", 
+                  featureY              = "", 
+                  feature3              = "", 
+                  selectedFigureType    = constants.FigureTypeBar, 
+                  selectedAxis          = constants.AxisH, 
+                  plotTitle             = '',
+                  hoverName             = "Name",
+                  marginalX             = '',
+                  marginalY             = '',
+                  hoverData             = [],
+                  color                 = "Name"
     ):
     
     rows = []
@@ -395,6 +400,12 @@ def getCustomPlot( df,
     
     if df is None  or df.empty   or    featureX == None     or     featureY == None :
         return rows
+    
+    if not featureX in df.columns  :
+        return rows.append(html.H3('Feature not in data ' + str(featureX ) + '  . Select another! ' ))
+
+    if not featureY in df.columns :
+        return rows.append(html.H3('Feature not in data ' + str(featureY ) + '  . Select another! ' ))
     
     
     featureX2Plot = featureX

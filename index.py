@@ -91,10 +91,12 @@ content = html.Div(
     ],
         
     id="page-main", 
-    className = constants.THEME + "  page-main "
+    className = "  page-main "
 )
 
-app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
+app.layout = html.Div([dcc.Location(id="url"), sidebar, content],
+                       className = constants.THEME
+                       )
 
 
 
@@ -141,7 +143,10 @@ def show_hide_topbar(pathname, currentClasses):
         currentClassesS.add('hidden')
         
     return  ' '.join(currentClassesS) 
-    
+
+
+
+
 
 
 #if __name__ == "__main__":

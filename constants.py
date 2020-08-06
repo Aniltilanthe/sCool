@@ -6,6 +6,27 @@ Created on Mon Jul  6 22:42:22 2020
 """
 
 
+
+
+keyLabel                    = 'label'
+keyHref                     = 'href'
+keySubmenu                  = 'submenu'
+keyValue                    = 'value'
+keyScrollTo                 = 'scrollTo'
+keyClassName                = 'className'
+keyHasMeanStd               = 'hasMeanStd'
+keyIsAxisEnabled            = 'isAxisEnabled'
+keyIsFeature3Enabled        = 'isFeature3Enabled'
+keyColor                    = 'color'
+keyExpress                  = 'express'
+keyLight                    = 'light'
+keyIsDefault                = 'isDefault'
+
+
+
+
+
+
 #--------------------------------------------------------------------------------
 #-------------------------------- STYLES START -----------------------------------
 # the styles for the main content position it to the right of the sidebar and
@@ -16,24 +37,61 @@ CONTENT_STYLE = {
     "padding": "2rem 1rem",
 }
 
-THEME           = "theme-cyan"
+THEME           = "theme-app"
 
 THEME_COLOR_MAP = {
-	"theme-cyan": {
-		"color" : '#3aaab2',
-		"light" 	: "rgb(232 252 253)",
-		"express"	: {
+	"theme-app": {
+        keyLabel : 'app', 
+		keyColor : '#3aaab2',
+		keyLight 	: "rgb(232 252 253)",
+        keyClassName : 'theme-color-app',
+		keyExpress	: {
 			"plot_bgcolor"      : 'rgb(243, 243, 243)',
 			"paper_bgcolor"     : 'rgb(243, 243, 243)',
-		}
+		},
+        keyIsDefault : True
+	},
+	"theme-cyan": {
+        keyLabel : 'cyan', 
+		keyColor : '#3aaab2',
+		keyLight 	: "rgb(232 252 253)",
+        keyClassName : 'theme-color-cyan',
+		keyExpress	: {
+			"plot_bgcolor"      : 'rgb(243, 243, 243)',
+			"paper_bgcolor"     : 'rgb(243, 243, 243)',
+		},
+        keyIsDefault : False
+	},
+	"theme-pink": {
+        keyLabel : 'pink', 
+		keyColor : 'pink',
+		keyLight 	: "rgb(232 252 253)",
+        keyClassName : 'theme-color-pink',
+		keyExpress	: {
+			"plot_bgcolor"      : 'rgb(243, 243, 243)',
+			"paper_bgcolor"     : 'rgb(243, 243, 243)',
+		},
+        keyIsDefault : False
+	},
+	"theme-dark": {
+        keyLabel : 'dark', 
+		keyColor : 'black',
+		keyLight 	: "grey",
+        keyClassName : 'theme-color-dark',
+		keyExpress	: {
+			"plot_bgcolor"      : 'rgb(243, 243, 243)',
+			"paper_bgcolor"     : 'rgb(243, 243, 243)',
+		},
+        keyIsDefault : False
 	}
-}
+}  
+
 THEME_COLOR = 'white'
 THEME_COLOR_LIGHT  = 'white'
 
 if THEME in THEME_COLOR_MAP.keys():    
     THEME_COLOR = THEME_COLOR_MAP.get(THEME)
-    THEME_COLOR_LIGHT = THEME_COLOR_MAP.get(THEME).get('light')
+    THEME_COLOR_LIGHT = THEME_COLOR_MAP.get(THEME).get(keyLight)
 
 
 ERROR_COLOR = "#FF4136"
@@ -243,16 +301,6 @@ iconNameStudents            = "fa-user-graduate"
 iconNameCustom              = "fa-wrench"
 
 
-keyLabel                    = 'label'
-keyHref                     = 'href'
-keySubmenu                  = 'submenu'
-keyValue                    = 'value'
-keyScrollTo                 = 'scrollTo'
-keyClassName                = 'className'
-keyHasMeanStd               = 'hasMeanStd'
-keyIsAxisEnabled            = 'isAxisEnabled'
-keyIsFeature3Enabled        = 'isFeature3Enabled'
-
 
 labelMean                   = 'mean'
 labelStd                    = 'std'
@@ -279,11 +327,11 @@ FigureTypes                 = {
                   keyValue      : FigureTypeScatter,
                   keyIsAxisEnabled : True,
                   keyIsFeature3Enabled : False  }
-#    ,   
-#     FigureTypePie      : { keyLabel      : FigureTypePie, 
-#                   keyValue     : FigureTypePie,
-#                  keyIsAxisEnabled : False,
-#                  keyIsFeature3Enabled : False  }
+    ,   
+     FigureTypePie      : { keyLabel      : FigureTypePie, 
+                   keyValue     : FigureTypePie,
+                  keyIsAxisEnabled : False,
+                  keyIsFeature3Enabled : False  }
     ,   
      FigureTypeBubble     : { keyLabel       : FigureTypeBubble, 
                    keyValue     : FigureTypeBubble,

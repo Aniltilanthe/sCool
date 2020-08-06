@@ -7,31 +7,31 @@ const baseHref = "/home/dataset/";
 // create the "ui" namespace within dash_clientside
 window.dash_clientside.ui = {
     // this function can be called by the python library
-    jsFunction: function(elmntId) {
-        console.log(elmntId)
-        console.log('Hello Anil . How do you do !')			
+    jsFunction: function(elmntId) {	
 		try  {
-			//setTimeout(function(){ 
-				//var menuInput = document.getElementById('menu-sub-link-input');		
-				//console.log(menuInput.value)
-				if (elmntId) {
-					var scrollToElmnt = document.getElementById(elmntId);
-					scrollToElmnt.scrollIntoView();			
-				} else {
-					window.scrollTo(0,0);
-				}
-			//}, 50);
+			if (elmntId) {
+				var scrollToElmnt = document.getElementById(elmntId);
+				scrollToElmnt.scrollIntoView();			
+			} else {
+				window.scrollTo(0,0);
+			}
 		}
 		catch (err) {
 			console.log('Error scrollIntoView_Menu : ' + err);
-		}
-    
-    }
+		}    
+    },
+	
+	updateThemeColor : function(newThemeColor) {
+		console.log('updateTheme Color');
+		console.log('newThemeColor', newThemeColor);
+		var bodyStyles = document.body.style;
+		bodyStyles.setProperty('--theme-color', newThemeColor);
+	}
+	
 }
 
 
 function pageMenuScroll(evt, elmntId) {
-	debugger;
 	console.log('pageMenuScroll evt ', evt);
 	console.log('pageMenuScroll elmntId ', elmntId);
 	evt = evt || window.event;

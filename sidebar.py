@@ -14,6 +14,7 @@ from dash.dependencies import Input, Output, State, ClientsideFunction
 
 from app import app
 import constants
+import settings
 
 
 # the style arguments for the sidebar. We use position:fixed and a fixed width
@@ -68,7 +69,7 @@ menuSubLink2Scroll = {
 	}
 
 
-br = [html.Br()]
+spacer = [html.Div(className = "  m-bottom_x-small ")]
 
 def getSubmenuButtons(menuKey):
     currentMenu = menuLink.get(menuKey)
@@ -93,7 +94,7 @@ def getMenu():
     for menuKey in menuLink.keys():
         currentMenu = menuLink.get(menuKey)
         
-        menuOpener = [html.I(className="fas fa-chevron-right mr-3", style= {'float': 'right'})] 
+        menuOpener = [html.I(className="fas fa-chevron-right mr-3 c-button-nav-icon-right float-r")] 
         if len(currentMenu.get(keySubmenu)) == 0  :
             menuOpener = []
         
@@ -104,13 +105,16 @@ def getMenu():
                     [
                         dbc.Col([
                                 
-                                dbc.Button(html.Span([html.I(className=  currentMenu.get(keyClassName)),
-                                                      currentMenu.get(keyLabel) ]
+                                dbc.Button(html.Span([
+                                                    html.Span( children= [html.I(className=  currentMenu.get(keyClassName)),
+                                                                          html.Span(currentMenu.get(keyLabel), className = "c-button-nav-text") ] )
+                                                        ]
                                                        +
-                                                       menuOpener ), 
+                                                       menuOpener,
+                                                       className = " c-button-nav-content " ), 
                                            href= currentMenu.get(keyHref) , 
                                            size="lg", 
-                                           className="mr-1", 
+                                           className="mr-1 c-button-nav", 
                                            outline=True, color="primary", 
                                            id= menuKey, 
                                            block=True),
@@ -143,67 +147,14 @@ def getMenu():
         )
                 
         countMenuLink += 1
-        menus = menus + br
+        menus = menus + spacer
 
     return menus
 
 
+
 def getModalHelpBody():
-    content = []
-    
-    
-    content.append(html.H3( children = [ html.I(className="fas " + iconNameHome + " p-right_xx-small"),   "Home"  ] ))
-    content.append(html.P("Information about the game data"))
-    
-    content.append(html.Br())
-    
-    content.append(html.H3( children = [ html.I(className="fas " + iconNameGroups + " p-right_xx-small"),   "Groups"  ] ))
-    content.append(html.P("Compare groups for quick informations"))
-    content.append(html.P("Main group is highlighted with application theme"))
-    content.append(html.P("The minimum values of other groups are highlighted"))
-    content.append(html.P("Distribution : distribution of various features"))
-    
-    content.append(html.Br())
-    
-    
-    content.append(html.H3( children = [ html.I(className="fas " + iconNameDetails + " p-right_xx-small"),   "Details"  ] ))
-    content.append(html.P("Group details"))
-    
-    content.append(html.Br())
-    
-    content.append(html.H3( children = [ html.I(className="fas " + iconNameStudents + " p-right_xx-small"),   "Students"  ] ))
-    content.append(html.P("Group Student details"))
-    
-    content.append(html.Br())    
-    
-    content.append(html.H3( children = [ html.I(className="fas " + iconNameCustom + " p-right_xx-small"),   "Custom"  ] ))
-    content.append(html.P("Create custom figures specifying various parameters"))
-    content.append(html.P( children = [ html.I(className="fas fa-chart-bar font-size_medium p-right_xx-small"),   "Bar"  ]))
-    content.append(html.P( children = [ html.I(className="fas fa-circle font-size_medium p-right_xx-small"),   "Scatter"  ] ))
-    content.append(html.P( children = [ html.I(className="fas fa-chart-pie font-size_medium p-right_xx-small"),   "Pie"  ] ))
-    content.append(html.P( children = [ html.I(className="fas fa-ellipsis-h font-size_medium p-right_xx-small"),   "Bubble" ] ))
-    content.append(html.P( children = [ html.I(className="fas fa-chart-line font-size_medium p-right_xx-small"),   "Line" ] ))
-    
-       
-    content.append(html.Br())
-        
-    
-    content.append(html.H3("Programming concepts"))
-    content.append(  
-            dcc.Link(children       = ['Python programming concepts']
-                     , href         = "https://docs.python.org/dev/library/ast.html"
-                     , className    = "c-link"
-            )
-    )
-    content.append(html.P("The ast module helps Python applications to process trees of the Python abstract syntax grammar. The abstract syntax itself might change with each Python release; this module helps to find out programmatically what the current grammar looks like."))
-    content.append(html.P("expr   =   BoolOp , NamedExpr, BinOp, UnaryOp"))
-    content.append(html.P("operator    =   Add , Sub , Mult , MatMult , Div , Mod , Pow , LShift , RShift , BitOr , BitXor , BitAnd , FloorDiv"))
-    
-       
-    content.append(html.Br())
-
-
-    return content
+    return settings.settingsLayout
 
 sidebar = html.Div(
     [
@@ -242,26 +193,26 @@ sidebar = html.Div(
         , html.Div(
             [
                 html.Button(children=[
-                    html.I(className="fas fa-info-circle font-size_medium p-right_xx-small"),
-                    'Help',], 
-                        id='menu-modal-help-open', 
-                        className="c-button button w3-btn w3-xlarge", n_clicks=0),
+                        html.I(className="fas fa-info-circle font-size_medium p-right_xx-small"),
+                        html.Span( 'Help', className = "menu-modal-help-button-text"  ) ],
+                        id='menu-modal-setting-open', 
+                        className="c-button button w3-btn w3-xlarge menu-modal-help-button btn btn-outline-info ", n_clicks=0),
                 dbc.Modal(
                     [
-                        dbc.ModalHeader("Help sCool Data Analysis Tool"),
+                        dbc.ModalHeader("sCool Data Analysis Tool Information & Settings"),
                         dbc.ModalBody(  children = getModalHelpBody()  ),
                         dbc.ModalFooter(
-                            dbc.Button("Close", id="menu-modal-help-close", className="ml-auto")
+                            dbc.Button("Close", id="menu-modal-setting-close", className="ml-auto")
                         ),
                     ],
-                    id="menu-modal-help",
+                    id="menu-modal-setting",
                     className = "c-modal-large"
                 ),
             ],
             className = "menu-modal-help"
-        )
-    
-    
+        ) 
+        
+        , 
     ],
     className = " page-sidebar ",
     id="sidebar",
@@ -339,9 +290,9 @@ def changeMenuSetInput(*args):
     
 
 @app.callback(
-    Output("menu-modal-help", "is_open"),
-    [Input("menu-modal-help-open", "n_clicks"), Input("menu-modal-help-close", "n_clicks")],
-    [State("menu-modal-help", "is_open")],
+    Output("menu-modal-setting", "is_open"),
+    [Input("menu-modal-setting-open", "n_clicks"), Input("menu-modal-setting-close", "n_clicks")],
+    [State("menu-modal-setting", "is_open")],
 )
 def toggle_modal(n1, n2, is_open):
     if n1 or n2:
@@ -357,3 +308,4 @@ app.clientside_callback(
          Output('menu-sub-link-output-hidden', 'children'),
         [Input("menu-sub-link-input", "value")]
     )
+

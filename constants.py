@@ -65,11 +65,11 @@ THEME_COLOR_MAP = {
 	"theme-pink": {
         keyLabel : 'pink', 
 		keyColor : 'pink',
-		keyLight 	: "rgb(232 252 253)",
+		keyLight 	: "#fbd5db",
         keyClassName : 'theme-color-pink',
 		keyExpress	: {
-			"plot_bgcolor"      : 'rgb(243, 243, 243)',
-			"paper_bgcolor"     : 'rgb(243, 243, 243)',
+			"plot_bgcolor"      : 'rgb(251, 213, 219)',
+			"paper_bgcolor"     : 'rgb(251, 213, 219)',
 		},
         keyIsDefault : False
 	},
@@ -88,10 +88,17 @@ THEME_COLOR_MAP = {
 
 THEME_COLOR = 'white'
 THEME_COLOR_LIGHT  = 'white'
+THEME_EXPRESS_LAYOUT = THEME_COLOR_MAP.get(THEME).get(keyExpress)
 
-if THEME in THEME_COLOR_MAP.keys():    
-    THEME_COLOR = THEME_COLOR_MAP.get(THEME)
-    THEME_COLOR_LIGHT = THEME_COLOR_MAP.get(THEME).get(keyLight)
+
+def refreshThemeColor():
+    if THEME in THEME_COLOR_MAP.keys():    
+        THEME_COLOR = THEME_COLOR_MAP.get(THEME)
+        THEME_COLOR_LIGHT = THEME_COLOR_MAP.get(THEME).get(keyLight)
+        THEME_EXPRESS_LAYOUT = THEME_COLOR_MAP.get(THEME).get(keyExpress)
+    return THEME_COLOR, THEME_COLOR_LIGHT, THEME_EXPRESS_LAYOUT
+
+THEME_COLOR, THEME_COLOR_LIGHT, THEME_EXPRESS_LAYOUT = refreshThemeColor()
 
 
 ERROR_COLOR = "#FF4136"
@@ -112,7 +119,6 @@ MENU_BUTTON_STYLE = {
     'width': '100%'
 }
 
-THEME_EXPRESS_LAYOUT = THEME_COLOR_MAP.get(THEME).get('express')
 
 THEME_TABLE_HEADER_STYLE = {
     'backgroundColor'   : 'rgb(230, 230, 230)',

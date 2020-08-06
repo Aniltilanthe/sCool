@@ -127,6 +127,11 @@ settingsLayout = [
 
 #------------------------------Customize Application ------------------------------
 
+def setAppTheme(newTheme):
+    
+    constants.THEME = newTheme
+    constants.THEME_COLOR, constants.THEME_COLOR_LIGHT, constants.THEME_EXPRESS_LAYOUT = constants.refreshThemeColor()
+
 
 @app.callback ( Output("setting-customize-theme-color-input", "value") , 
               [Input( themeOptionsButtonPre + f"{j}", "n_clicks")   for j in THEME_COLOR_MAP ])
@@ -141,7 +146,9 @@ def onChangeCustomizeAppTheme(*args):
     clickedButton_id = triggered_id.split('.')[0]
     
     if not clickedButton_id == ''  and clickedButton_id.split(themeOptionsButtonPre)[1] in THEME_COLOR_MAP :
-         return THEME_COLOR_MAP.get( clickedButton_id.split(themeOptionsButtonPre)[1] ).get(keyColor)
+        setAppTheme( clickedButton_id.split(themeOptionsButtonPre)[1] )
+        
+        return THEME_COLOR_MAP.get( clickedButton_id.split(themeOptionsButtonPre)[1] ).get(keyColor)
         
     return newValue  
 

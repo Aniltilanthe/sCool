@@ -277,8 +277,9 @@ feature2UserNamesDict[featureConceptsUsedDetailsStr] = "Concepts used details"
 
 
 #------------------- GRAPHS START -----------------------------------------------
-graphHeight = 800
-graphWidth =  1300
+graphHeight     = 800
+graphWidth      =  1300
+graphHeightMin  = 400
 
 graphTemplete = 'seaborn'
 

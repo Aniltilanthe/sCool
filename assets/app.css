@@ -243,6 +243,10 @@ html {
     box-shadow: 0 0 4px 0.2rem lightgrey;
 }
 
+.theme-app .js-plotly-plot {
+	min-height: 400px;
+}
+
 
 .theme-color-app {
 	color : white;

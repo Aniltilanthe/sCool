@@ -679,7 +679,7 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                          points         = "all",
                          title          = "Distribution  - " + title,
                          hover_data     = ['Name'] + hoverData,
-                         height         =   constants.graphHeight - 300
+                         height         =   constants.graphHeightMin
         )
     figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)
     graphDistributions.append( html.Div( dcc.Graph(

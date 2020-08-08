@@ -1,5 +1,6 @@
 :root {
-  --theme-color: #3aaab2;
+  --theme-background-color: #3aaab2;
+  --theme-color: white;
 }
 
 
@@ -29,19 +30,6 @@ html {
 }
 .page-content {
 	margin-top: 0.5rem;
-}
-
-.highlight {
-	color: aliceblue;
-    background-color: #0069d9;
-    border-color: #0062cc;
-    font-weight: bold;
-}
-.highlight:focus {
-    color: aliceblue;
-    background-color: #0069d9;
-    border-color: #0062cc;
-    box-shadow: 0 0 0 0.2rem rgba(38,143,255,.5);
 }
 
 .row {
@@ -181,8 +169,8 @@ html {
 	margin-right: 0.5rem;
 }
 .c-modal-large i {
-	background-color: var(--theme-color) !important;
-    color: white;
+	background-color: var(--theme-background-color) !important;
+	color: var(--theme-color) ;
 }
 	
 	
@@ -212,11 +200,15 @@ html {
 }
 
 
+.theme-app {
+	color: var(--theme-color) ;
+}
+
 .theme-app .navbar-main, 
 .theme-app .selector-main-row {
-	background-color: var(--theme-color) !important;
+	background-color: var(--theme-color) ;
     font-size: initial;
-    color: white;
+	color: var(--theme-background-color) !important;
 }
 
 .theme-app  .dropdown-main {
@@ -238,12 +230,34 @@ html {
 	padding: 2rem;
 }
 .theme-app  .c-card .card_value {
-	color: var(--theme-color);
+	color: var(--theme-background-color);
 }
-.theme-app .c-card .card_value1, .c-card .card_value2 {
-	color: var(--theme-color);
+.theme-app .c-card .card_value1, .theme-app  .c-card .card_value2 {
+	color: var(--theme-background-color);
 }
 
+.theme-app .highlight {
+	color: var(--theme-color) ;
+	background-color: var(--theme-background-color);
+	border-color: var(--theme-background-color);
+    font-weight: bold;
+}
+.theme-app .highlight:focus, 
+.theme-app .btn-outline-primary:hover, 
+.theme-app .btn-outline-primary:active,
+.theme-app .btn-outline-primary:not(:disabled):not(.disabled):active {
+	color: var(--theme-color);
+	background-color: var(--theme-background-color);
+	border-color: var(--theme-background-color);
+    box-shadow: 0 0 4px 0.2rem lightgrey;
+}
+
+.theme-app .c-card, .theme-app .form {
+	background: var(--theme-color);
+}
+.theme-app .page-main {
+	background: var(--theme-background-color);
+}
 
 .theme-color-app {
 	color : white;
@@ -260,6 +274,10 @@ html {
 .theme-color-dark {
 	color : white;
 	background-color: black;
+}
+.theme-color-teal {
+	color : white;
+	background-color: #009688;
 }
 
 
@@ -394,6 +412,37 @@ html {
 	margin-left: 3rem;
 }
 
+@media only screen and (max-width: 80em) {
+	.page-sidebar {
+		overflow-y: scroll;
+	}
+	.theme-app h2 {
+		margin-top: 0;
+	}
+	.page-sidebar {
+		padding: 0.5rem 1rem;
+	}
+	.menu-modal-help {
+		position: fixed;
+		bottom: 0.5rem;
+		left: 0.5rem;
+	}
+	.menu-modal-help-button {
+		padding: 0.5em;
+		border-radius: 50%;
+		font-size: initial;
+		border: none;
+		height: auto;
+		text-align: start;
+		border-radius: 50%;
+	}
+	.menu-modal-help-button .menu-modal-help-button-text {
+		display: none;
+	}
+	.menu-modal-help-button i {
+		padding: 0;
+	}
+}
 @media only screen and (max-width: 60em) {
 	.m_x-small {
 		margin: 0.1rem;	
@@ -440,26 +489,6 @@ html {
 	}
 	.c-button-nav .c-button-nav-text {
 		display: none;
-	}
-	.menu-modal-help {
-		position: fixed;
-		bottom: 0.5rem;
-		left: 0.5rem;
-	}
-	.menu-modal-help-button {
-		padding: 0.5em;
-		border-radius: 50%;
-		font-size: initial;
-		border: none;
-		height: auto;
-		text-align: start;
-		border-radius: 50%;
-	}
-	.menu-modal-help-button .menu-modal-help-button-text {
-		display: none;
-	}
-	.menu-modal-help-button i {
-		padding: 0;
 	}
 }
 

@@ -18,6 +18,7 @@ keyHasMeanStd               = 'hasMeanStd'
 keyIsAxisEnabled            = 'isAxisEnabled'
 keyIsFeature3Enabled        = 'isFeature3Enabled'
 keyColor                    = 'color'
+keyBackgroundColor          = 'backgroundColor'
 keyExpress                  = 'express'
 keyLight                    = 'light'
 keyIsDefault                = 'isDefault'
@@ -42,7 +43,8 @@ THEME           = "theme-app"
 THEME_COLOR_MAP = {
 	"theme-app": {
         keyLabel : 'app', 
-		keyColor : '#3aaab2',
+        keyBackgroundColor  : '#3aaab2',
+		keyColor : 'white',
 		keyLight 	: "rgb(232 252 253)",
         keyClassName : 'theme-color-app',
 		keyExpress	: {
@@ -51,31 +53,34 @@ THEME_COLOR_MAP = {
 		},
         keyIsDefault : True
 	},
-	"theme-cyan": {
-        keyLabel : 'cyan', 
-		keyColor : '#3aaab2',
-		keyLight 	: "rgb(232 252 253)",
-        keyClassName : 'theme-color-cyan',
+	"theme-teal": {
+        keyLabel : 'teal', 
+        keyBackgroundColor  : '#009688',
+		keyColor : 'white',
+		keyLight 	: "#e9fffd",
+        keyClassName : 'theme-color-teal',
 		keyExpress	: {
-			"plot_bgcolor"      : 'rgb(243, 243, 243)',
-			"paper_bgcolor"     : 'rgb(243, 243, 243)',
+			"plot_bgcolor"      : '#e9fffd',
+			"paper_bgcolor"     : '#e9fffd',
 		},
         keyIsDefault : False
 	},
 	"theme-pink": {
         keyLabel : 'pink', 
-		keyColor : 'pink',
-		keyLight 	: "#fbd5db",
+        keyBackgroundColor  : '#e91e63',
+		keyColor : 'white',
+		keyLight 	: "#fbd2e0",
         keyClassName : 'theme-color-pink',
 		keyExpress	: {
-			"plot_bgcolor"      : 'rgb(251, 213, 219)',
-			"paper_bgcolor"     : 'rgb(251, 213, 219)',
+			"plot_bgcolor"      : '#fef2f6',
+			"paper_bgcolor"     : '#fef2f6',
 		},
         keyIsDefault : False
 	},
 	"theme-dark": {
         keyLabel : 'dark', 
-		keyColor : 'black',
+        keyBackgroundColor  : 'black',
+		keyColor : 'white',
 		keyLight 	: "grey",
         keyClassName : 'theme-color-dark',
 		keyExpress	: {
@@ -86,22 +91,25 @@ THEME_COLOR_MAP = {
 	}
 }  
 
-THEME_COLOR = 'white'
+THEME_COLOR = 'black'
+THEME_BACKGROUND_COLOR = 'white'
 THEME_COLOR_LIGHT  = 'white'
 THEME_EXPRESS_LAYOUT = THEME_COLOR_MAP.get(THEME).get(keyExpress)
 
 
 def refreshThemeColor():
     if THEME in THEME_COLOR_MAP.keys():    
-        THEME_COLOR = THEME_COLOR_MAP.get(THEME)
-        THEME_COLOR_LIGHT = THEME_COLOR_MAP.get(THEME).get(keyLight)
-        THEME_EXPRESS_LAYOUT = THEME_COLOR_MAP.get(THEME).get(keyExpress)
-    return THEME_COLOR, THEME_COLOR_LIGHT, THEME_EXPRESS_LAYOUT
+        THEME_COLOR                     = THEME_COLOR_MAP.get(THEME).get(keyColor)
+        THEME_BACKGROUND_COLOR          = THEME_COLOR_MAP.get(THEME).get(keyBackgroundColor)
+        THEME_COLOR_LIGHT               = THEME_COLOR_MAP.get(THEME).get(keyLight)
+        THEME_EXPRESS_LAYOUT            = THEME_COLOR_MAP.get(THEME).get(keyExpress)
+    return THEME_COLOR, THEME_BACKGROUND_COLOR, THEME_COLOR_LIGHT, THEME_EXPRESS_LAYOUT
 
-THEME_COLOR, THEME_COLOR_LIGHT, THEME_EXPRESS_LAYOUT = refreshThemeColor()
+THEME_COLOR, THEME_BACKGROUND_COLOR, THEME_COLOR_LIGHT, THEME_EXPRESS_LAYOUT = refreshThemeColor()
 
 
 ERROR_COLOR = "#FF4136"
+SUCCESS_COLOR = "#4caf50"
 
 
 SIDEBAR_STYLE = {
@@ -333,11 +341,11 @@ FigureTypes                 = {
                   keyValue      : FigureTypeScatter,
                   keyIsAxisEnabled : True,
                   keyIsFeature3Enabled : False  }
-    ,   
-     FigureTypePie      : { keyLabel      : FigureTypePie, 
-                   keyValue     : FigureTypePie,
-                  keyIsAxisEnabled : False,
-                  keyIsFeature3Enabled : False  }
+#    ,   
+#     FigureTypePie      : { keyLabel      : FigureTypePie, 
+#                   keyValue     : FigureTypePie,
+#                  keyIsAxisEnabled : False,
+#                  keyIsFeature3Enabled : False  }
     ,   
      FigureTypeBubble     : { keyLabel       : FigureTypeBubble, 
                    keyValue     : FigureTypeBubble,

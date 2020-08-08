@@ -29,7 +29,7 @@ from plotly import graph_objs as go
 from app import app
 
 
-import studentGrouped
+from data import studentGrouped
 import constants
 import util
 
@@ -279,7 +279,7 @@ layout = [
                 # Left column
                 html.Div(
                     id= idApp + "-custom-plot-form",
-                    className=" m_small",
+                    className=" ",
                     children=[ generateControlCardCustomPlot() ]
                 ),
         ),

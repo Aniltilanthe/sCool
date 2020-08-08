@@ -9,9 +9,10 @@ Created on Sun Jun 28 15:48:22 2020
 import numpy as np
 import pandas as pd
 
-import main
-import studentGroupedPerformance
-import studentGroupedPerformanceTheory
+from data import main
+from data import studentGroupedPerformance
+from data import studentGroupedPerformanceTheory
+
 import constants
 
 

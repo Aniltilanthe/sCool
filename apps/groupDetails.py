@@ -31,7 +31,7 @@ from app import app
 
 
 
-import studentGrouped
+from data import studentGrouped
 import constants
 import util
 

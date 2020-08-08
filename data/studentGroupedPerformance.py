@@ -20,7 +20,7 @@ import dash
 import dash_html_components as html
 
 #main library
-import main
+from data import main
 import constants
 #from main import PythonParser
 

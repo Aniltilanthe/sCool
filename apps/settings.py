@@ -23,6 +23,7 @@ keyValue            = constants.keyValue
 keyScrollTo         = constants.keyScrollTo
 keyClassName        = constants.keyClassName
 keyColor            = constants.keyColor
+keyBackgroundColor  = constants.keyBackgroundColor
 keyIsDefault        = constants.keyIsDefault
 
 iconNameHome        = constants.iconNameHome
@@ -44,6 +45,12 @@ layoutModalBodyCustomize =[
     
     , dcc.Input(
                 id              = "setting-customize-theme-color-input",
+                type            = "text", 
+                className       = "hidden",
+                value           = "cyan"
+            )
+    , dcc.Input(
+                id              = "setting-customize-theme-background-color-input",
                 type            = "text", 
                 className       = "hidden",
                 value           = "cyan"
@@ -130,14 +137,16 @@ settingsLayout = [
 def setAppTheme(newTheme):
     
     constants.THEME = newTheme
-    constants.THEME_COLOR, constants.THEME_COLOR_LIGHT, constants.THEME_EXPRESS_LAYOUT = constants.refreshThemeColor()
+    constants.THEME_COLOR, constants.THEME_BACKGROUND_COLOR, constants.THEME_COLOR_LIGHT, constants.THEME_EXPRESS_LAYOUT = constants.refreshThemeColor()
 
 
-@app.callback ( Output("setting-customize-theme-color-input", "value") , 
+@app.callback ( [ Output("setting-customize-theme-background-color-input", "value") ,
+                    Output("setting-customize-theme-color-input", "value"), 
+                 ], 
               [Input( themeOptionsButtonPre + f"{j}", "n_clicks")   for j in THEME_COLOR_MAP ])
 def onChangeCustomizeAppTheme(*args):
     ctx = dash.callback_context
-    newValue = ""
+    newValue = "", ""
 
     if not ctx.triggered or not any(args):
         return newValue
@@ -148,7 +157,9 @@ def onChangeCustomizeAppTheme(*args):
     if not clickedButton_id == ''  and clickedButton_id.split(themeOptionsButtonPre)[1] in THEME_COLOR_MAP :
         setAppTheme( clickedButton_id.split(themeOptionsButtonPre)[1] )
         
-        return THEME_COLOR_MAP.get( clickedButton_id.split(themeOptionsButtonPre)[1] ).get(keyColor)
+        return [
+                THEME_COLOR_MAP.get( clickedButton_id.split(themeOptionsButtonPre)[1] ).get(keyBackgroundColor),
+                THEME_COLOR_MAP.get( clickedButton_id.split(themeOptionsButtonPre)[1] ).get(keyColor),  ]
         
     return newValue  
 
@@ -160,5 +171,7 @@ app.clientside_callback(
         ClientsideFunction('ui', 'updateThemeColor'),
         # the Output, Input and State are passed in as with a regular callback
          Output('setting-customize-theme-color-output', 'children'),
-        [Input("setting-customize-theme-color-input", "value")]
+        [ Input("setting-customize-theme-background-color-input", "value"),
+            Input("setting-customize-theme-color-input", "value"),
+            ]
     )

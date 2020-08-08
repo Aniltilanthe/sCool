@@ -17,7 +17,7 @@ import plotly.express as px
 
 
 #main library
-import main
+from data import main
 #from main import PythonParser
 
 

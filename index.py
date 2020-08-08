@@ -20,14 +20,11 @@ import plotly.figure_factory as ff
 from plotly import graph_objs as go
 
 from app import app
-from apps import groups, groupDetails, groupStudents, custom, home
-
-from sidebar import sidebar
-
+from apps import groups, groupDetails, groupStudents, custom, home, sidebar
+from data import studentGrouped
 
 import constants
 
-import studentGrouped
 
 
 
@@ -94,7 +91,7 @@ content = html.Div(
     className = "  page-main "
 )
 
-app.layout = html.Div([dcc.Location(id="url"), sidebar, content],
+app.layout = html.Div([dcc.Location(id="url"), sidebar.sidebar, content],
                        className = constants.THEME
                        )
 

@@ -5,7 +5,7 @@
 
 
 html {
-  scroll-behavior: smooth;
+  	scroll-behavior: smooth;
 }
 
 .open {
@@ -173,11 +173,6 @@ html {
 	color: var(--theme-color) ;
 }
 	
-	
-
-.width-100 {
-	width: 100%;
-}
 
 .c-table {
 	font-size : 1.2em;
@@ -200,15 +195,11 @@ html {
 }
 
 
-.theme-app {
-	color: var(--theme-color) ;
-}
-
 .theme-app .navbar-main, 
 .theme-app .selector-main-row {
-	background-color: var(--theme-color) ;
+	background-color: var(--theme-background-color) !important;
     font-size: initial;
-	color: var(--theme-background-color) !important;
+	color: var(--theme-color) ;
 }
 
 .theme-app  .dropdown-main {
@@ -246,18 +237,12 @@ html {
 .theme-app .btn-outline-primary:hover, 
 .theme-app .btn-outline-primary:active,
 .theme-app .btn-outline-primary:not(:disabled):not(.disabled):active {
-	color: var(--theme-color);
+	color: var(--theme-color) ;
 	background-color: var(--theme-background-color);
 	border-color: var(--theme-background-color);
     box-shadow: 0 0 4px 0.2rem lightgrey;
 }
 
-.theme-app .c-card, .theme-app .form {
-	background: var(--theme-color);
-}
-.theme-app .page-main {
-	background: var(--theme-background-color);
-}
 
 .theme-color-app {
 	color : white;
@@ -280,7 +265,64 @@ html {
 	background-color: #009688;
 }
 
+@media only screen and (max-width: 80em) {
+	.page-sidebar {
+		overflow-y: scroll;
+	}
+	.theme-app h2 {
+		margin-top: 0;
+	}
+	.page-sidebar {
+		padding: 0.5rem 1rem;
+	}
+	.menu-modal-help {
+		position: fixed;
+		bottom: 0.5rem;
+		left: 0.5rem;
+	}
+	.menu-modal-help-button {
+		padding: 0.5em;
+		border-radius: 50%;
+		font-size: initial;
+		border: none;
+		height: auto;
+		text-align: start;
+		border-radius: 50%;
+	}
+	.menu-modal-help-button .menu-modal-help-button-text {
+		display: none;
+	}
+	.menu-modal-help-button i {
+		padding: 0;
+	}
+}
 
+@media only screen and (max-width: 60em) {
+
+}
+
+@media only screen and (max-width: 45em) {
+	.page-sidebar {
+		width: 100%;
+		position: initial;
+	}
+	.page-main {
+		margin: 0;
+		padding: 0;
+	}
+	.c-button-nav .c-button-nav-text {
+		display: none;
+	}
+}
+
+
+
+
+	
+
+.width-100 {
+	width: 100%;
+}
 .float-r {
 	float: right;
 }
@@ -412,37 +454,6 @@ html {
 	margin-left: 3rem;
 }
 
-@media only screen and (max-width: 80em) {
-	.page-sidebar {
-		overflow-y: scroll;
-	}
-	.theme-app h2 {
-		margin-top: 0;
-	}
-	.page-sidebar {
-		padding: 0.5rem 1rem;
-	}
-	.menu-modal-help {
-		position: fixed;
-		bottom: 0.5rem;
-		left: 0.5rem;
-	}
-	.menu-modal-help-button {
-		padding: 0.5em;
-		border-radius: 50%;
-		font-size: initial;
-		border: none;
-		height: auto;
-		text-align: start;
-		border-radius: 50%;
-	}
-	.menu-modal-help-button .menu-modal-help-button-text {
-		display: none;
-	}
-	.menu-modal-help-button i {
-		padding: 0;
-	}
-}
 @media only screen and (max-width: 60em) {
 	.m_x-small {
 		margin: 0.1rem;	
@@ -478,17 +489,3 @@ html {
 		margin-bottom: 1rem;
 	}
 }
-@media only screen and (max-width: 45em) {
-	.page-sidebar {
-		width: 100%;
-		position: initial;
-	}
-	.page-main {
-		margin: 0;
-		padding: 0;
-	}
-	.c-button-nav .c-button-nav-text {
-		display: none;
-	}
-}
-

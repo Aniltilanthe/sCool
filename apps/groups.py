@@ -21,7 +21,7 @@ from plotly import graph_objs as go
 from app import app
 
 
-import studentGrouped
+from data import studentGrouped
 import constants
 import util
 
@@ -103,12 +103,18 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                         'column_id'     : 'SessionDuration',
                     },
                     'color': constants.ERROR_COLOR,
-#                    'color': 'white',
-#                    'backgroundColor': constants.ERROR_COLOR,
-#                    'color': 'white',
                 }
                 for i in  df['SessionDuration'].nsmallest(1)
-            ] ) + 
+            ] ) +   ( []  if ( isMinNotHighlight ) else   [
+                {
+                    'if': {
+                        'filter_query'  : '{SessionDuration}' + ' = {}'.format(i) ,
+                        'column_id'     : 'SessionDuration',
+                    },
+                    'color': constants.SUCCESS_COLOR,
+                }
+                for i in  df['SessionDuration'].nlargest(1)
+            ] ) +
             ( []  if ( isMinNotHighlight ) else   [
                 {
                     'if': {
@@ -116,11 +122,18 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                         'column_id'     : 'PracticeSessionDuration',
                     },
                     'color': constants.ERROR_COLOR,
-#                    'color': 'white',
-#                    'backgroundColor': constants.ERROR_COLOR,
-#                    'color': 'white',
                 }
                 for i in  df['PracticeSessionDuration'].nsmallest(1)
+            ] ) + 
+            ( []  if ( isMinNotHighlight ) else   [
+                {
+                    'if': {
+                        'filter_query'  : '{PracticeSessionDuration}' + ' = {}'.format(i) ,
+                        'column_id'     : 'PracticeSessionDuration',
+                    },
+                    'color': constants.SUCCESS_COLOR,
+                }
+                for i in  df['PracticeSessionDuration'].nlargest(1)
             ] ) +
             ( []  if ( isMinNotHighlight ) else   [
                 {
@@ -129,11 +142,18 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                         'column_id'     : 'TheorySessionDuration',
                     },
                     'color': constants.ERROR_COLOR,
-#                    'color': 'white',
-#                    'backgroundColor': constants.ERROR_COLOR,
-#                    'color': 'white',
                 }
                 for i in  df['TheorySessionDuration'].nsmallest(1)
+            ] ) +  
+            ( []  if ( isMinNotHighlight ) else   [
+                {
+                    'if': {
+                        'filter_query'  : '{TheorySessionDuration}' + ' = {}'.format(i) ,
+                        'column_id'     : 'TheorySessionDuration',
+                    },
+                    'color': constants.SUCCESS_COLOR,
+                }
+                for i in  df['TheorySessionDuration'].nlargest(1)
             ] ) +
             ( []  if ( isMinNotHighlight ) else   [
                 {
@@ -142,11 +162,18 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                         'column_id'     : 'Points',
                     },
                     'color': constants.ERROR_COLOR,
-#                    'color': 'white',
-#                    'backgroundColor': constants.ERROR_COLOR,
-#                    'color': 'white',
                 }
                 for i in  df['Points'].nsmallest(1)     
+            ] ) + 
+            ( []  if ( isMinNotHighlight ) else   [
+                {
+                    'if': {
+                        'filter_query'  : '{Points}' + ' = {}'.format(i) ,
+                        'column_id'     : 'Points',
+                    },
+                    'color': constants.SUCCESS_COLOR,
+                }
+                for i in  df['Points'].nlargest(1)     
             ] ) + 
             ( []  if ( isMinNotHighlight )  else   [
                 {
@@ -155,11 +182,18 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                         'column_id'     : 'Attempts',
                     },
                     'color': constants.ERROR_COLOR,
-#                    'color': 'white',
-#                    'backgroundColor': constants.ERROR_COLOR,
-#                    'color': 'white',
                 }
                 for i in     df['Attempts'].nsmallest(1)   
+            ] ) + 
+            ( []  if ( isMinNotHighlight )  else   [
+                {
+                    'if': {
+                        'filter_query'  : '{Attempts}' + (' = {}'.format(i)),
+                        'column_id'     : 'Attempts',
+                    },
+                    'color': constants.SUCCESS_COLOR,
+                }
+                for i in     df['Attempts'].nlargest(1)   
             ] ) + 
             ( []  if ( isMinNotHighlight )  else   [
                 {
@@ -168,22 +202,26 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
                         'column_id'     : 'itemsCollectedCount',
                     },
                     'color': constants.ERROR_COLOR,
-#                    'color': 'white',
-#                    'backgroundColor': constants.ERROR_COLOR,
-#                    'color': 'white',
                 }
                 for i in   df['itemsCollectedCount'].nsmallest(1)
+            ] ) +  
+            ( []  if ( isMinNotHighlight )  else   [
+                {
+                    'if': {
+                        'filter_query'  : '{itemsCollectedCount}' + ' = {}'.format(i),
+                        'column_id'     : 'itemsCollectedCount',
+                    },
+                    'color': constants.SUCCESS_COLOR,
+                }
+                for i in   df['itemsCollectedCount'].nlargest(1)
             ] ) + 
              ( [
                 {
                     'if': {
                         'filter_query': '{{GroupId}} = {}'.format(i),
                     },
-                    'color': constants.THEME_COLOR,
+                    'color': constants.THEME_BACKGROUND_COLOR,
                     'backgroundColor': constants.THEME_COLOR_LIGHT,
-#                    'color': 'white',
-#                    'backgroundColor': constants.THEME_COLOR,
-#                    'color': 'white',
                 }
                 for i in [ featureAdderGroup + str(groupKey) ]
             ] )

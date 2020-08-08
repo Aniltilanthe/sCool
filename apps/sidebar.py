@@ -14,7 +14,8 @@ from dash.dependencies import Input, Output, State, ClientsideFunction
 
 from app import app
 import constants
-import settings
+
+from apps import settings
 
 
 # the style arguments for the sidebar. We use position:fixed and a fixed width

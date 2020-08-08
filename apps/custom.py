@@ -21,7 +21,8 @@ from app import app
 
 
 
-import studentGrouped
+
+from data import studentGrouped
 import constants
 import util
 
@@ -269,12 +270,12 @@ def update_axis_selector_disabled(selectedFigureType, initialClass):
     initialClassS = set()
     
     if not None is initialClass:
-        initialClassS = set(initialClass.split(' '))  
+        initialClassS = set(initialClass.split(' '))
     
     if selectedFigureType in FigureTypes   and   not FigureTypes.get(selectedFigureType).get(constants.keyIsAxisEnabled):
-        initialClassS.add('disabled')  
+        initialClassS.add('disabled')
     else:
-        initialClassS.discard('disabled') 
+        initialClassS.discard('disabled')
 
     return  ' '.join(initialClassS)
 
@@ -293,12 +294,12 @@ def update_feature_size_disabled(selectedFigureType, initialClass):
     initialClassS = set()
     
     if not None is initialClass:
-        initialClassS = set(initialClass.split(' ')) 
+        initialClassS = set(initialClass.split(' '))
 
     if selectedFigureType in FigureTypes and   not FigureTypes.get(selectedFigureType).get(constants.keyIsFeature3Enabled):
-        initialClassS.add('disabled') 
+        initialClassS.add('disabled')
     else:
-        initialClassS.discard('disabled') 
+        initialClassS.discard('disabled')
 
     return  ' '.join(initialClassS)
 

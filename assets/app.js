@@ -18,28 +18,14 @@ window.dash_clientside.ui = {
 		}
 		catch (err) {
 			console.log('Error scrollIntoView_Menu : ' + err);
-		}    
+		}
     },
 	
-	updateThemeColor : function(newThemeColor) {
-		console.log('updateTheme Color');
-		console.log('newThemeColor', newThemeColor);
+	updateThemeColor : function(newThemeBackgroundColor, newThemeColor) {
 		var bodyStyles = document.body.style;
+		bodyStyles.setProperty('--theme-background-color', newThemeBackgroundColor);
 		bodyStyles.setProperty('--theme-color', newThemeColor);
-	}
+	},
+
 	
-}
-
-
-function pageMenuScroll(evt, elmntId) {
-	console.log('pageMenuScroll evt ', evt);
-	console.log('pageMenuScroll elmntId ', elmntId);
-	evt = evt || window.event;
-	 // stops the default-action from happening
-    // means you need to find another way to fire it, if you want to later
-    
-	if (elmntId) {
-		var scrollToElmnt = document.getElementById(elmntId);
-		scrollToElmnt.scrollIntoView();	
-	}
 }

@@ -582,6 +582,10 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                     constants.TaskTypeTheory    : constants.colorTheory,
                     constants.TaskTypePractice  : constants.colorPractice, },
             )
+            graphs.append(
+                    dcc.Graph(
+                        figure = fig
+                ))
         except Exception as e: 
             print('getFeaturePlot  1st  ')
             print('title  ' + title)
@@ -599,51 +603,56 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                 , hover_name    =  hoverName
                 , hover_data    =  hoverData
             )
+            graphs.append(
+                    dcc.Graph(
+                        figure = fig
+                ))
         except Exception as e: 
             print('getFeaturePlot  2nd  ')
             print('title  ' + title)
             print(e)
                     
     
-    graphs.append(
-            dcc.Graph(
-                figure = fig
-        ))
                     
                     
                     
     graphDistributions = []
-    
-    if hasDistribution :
-        if hasMeanStd :
-            figMean = df.mean().round(decimals=2)[featureX]
-            figStd = df.std().round(decimals=2)[featureX]
-            graphDistributions.append(
-                    html.Div(children=[
-                            html.P('Mean ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figMean) ),
-                            html.P('Std. ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figStd) ),
-                            ])
-            )  
-                     
-        figQuantile = px.box(df, 
-                             y                      = featureX, 
-                             points                 = "all",
-                             title                  = "Distribution  - " + title,
-                             hover_data             = ['Name'] + hoverData,
-                             labels                 = feature2UserNamesDict , # customize axis label
-                             height                 =   constants.graphHeightMin,
-                             template               = constants.graphTemplete ,     
-                             color                  = constants.featureTaskType ,
-                             color_discrete_map     =   {
-                                constants.TaskTypeTheory    : constants.colorTheory,
-                                constants.TaskTypePractice  : constants.colorPractice, 
-                                },
-            )
-            
-        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)
-        graphDistributions.append( html.Div( dcc.Graph(
-                figure =  figQuantile
-        )))
+      
+    try :
+        if hasDistribution :
+            if hasMeanStd :
+                figMean = df.mean().round(decimals=2)[featureX]
+                figStd = df.std().round(decimals=2)[featureX]
+                graphDistributions.append(
+                        html.Div(children=[
+                                html.P('Mean ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figMean) ),
+                                html.P('Std. ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figStd) ),
+                                ])
+                )  
+                         
+            figQuantile = px.box(df, 
+                                 y                      = featureX, 
+                                 points                 = "all",
+                                 title                  = "Distribution  - " + title,
+                                 hover_data             = ['Name'] + hoverData,
+                                 labels                 = feature2UserNamesDict , # customize axis label
+                                 height                 =   constants.graphHeightMin,
+                                 template               = constants.graphTemplete ,     
+                                 color                  = constants.featureTaskType ,
+                                 color_discrete_map     =   {
+                                    constants.TaskTypeTheory    : constants.colorTheory,
+                                    constants.TaskTypePractice  : constants.colorPractice, 
+                                    },
+                )
+                
+            figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)
+            graphDistributions.append( html.Div( dcc.Graph(
+                    figure =  figQuantile
+            )))
+    except Exception as e: 
+        print('getFeaturePlot  hasDistribution ')
+        print('title  ' + title)
+        print(e)
         
         
         

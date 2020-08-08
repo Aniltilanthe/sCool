@@ -811,17 +811,17 @@ def plotSingleClassGeneral( titleTextAdd, school ):
 #    Graphs only for THEORY
         for rowTheory in featurePairsToPlotTheory : 
             if (rowTheory not in featurePairsToPlotSingle) :
-    
+                
                 try :
                 #                           for setting title  
                     titleFirst = rowTheory[0]
                     if rowTheory[0] in feature2UserNamesDict:
                         titleFirst = feature2UserNamesDict.get(rowTheory[0])  
                         
-                    featurePlot, graphDistributions = getFeaturePlot(studentWiseData, featuresPractice[first], featuresPractice[second], 
-                                                           '(Practice) Details of students ' + titleFirst,
-                                                           hoverDataPractice,
-                                                           hasDistribution = True)
+                    featurePlot, graphDistributions = getFeaturePlot(studentWiseDataTheory, rowTheory[0], rowTheory[1] , 
+                                                                   '(Theory) Details of students ' + titleFirst,
+                                                                   hoverDataTheory, isColored = True,
+                                                                   hasDistribution = True)
                     
                     graphs.append(
                                     html.Div(
@@ -1044,7 +1044,7 @@ def setClassOverview(groupMain):
 
 
 # **IMPORTANT - Quantile Count must be updated when Adding Distribution Quantile Plots !!!!
-quantileCount = 8
+quantileCount = 9
 @app.callback(
     [Output(f"groupDetails-collapse-distribution-{i}", "is_open") for i in range(quantileCount)],
     [Input(f"groupDetails-collapse-distribution-button-{i}", "n_clicks") for i in range(quantileCount)],

@@ -120,31 +120,6 @@ getTheoryDescription                     =  studentGrouped.getTheoryDescription
 
 
 
-def getSuccessPieFig(groupData, taskId, dfTaskDetails, featureTaskId, typeOfTask):
-    
-    groupData = groupData.sort_values(['StudentId','Result'], ascending=False)
-
-    taskTitle = ' missing '
-    
-    try :
-        taskTitle =  dfTaskDetails[ dfTaskDetails[featureTaskId] == int(taskId) ]['Title'].values[0]
-    except Exception as e: 
-        print(e)
-    
-    pieFig = go.Figure(go.Pie(
-                        values = [groupData[groupData['Result'] == 1].count()[0], 
-                                  groupData[groupData['Result'] == 0].count()[0]],
-                        labels = [constants.successPieFigClassSuccess, constants.successPieFigClassOthers],
-                        text = ["Success", "Others"],
-                        marker_colors =  [ constants.colorSuccess, constants.colorError ]
-                    ))
-    pieFig.update_layout(
-            autosize =  False,
-            title_text =  str(typeOfTask) + ' Task ' + ": " + str(taskTitle) + " (Id: " + str(taskId) + ")"
-    )
-    
-    return pieFig
-
 def convert_list_column_tostr_NL(val) :
     separator = ',<br>'
     return separator.join(val)
@@ -169,6 +144,7 @@ def plotSingleClass( titleTextAdd, school ):
         try :
             groupOriginalTheory = dfGroupedPlayerStrategyTheory.get_group(school)
         except Exception as e: 
+            print('plotSingleClass 1 ')
             print(e)
         
         
@@ -273,6 +249,7 @@ def plotSingleClass( titleTextAdd, school ):
                 ))
             graphIndex = graphIndex + 1
         except Exception as e: 
+                print('plotSingleClass 1 ')
                 print(e)
                 
         try :
@@ -307,6 +284,7 @@ def plotSingleClass( titleTextAdd, school ):
             graphIndex = graphIndex + 1
         
         except Exception as e: 
+                print('plotSingleClass 2 ')
                 print(e)
         
         
@@ -407,15 +385,10 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 ) :
         
         studentWiseTaskWiseConceptPractice = pd.DataFrame()
         
-        print('inside plotGroupTaskWiseConcepts')
-        print(taskId)
-        print(taskId in taskWiseConceptPracticeGrouped.groups.keys())
-        print(taskWiseConceptPracticeGrouped.groups.keys())
-        print('after taskId in .... ')
         
         
         if not taskId is None and  taskId > 0 and taskId in taskWiseConceptPracticeGrouped.groups.keys():
-            print('after taskId in .... first if where taskId > 0 ')
+            
             groupTask = taskWiseConceptPracticeGrouped.get_group(taskId)
             
             studentWiseDataConceptsTask = groupTask.sum()
@@ -438,6 +411,7 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 ) :
             try :
                 taskTitle =  dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == taskId ]['Title'].astype(str).values[0]
             except Exception as e: 
+                print('plotGroupTaskWiseConcepts 1 ')
                 print(e)
                 
             figBar = px.bar(studentWiseDataConceptsTask
@@ -486,22 +460,8 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 ) :
             try :
                 taskTitle =  dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == int(groupKeyTaskId) ]['Title'].astype(str).values[0]
             except Exception as e: 
+                print('plotGroupTaskWiseConcepts 1 last ')
                 print(e)
-#                
-#            figBar = px.bar(studentWiseDataConceptsTask
-#                                , x             =   featureX
-#                                , y             =   featureY
-#                                , orientation   =  'h'
-#                                , height        =   constants.graphHeight - 100
-#                                , template      =   constants.graphTemplete   
-#                                , title         =   "(Practice) Concepts used by students in task " + str(groupKeyTaskId) + '(TaskId)'+ "<br>" + str(taskTitle)  +   " (no. of students used a concept in code)"
-#                                , labels        =   feature2UserNamesDict # customize axis label
-#                )
-#            
-#            graphs.append(
-#                    dcc.Graph(
-#                        figure= figBar
-#                )) 
         
         if isGrouped:
             figGroupedTaskConcepts = px.bar(studentWiseTaskWiseConceptPractice
@@ -519,6 +479,7 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 ) :
                 
         return graphs
     except Exception as e: 
+        print('plotGroupTaskWiseConcepts  last ')
         print(e)               
 
 
@@ -533,12 +494,11 @@ def getGroupPTaskDoneOptions(groupId) :
                     'label' : '(TaskId ' + str(groupKeyTaskId) + ')' + dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == int(groupKeyTaskId) ]['Title'].astype(str).values[0],
                     'value' : groupKeyTaskId
                     
-            })            
+            })
                     
-        print('options')
-        print(options)
         return options
     except Exception as e: 
+        print('getGroupPTaskDoneOptions')
         print(e)    
     
     return options
@@ -592,29 +552,6 @@ def plotGroupConceptDetails(groupId):
                     dcc.Graph(
                         figure= figBar
                 ))
-
-
-#            graphs.append(  html.Div([
-#                    dbc.Button(
-#                        "Show Task Wise Concept Used",
-#                        id          = "collapse-taskwise-concept-button",
-#                        color       = "primary",
-#                        n_clicks    = 0
-#                    ),
-#                    dbc.Tooltip(
-#                        "Click to View/Hide",
-#                        target      = "collapse-taskwise-concept-button",
-#                        style       = { 'font-size' : 'initial'  }
-#                    ),
-#                    dbc.Collapse(
-#                        children = [] ,
-#                        id = "collapse-taskwise-concept",
-#                        is_open = False
-#                    ),
-#                ] ,
-#                className = "c-container"
-#            ))
-            
         except Exception as e: 
                 print('Task Concepts used')
                 print(e)                
@@ -626,65 +563,87 @@ def plotGroupConceptDetails(groupId):
     return graphs        
 
 
-def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, hasMeanStd = True, hoverName = "Name"):
+def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, hasMeanStd = True, hoverName = "Name", hasDistribution = False):
     graphs = []
     
     if isColored:
-        fig = px.bar( df
-            , x             =  featureX
-            , y             =  featureY
-            , title         = title
-            , labels        = feature2UserNamesDict # customize axis label
-            , template      = constants.graphTemplete                              
-            , orientation   = 'h'
-            , hover_name    =  hoverName
-            , hover_data    =  hoverData
-            , color         = constants.featureTaskType
-            , color_discrete_sequence = [constants.colorTheory, constants.colorPractice ]
-        )
+        try :
+            fig = px.bar( df
+                , x             =  featureX
+                , y             =  featureY
+                , title         = title
+                , labels        = feature2UserNamesDict # customize axis label
+                , template      = constants.graphTemplete                              
+                , orientation   = 'h'
+                , hover_name    =  hoverName
+                , hover_data    =  hoverData
+                , color         = constants.featureTaskType
+                , color_discrete_map     =   {
+                    constants.TaskTypeTheory    : constants.colorTheory,
+                    constants.TaskTypePractice  : constants.colorPractice, },
+            )
+        except Exception as e: 
+            print('getFeaturePlot  1st  ')
+            print('title  ' + title)
+            print(e)
         
     else:    
-        fig = px.bar( df
-            , x             =  featureX
-            , y             =  featureY
-            , title         = title
-            , labels        = feature2UserNamesDict # customize axis label
-            , template      = constants.graphTemplete                              
-            , orientation   = 'h'
-            , hover_name    =  hoverName
-            , hover_data    =  hoverData
-        )
+        try :
+            fig = px.bar( df
+                , x             =  featureX
+                , y             =  featureY
+                , title         = title
+                , labels        = feature2UserNamesDict # customize axis label
+                , template      = constants.graphTemplete                              
+                , orientation   = 'h'
+                , hover_name    =  hoverName
+                , hover_data    =  hoverData
+            )
+        except Exception as e: 
+            print('getFeaturePlot  2nd  ')
+            print('title  ' + title)
+            print(e)
                     
     
     graphs.append(
             dcc.Graph(
                 figure = fig
         ))
+                    
+                    
+                    
+    graphDistributions = []
     
-                    
-                    
-                    
-    graphDistributions= []
-    if hasMeanStd :
-        figMean = df.mean().round(decimals=2)[featureX]
-        figStd = df.std().round(decimals=2)[featureX]
-        graphDistributions.append(
-                html.Div(children=[
-                        html.P('Mean ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figMean) ),
-                        html.P('Std. ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figStd) ),
-                        ])
-        )           
-    figQuantile = px.box(df, 
-                         y              = featureX, 
-                         points         = "all",
-                         title          = "Distribution  - " + title,
-                         hover_data     = ['Name'] + hoverData,
-                         height         =   constants.graphHeightMin
-        )
-    figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)
-    graphDistributions.append( html.Div( dcc.Graph(
-            figure =  figQuantile
-    )))
+    if hasDistribution :
+        if hasMeanStd :
+            figMean = df.mean().round(decimals=2)[featureX]
+            figStd = df.std().round(decimals=2)[featureX]
+            graphDistributions.append(
+                    html.Div(children=[
+                            html.P('Mean ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figMean) ),
+                            html.P('Std. ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figStd) ),
+                            ])
+            )  
+                     
+        figQuantile = px.box(df, 
+                             y                      = featureX, 
+                             points                 = "all",
+                             title                  = "Distribution  - " + title,
+                             hover_data             = ['Name'] + hoverData,
+                             labels                 = feature2UserNamesDict , # customize axis label
+                             height                 =   constants.graphHeightMin,
+                             template               = constants.graphTemplete ,     
+                             color                  = constants.featureTaskType ,
+                             color_discrete_map     =   {
+                                constants.TaskTypeTheory    : constants.colorTheory,
+                                constants.TaskTypePractice  : constants.colorPractice, 
+                                },
+            )
+            
+        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)
+        graphDistributions.append( html.Div( dcc.Graph(
+                figure =  figQuantile
+        )))
         
         
         
@@ -796,7 +755,8 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                             
                             featurePlot, graphDistributions = getFeaturePlot(studentWiseData, featuresPractice[first], featuresPractice[second], 
                                                                    '(Practice) Details of students ' + titleFirst,
-                                                                   hoverDataPractice)
+                                                                   hoverDataPractice,
+                                                                   hasDistribution = True)
                             
                             graphs.append(
                                     html.Div(
@@ -811,7 +771,8 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                             
                             featurePlot, graphDistributions = getFeaturePlot(studentWiseDataTheory, featuresPractice[first], featuresPractice[second], 
                                                                    '(Theory) Details of students ' + titleFirst,
-                                                                   hoverDataTheory, isColored = True)
+                                                                   hoverDataTheory, isColored = True,
+                                                                   hasDistribution = True)
                             graphs.append(
                                     html.Div(
                                             children = featurePlot
@@ -826,7 +787,8 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                         if ([featuresPractice[first], featuresPractice[second]] not in  featurePairsToPlotTheory):    
                             featurePlot, graphDistributions = getFeaturePlot(studentWiseData, featuresPractice[first], featuresPractice[second], 
                                                                    '(Practice) Details of students ' + titleFirst,
-                                                                   hoverDataPractice)
+                                                                   hoverDataPractice,
+                                                                   hasDistribution = True)
                             graphs.append(
                                     html.Div(
                                             children = featurePlot
@@ -849,7 +811,8 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                         
                     featurePlot, graphDistributions = getFeaturePlot(studentWiseData, featuresPractice[first], featuresPractice[second], 
                                                            '(Practice) Details of students ' + titleFirst,
-                                                           hoverDataPractice)
+                                                           hoverDataPractice,
+                                                           hasDistribution = True)
                     
                     graphs.append(
                                     html.Div(
@@ -868,9 +831,6 @@ def plotSingleClassGeneral( titleTextAdd, school ):
     except Exception as e: 
         print(e)
 
-
-    print('last quantile Index ')
-    print(quantileIndex)
 
     return graphs        
 
@@ -1117,7 +1077,6 @@ def onClickDistributionCollapseButton(*args):
 def onSelectGroupSetTaskOptions(groupId):
     if groupId is not None and int(groupId) >= 0:
         options = getGroupPTaskDoneOptions(groupId)
-        print(options)
         return [getGroupPTaskDoneOptions(groupId)]
     
     return [[{'label': 'Select a group', 'value' : '0'}]]

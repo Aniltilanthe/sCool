@@ -290,7 +290,7 @@ StudentResultExplanation = '        (*has student completed this task in any run
 
 colorError = 'rgb(255,127,80)'
 colorSuccess = 'rgb(0,128,0)'
-colorPractice = 'rgb(0, 0, 255)'
+colorPractice = 'rgb(99, 110, 250)'
 colorTheory = 'rgb(214,12,140)'
 
 

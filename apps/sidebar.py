@@ -82,7 +82,7 @@ def getSubmenuButtons(menuKey):
                 dbc.Button(menuSubLink2Scroll.get(submenuKey).get('label'), 
                                    id="menu-sub-link-" + str(countMenuSubLink), 
                                    outline=True, color="primary", 
-                                   className="mr-2 w-100", 
+                                   className="", 
                                    block=True),
         )
 
@@ -102,28 +102,21 @@ def getMenu():
         menus.append( 
             html.Li(
                 # use Row and Col components to position the chevrons
-                dbc.Row(
-                    [
-                        dbc.Col([
-                                
-                                dbc.Button(html.Span([
-                                                    html.Span( children= [html.I(className=  currentMenu.get(keyClassName)),
-                                                                          html.Span(currentMenu.get(keyLabel), className = "c-button-nav-text") ] )
-                                                        ]
-                                                       +
-                                                       menuOpener,
-                                                       className = " c-button-nav-content " ), 
-                                           href= currentMenu.get(keyHref) , 
-                                           size="lg", 
-                                           className="mr-1 c-button-nav", 
-                                           outline=True, color="primary", 
-                                           id= menuKey, 
-                                           block=True),
-                                ]),
-                    ],
-                    className="my-1",
-                ),
-            ) 
+                        dbc.Button(html.Span([
+                                            html.Span( children= [html.I(className=  currentMenu.get(keyClassName)),
+                                                                    html.Span(currentMenu.get(keyLabel), className = "c-button-nav-text") ] )
+                                                ]
+                                                +
+                                                menuOpener,
+                                                className = " c-button-nav-content " ), 
+                                    href= currentMenu.get(keyHref) , 
+                                    size="lg", 
+                                    className="c-button-nav", 
+                                    outline=True, color="primary", 
+                                    id= menuKey, 
+                                    block=True),
+                className = "m-top_x-small"
+            )
         )
         # we use the Collapse component to hide and reveal the navigation links
         subMenuButtons = []
@@ -133,7 +126,7 @@ def getMenu():
                     dbc.Button(menuSubLink2Scroll.get(submenuKey).get('label'), 
                                        id=  submenuKey , 
                                        outline=True, color="primary", 
-                                       className="mr-2 w-100", 
+                                       className="m_x-small", 
                                        block=True),
             )
             countMenuSubLink += 1
@@ -143,7 +136,7 @@ def getMenu():
                 dbc.Collapse(
                     subMenuButtons,
                     id= menuKey + "-collapse",
-                    className="p-left_medium",
+                    className=" p-left_small ",
                 )
         )
                 

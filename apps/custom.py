@@ -171,6 +171,7 @@ def generateControlCardCustomPlotForm():
             feature1ValueDefault    = "",
             feature2ValueDefault    = Feature1,
             feature3ValueDefault    = Feature3Size,
+            colorGroupIsDisabled    = True
     )
 
 #------------------------------------------------------------------------------------------------

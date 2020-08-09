@@ -318,7 +318,8 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                                       feature3ValueDefault  = feature3SizeDefault,
                                       figureTypeDefault     = constants.FigureTypeBar,
                                       featureAxisDefault    = constants.AxisH,
-                                      colorDefault          = colorDefault
+                                      colorDefault          = colorDefault,
+                                      colorGroupIsDisabled  = False
                                       ):
     """
     :return: A Div containing controls for feature selection for plotting graphs.
@@ -433,7 +434,7 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                                         {'label': 'Group', 'value': 'GroupId'  },
                                     ],
                                     value       = colorDefault ,
-                                    className   = "radio-items-inline"
+                                    className   = "radio-items-inline " + ( ' disabled ' if colorGroupIsDisabled else ' ')
                                 )
                             ],
                             className = "c-container"
@@ -479,6 +480,9 @@ def getCustomPlot( df,
         return rows
     
     if ( '' == featureY     and    not selectedFigureType == constants.FigureTypePie ):
+        return rows
+    
+    if ( '' == feature3     and   constants.FigureTypes.get(selectedFigureType).get(constants.keyIsFeature3Enabled) ):
         return rows
     
     

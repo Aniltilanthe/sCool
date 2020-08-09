@@ -222,10 +222,9 @@ html {
 .theme-app .graph-small {
 	padding: 2rem;
 }
-.theme-app  .c-card .card_value {
-	color: var(--theme-background-color);
-}
-.theme-app .c-card .card_value1, .theme-app  .c-card .card_value2 {
+.theme-app  .c-card .card_value,
+.theme-app .c-card .card_value1, .theme-app  .c-card .card_value2,
+.theme-app  i.fas {
 	color: var(--theme-background-color);
 }
 
@@ -238,9 +237,20 @@ html {
 .theme-app .highlight:focus, 
 .theme-app .btn-outline-primary:hover, 
 .theme-app .btn-outline-primary:active,
-.theme-app .btn-outline-primary:not(:disabled):not(.disabled):active {
+.theme-app .btn-outline-primary:not(:disabled):not(.disabled):active{
 	color: var(--theme-color) ;
 	background-color: var(--theme-background-color);
+}
+.theme-app .highlight:focus  i.fas, 
+.theme-app .btn-outline-primary:hover  i.fas, 
+.theme-app .btn-outline-primary:active  i.fas,
+.theme-app .btn-outline-primary:not(:disabled):not(.disabled):active  i.fas {
+	color: var(--theme-color);
+}
+.theme-app .highlight:focus, 
+.theme-app .btn-outline-primary:hover, 
+.theme-app .btn-outline-primary:active,
+.theme-app .btn-outline-primary:not(:disabled):not(.disabled):active {
 	border-color: var(--theme-background-color);
     box-shadow: 0 0 4px 0.2rem lightgrey;
 }

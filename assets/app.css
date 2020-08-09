@@ -241,11 +241,20 @@ html {
 	color: var(--theme-color) ;
 	background-color: var(--theme-background-color);
 }
-.theme-app .highlight:focus  i.fas, 
+.theme-app .highlight  i.fas, 
+.theme-app .btn:hover  i.fas, 
+.theme-app .btn:active  i.fas, 
+.theme-app .btn-outline-info:hover i.fas,
 .theme-app .btn-outline-primary:hover  i.fas, 
 .theme-app .btn-outline-primary:active  i.fas,
 .theme-app .btn-outline-primary:not(:disabled):not(.disabled):active  i.fas {
 	color: var(--theme-color);
+}
+
+.theme-app .highlight:focus  i.fas, 
+.theme-app  button:not(:disabled) i.fas,
+.theme-app  .btn-outline-info:focus i.fas,  {
+	color: var(--theme-background-color);
 }
 .theme-app .highlight:focus, 
 .theme-app .btn-outline-primary:hover, 

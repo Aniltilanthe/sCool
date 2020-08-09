@@ -95,20 +95,25 @@ def getMenu():
     for menuKey in menuLink.keys():
         currentMenu = menuLink.get(menuKey)
         
-        menuOpener = [html.I(className="fas fa-chevron-right mr-3 c-button-nav-icon-right float-r")] 
-        if len(currentMenu.get(keySubmenu)) == 0  :
-            menuOpener = []
+#        menuOpener = [html.I(className="fas fa-chevron-right mr-3 c-button-nav-icon-right float-r")] 
+        contentClass = ""
+        if len(currentMenu.get(keySubmenu)) > 0  :
+            contentClass = " c-button-nav-content-hover-items "
         
         menus.append( 
             html.Li(
                 # use Row and Col components to position the chevrons
                         dbc.Button(html.Span([
-                                            html.Span( children= [html.I(className=  currentMenu.get(keyClassName)),
-                                                                    html.Span(currentMenu.get(keyLabel), className = "c-button-nav-text") ] )
+                                                html.Span(children = [
+                                                            html.I(className=  currentMenu.get(keyClassName)),
+                                                            html.Span(currentMenu.get(keyLabel), className = "c-button-nav-text")
+                                                    ], 
+                                                    className = contentClass)
                                                 ]
-                                                +
-                                                menuOpener,
-                                                className = " c-button-nav-content " ), 
+#                                                +
+#                                                menuOpener
+                                        ,
+                                        className = " c-button-nav-content " ), 
                                     href= currentMenu.get(keyHref) , 
                                     size="lg", 
                                     className="c-button-nav", 
@@ -206,10 +211,9 @@ sidebar = html.Div(
             ],
             className = "menu-modal-help"
         ) 
-        
         , 
     ],
-    className = " page-sidebar ",
+    className = " page-sidebar p-bottom_x-large ",
     id="sidebar",
 )
 

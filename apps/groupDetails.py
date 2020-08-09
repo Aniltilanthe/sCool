@@ -628,7 +628,7 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                                 html.P('Mean ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figMean) ),
                                 html.P('Std. ' + ((constants.feature2UserNamesDict.get(featureX)) if featureX in constants.feature2UserNamesDict.keys() else featureX )  + ' = ' + str(figStd) ),
                                 ])
-                )  
+                )
                          
             figQuantile = px.box(df, 
                                  y                      = featureX, 
@@ -667,7 +667,7 @@ def plotSingleClassGeneral( titleTextAdd, school ):
     graphs.append(html.Div(id='General-Information',
                        children = [html.H2('General Information')], 
                        className = "c-container p_medium p-top_xx-large", 
-            ))   
+            ))
     
       
     featuresPractice            = dfPlayerStrategyPractice.columns
@@ -845,8 +845,8 @@ def plotSingleClassGeneral( titleTextAdd, school ):
 
 
 def getPlotDistributionPlotChildrens(graphDistributions, quantileIndex = 0):
-    return [dbc.Button(
-        "Show Distribution",
+    return [dbc.Button( [  html.I(className="fas fa-info m-right-small"),
+        "Show Distribution" ],
         id          = "groupDetails-collapse-distribution-button-" + str(quantileIndex),
         color       = "light",
         n_clicks    = 0,
@@ -871,6 +871,15 @@ def plotClassOverview(schoolKey):
                      ]
         
     studentDataDf = studentGrouped.getStudentsOfSchoolDF(schoolKey)
+    
+    
+    if studentDataDf is None    or   studentDataDf.empty :
+        graphs.append(
+                util.getNoDataMsg()
+        )
+        return graphs
+    
+    
     studentDataDfSum = studentDataDf.groupby(['StudentId', 'Name'], as_index=False).sum()
     
     studentDataDfSumTask = studentDataDf.groupby(['StudentId', 'Name', constants.TASK_TYPE_FEATURE
@@ -929,7 +938,9 @@ def plotGroupOverview(groupId):
     
     groupStudents     =  getStudentsOfSchool(groupId)
     studentDataDf     =  studentGrouped.getStudentsOfSchoolDF(groupId)
+    plots               = []
     
+#    if not studentDataDf is None and not studentDataDf.empty:
     plots = util.plotGroupOverview(groupId, groupStudents, studentDataDf)
     
     return plots
@@ -1085,7 +1096,6 @@ def onClickDistributionCollapseButton(*args):
 )
 def onSelectGroupSetTaskOptions(groupId):
     if groupId is not None and int(groupId) >= 0:
-        options = getGroupPTaskDoneOptions(groupId)
         return [getGroupPTaskDoneOptions(groupId)]
     
     return [[{'label': 'Select a group', 'value' : '0'}]]

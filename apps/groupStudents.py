@@ -239,7 +239,7 @@ def plotStudentOverview(StudentId, groupId):
     
     if studentDataDf is None or studentDataDf.empty == True :
         graphs.append(
-                html.H2(  constants.labelNoData  )
+                util.getNoDataMsg()
         )
         return graphs
     
@@ -376,7 +376,7 @@ def plotStudentOverviewFeatures( StudentId, groupId, features2Overview ):
     
     if studentDataDf is None or studentDataDf.empty == True :
         graphs.append(
-                html.H2(  constants.labelNoData  )
+                util.getNoDataMsg()
         )
         return graphs
     
@@ -436,7 +436,7 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
 
     if studentData is None or studentData.empty == True :
         graphs.append(
-                html.H2(  constants.labelNoData  )
+                util.getNoDataMsg()
         )
         return graphs
     

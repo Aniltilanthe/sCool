@@ -31,6 +31,14 @@ import constants
 def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = ""):
     plots = []
     
+    
+    if studentDataDf is None    or   studentDataDf.empty :
+        plots.append(
+                getNoDataMsg()
+        )
+        return plots
+    
+    
     plotRow = []
     
     plotRow.append( html.Div([],
@@ -168,7 +176,7 @@ def plotStudentOverview(studentDataDf, classes = ""):
     try:
         plotRow.append(
                 html.Div([
-                       generateCardDetail( 
+                       generateCardDetail(
                                ((constants.feature2UserNamesDict.get(constants.featurePoints)) if constants.featurePoints in constants.feature2UserNamesDict.keys() else constants.featurePoints ) 
                                 , 
                                             '' + millify(studentDataDf[ constants.featurePoints ].sum().round(decimals=2)), 
@@ -191,6 +199,13 @@ def plotStudentOverview(studentDataDf, classes = ""):
     )
     
     return plots
+
+
+
+def getNoDataMsg():
+    return html.Div(
+                html.H2(  constants.labelNoData  )
+        )
 
 #----------------------------------- DATA INFO END -----------------------------------------
 
@@ -373,7 +388,7 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                     html.I(className="fas fa-plus font-size_medium p-right_xx-small"),
                     'Add Plot',  ], 
                         id  =   idApp + "-form-submit-btn", 
-                        className="c-button button w3-btn w3-xlarge", n_clicks=0),
+                        className="c-button btn btn-outline-primary", n_clicks=0),
             html.Br(),
         ],
         className = "form"

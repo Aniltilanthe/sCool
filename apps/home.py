@@ -40,6 +40,35 @@ import util
 idApp             = "home"
 
 
+
+
+
+   
+    
+
+    
+FeaturesCustom          = constants.FeaturesCustom
+
+FeaturesCustomPractice  = constants.FeaturesCustomPractice
+FeaturesCustomTheory    = constants.FeaturesCustomTheory
+
+
+FigureTypes             = constants.FigureTypes 
+
+
+graphHeight             =  constants.graphHeight
+graphHeight             =   graphHeight - 200
+
+
+hoverData               =  constants.hoverData.copy()
+hoverData.remove("lineOfCodeCount")
+
+
+
+selectedColorGroupDefault    = "Name"
+
+
+
 #--------------------- school selection START ----------------------
 GroupSelector_options = studentGrouped.GroupSelector_options 
 #--------------------- school selection END ----------------------
@@ -154,15 +183,28 @@ def plotGameOverview():
 def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '', 
                    selectedAxis = constants.AxisH, 
                    selectedFigureType = constants.FigureTypeBar,
-                   plotClassName = " col-sm-6 ") :
+                   plotClassName = " col-sm-6 ", selectedDistribution = [],
+                   selectedColorGroup        = selectedColorGroupDefault  ) :
 
     graphs = []
     rows = []
     
-    if (None == feature1   or  '' == feature1  or '' == feature2 ) :
+    print('   plotGamePlots  in home !!!! ' )
+    
+    
+    if (None == feature1   or  '' == feature1 ) :
         return graphs
     
+    if ( '' == feature2    and   not selectedFigureType == constants.FigureTypePie ) :
+        return graphs
     
+    hoverName   = selectedColorGroup
+    color       = selectedColorGroup
+    
+    marginalX   = ''
+    marginalY   = ''
+    
+        
     gameData = pd.concat([dfPlayerStrategyPracticeOriginal, dfPlayerStrategyTheory], ignore_index=True)
             
 #--------------------------------Total of each Features ----------------------------------     
@@ -174,19 +216,32 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
             dfStudentDetails[['StudentId', 'Name']]
             , how='inner', on=['StudentId'], left_index=False, right_index=False)
     
+    
+#    for the Pie figures - we show data Grouped by Groups ! - so no StudentId information
+    if selectedFigureType == constants.FigureTypePie   or    selectedColorGroup == "GroupId"  :
+        gameDataDfGroupedStudent = gameData.groupby([constants.GROUPBY_FEATURE], as_index=False).sum()
+        gameDataDfGroupedStudent['Group'] = 'Group ' + gameDataDfGroupedStudent['GroupId'].astype(str)
+        hoverName   = "Group"
+        color       = "Group"
 
-    if 'gameDataDfGroupedStudent' in locals()     and    ( gameDataDfGroupedStudent is not None  )    and    ( feature1 in gameDataDfGroupedStudent.columns ) and (feature2 in gameDataDfGroupedStudent.columns)   :
+        if "StudentId" in hoverData:
+            hoverData.remove("StudentId")
+        
+        if not "GroupId" in hoverData:
+            hoverData.append("GroupId")
+    else :
+        if not "StudentId" in hoverData:
+            hoverData.append("StudentId")
+        
+    
+    if 'gameDataDfGroupedStudent' in locals()     and    ( gameDataDfGroupedStudent is not None  )    and    ( feature1 in gameDataDfGroupedStudent.columns ):
         
         
         plotTitle   = ' Details of students ' 
         plotTitle   = plotTitle + str( constants.feature2UserNamesDict.get(feature1) if feature1 in constants.feature2UserNamesDict.keys() else feature1 )
         plotTitle   = plotTitle + ' vs ' + str( constants.feature2UserNamesDict.get(feature2) if feature2 in constants.feature2UserNamesDict.keys() else feature2 )
         
-        hoverName   = "Name"
-        color       = "Name"
         
-        marginalX   = ''
-        marginalY   = ''
         
         print('selectedFigureType   ' + str(selectedFigureType) + '   feature1   ' + str(feature1)  + '   feature2   ' + str(feature2) )
         
@@ -202,7 +257,9 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
                           marginalX             = marginalX,
                           marginalY             = marginalY,
                           hoverData             = hoverData,
-                          color                 = color
+                          color                 = color,
+                          isThemeSizePlot       = True,
+                          selectedDistribution  = selectedDistribution
             )
        
         graphs.append( html.Div( rows ,
@@ -210,26 +267,6 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         
 
     return graphs
-
-   
-    
-
-    
-FeaturesCustom          = constants.FeaturesCustom
-
-FeaturesCustomPractice  = constants.FeaturesCustomPractice
-FeaturesCustomTheory    = constants.FeaturesCustomTheory
-
-
-FigureTypes             = constants.FigureTypes 
-
-
-graphHeight         =  constants.graphHeight
-graphHeight         =   graphHeight - 200
-
-
-hoverData           =  constants.hoverData
-hoverData.remove("lineOfCodeCount")
 
 
 
@@ -307,10 +344,13 @@ layout = [
                 State(component_id = idApp + "-form-feature-3", component_property='value'),
                 State(component_id = idApp + "-form-feature-axis", component_property='value'),
                 State(component_id = idApp + "-form-figure-type", component_property='value'),
+                State(component_id = idApp + "-form-feature-distribution", component_property='value'),
+                State(component_id = idApp + "-form-feature-color-group", component_property='value'),
                 State(component_id = idApp + "-custom-plot-container", component_property='children'),
                 ]
 )
-def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, selectedAxis, selectedFigureType, 
+def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, selectedAxis, selectedFigureType,  
+               selectedDistribution, selectedColorGroup,
                containerChildren 
                ):    
     graphs = []
@@ -319,7 +359,7 @@ def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, s
         return html.Div(graphs)
     
     if selectedFeature2 is None or  '' == selectedFeature2:
-        selectedFeature1 = ''
+        selectedFeature2 = ''
     
     if selectedFeature3 is None or '' == selectedFeature3:
         selectedFeature3 = ''
@@ -327,12 +367,15 @@ def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, s
     print('   selectedFeature2   ' + str(selectedFeature2)  + '   selectedAxis   ' + str(selectedAxis) )
     print('selectedFigureType   ' + str(selectedFigureType) + '   selectedFeature1   ' + str(selectedFeature1)  + '     selectedFeature3   ' + str(selectedFeature3) )
     
-    graphs = plotGamePlots( feature1 = selectedFeature1, 
-                           feature2 = selectedFeature2, 
-                           feature3 = selectedFeature3,
-                           selectedAxis = selectedAxis, 
-                           selectedFigureType = selectedFigureType, 
-                           plotClassName = " col-sm-12 ")
+    
+    graphs = plotGamePlots( feature1            = selectedFeature1, 
+                           feature2             = selectedFeature2, 
+                           feature3             = selectedFeature3,
+                           selectedAxis         = selectedAxis, 
+                           selectedFigureType   = selectedFigureType, 
+                           plotClassName        = " col-sm-12 ",
+                           selectedDistribution = selectedDistribution,
+                           selectedColorGroup        = selectedColorGroup )
     
     if not(None is containerChildren):
         if isinstance(containerChildren, list):
@@ -395,6 +438,29 @@ def update_feature_size_disabled(selectedFigureType, initialClass):
         initialClassS.add('disabled') 
     else:
         initialClassS.discard('disabled') 
+
+    return  ' '.join(initialClassS)
+
+@app.callback(
+    Output(idApp + "-form-feature-distribution", "className"),
+    [
+        Input(idApp + "-form-figure-type", "value")
+    ],
+    state=[ State(component_id = idApp +"-form-feature-distribution", component_property='className') ]
+)
+def update_feature_distribution_disabled(selectedFigureType, initialClass):   
+    if None is selectedFigureType or '' == selectedFigureType:
+        return initialClass
+
+    initialClassS = set()
+    
+    if not None is initialClass:
+        initialClassS = set(initialClass.split(' '))
+
+    if selectedFigureType in FigureTypes and   not FigureTypes.get(selectedFigureType).get(constants.keyIsDistributionEnabled):
+        initialClassS.add('disabled')
+    else:
+        initialClassS.discard('disabled')
 
     return  ' '.join(initialClassS)
 

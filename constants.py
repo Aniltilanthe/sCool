@@ -17,6 +17,7 @@ keyClassName                = 'className'
 keyHasMeanStd               = 'hasMeanStd'
 keyIsAxisEnabled            = 'isAxisEnabled'
 keyIsFeature3Enabled        = 'isFeature3Enabled'
+keyIsDistributionEnabled        = 'isDistributionEnabled'
 keyColor                    = 'color'
 keyBackgroundColor          = 'backgroundColor'
 keyExpress                  = 'express'
@@ -110,6 +111,11 @@ THEME_COLOR, THEME_BACKGROUND_COLOR, THEME_COLOR_LIGHT, THEME_EXPRESS_LAYOUT = r
 
 ERROR_COLOR = "#FF4136"
 SUCCESS_COLOR = "#4caf50"
+
+THEME_MARKER = dict(size = 16
+                                            , showscale    = False
+                                            ,  line = dict(width=1,
+                                                        color='DarkSlateGrey'))
 
 
 SIDEBAR_STYLE = {
@@ -317,31 +323,39 @@ iconNameCustom              = "fa-wrench"
 
 
 
+labelMedian                 = 'median'
 labelMean                   = 'mean'
 labelStd                    = 'std'
 labelTotal                  = 'total'
 
 
 FigureTypeScatter           = 'Scatter'
-FigureTypePie               = 'Pie'
+FigureTypePie               = 'Pie.'
 FigureTypeBar               = 'Bar'
 FigureTypeLine              = 'Line'
 FigureTypeBubble            = 'Bubble'
+FigureTypeScatterMedian            = 'ScatterMedian'
      
 AxisV                       = 'v'
 AxisH                       = 'h'
 MarginalPlotDefault         = 'box'
 
+PlotDistributionMedian      = "median"
+PlotDistributionMean        = "mean"
+PlotDistributionStd         = "std"
+
 FigureTypes                 = {
      FigureTypeBar      : { keyLabel      : FigureTypeBar, 
                    keyValue     : FigureTypeBar,
                   keyIsAxisEnabled : True,
-                  keyIsFeature3Enabled : False }
+                  keyIsFeature3Enabled : False,
+                  keyIsDistributionEnabled : False  }
     ,   
      FigureTypeScatter : { keyLabel           : FigureTypeScatter, 
                   keyValue      : FigureTypeScatter,
                   keyIsAxisEnabled : True,
-                  keyIsFeature3Enabled : False  }
+                  keyIsFeature3Enabled : False,
+                  keyIsDistributionEnabled : True   }
 #    ,   
 #     FigureTypePie      : { keyLabel      : FigureTypePie, 
 #                   keyValue     : FigureTypePie,
@@ -351,13 +365,17 @@ FigureTypes                 = {
      FigureTypeBubble     : { keyLabel       : FigureTypeBubble, 
                    keyValue     : FigureTypeBubble,
                   keyIsAxisEnabled : True,
-                  keyIsFeature3Enabled : True  }
+                  keyIsFeature3Enabled : True,
+                  keyIsDistributionEnabled : False  }
     ,   
      FigureTypeLine     : { keyLabel       : FigureTypeLine, 
                    keyValue     : FigureTypeLine,
                   keyIsAxisEnabled : True,
-                  keyIsFeature3Enabled : False  }
+                  keyIsFeature3Enabled : False ,
+                  keyIsDistributionEnabled : False }
 }
+     
+     
      
 def getFigureTypesOptions():
     return [{keyLabel: FigureTypes.get(i).get(keyLabel) , keyValue: FigureTypes.get(i).get(keyValue)} for i in FigureTypes]

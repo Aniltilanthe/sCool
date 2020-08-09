@@ -54,11 +54,13 @@ html {
 	display: none;
 }
 
-.disabled  {
+.disabled,
+.disabled .custom-switch .custom-control-label::before {
 	pointer-events: none;
 	opacity: 0.5;
 }
-.disabled label, .disabled .Select-control {
+.disabled label, .disabled .Select-control,
+.disabled .custom-switch .custom-control-label::before {
 	background-color: #dddddd;
 }
 
@@ -305,7 +307,7 @@ html {
           animation: fadein 0.5s ease-in 7s forwards;  
   
   /* The banner */
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -320,16 +322,16 @@ html {
 	content: " ";
 	display: inline-block;
 	visibility: visible;
-	border: 20px solid #f3f3f3;
+	border: 1.5rem solid #f3f3f3;
 	border-radius: 50%;
-	border-top: 20px solid var(--theme-background-color);
-	width: 120px;
-	height: 120px;
+	border-top: 1.5rem solid var(--theme-background-color);
+	width: 8rem;
+	height: 8rem;
 	-webkit-animation: spin 1s linear infinite; /* Safari */
 	animation: spin 1s linear infinite;
   
 	/* The banner */
-	position: absolute;
+	position: fixed;
 	top: 50%;
 	left: 50%;
 }

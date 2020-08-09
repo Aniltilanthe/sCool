@@ -97,7 +97,7 @@ Feature3Size        = "SessionDuration"
 
 #Student Interaction with Game - TIMELINE
 def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType, feature2 = Feature1, feature3 = Feature3Size,
-                      plotClassName = " col-sm-6 "):
+                      plotClassName = " col-sm-6 ", selectedDistribution = [] ):
 
     graphs = []
     rows = []
@@ -148,7 +148,8 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType, fea
                           marginalX             = marginalX,
                           marginalY             = marginalY,
                           hoverData             = hoverData,
-                          color                 = color
+                          color                 = color,
+                          selectedDistribution  = selectedDistribution
             )
        
         graphs.append( html.Div( rows ,
@@ -203,6 +204,8 @@ layout = [
 #----------------------------------------------------------------------------------------------
 #                    CALL BACK
 #----------------------------------------------------------------------------------------------
+    
+    
 # Form Submission  - Update plot container with new selected plot
 @app.callback(
     Output( idApp + "-main-container", "children"),
@@ -215,15 +218,18 @@ layout = [
                 State(component_id = idApp + "-form-feature-3", component_property='value'),
                 State(component_id = idApp + "-form-feature-axis", component_property='value'),
                 State(component_id = idApp + "-form-figure-type", component_property='value'),
+                State(component_id = idApp + "-form-feature-distribution", component_property='value'),
                 State(component_id = idApp + "-main-container", component_property='children'),
                 ]
 )
 def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedFeature3, selectedAxis, selectedFigureType, 
+               selectedDistribution,
                containerChildren 
                ):    
     graphs = []
     
     print('update_bar')
+    print(selectedDistribution)
     
     if n_clicks == 0 or groupMain is None or not int(groupMain) >= 0  or None is selectedFeature or '' == selectedFeature:
         return html.Div(graphs)
@@ -237,7 +243,8 @@ def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedF
     print('groupMain   ' + str(groupMain) + '   selectedFeature   ' + str(selectedFeature)  + '   selectedAxis   ' + str(selectedAxis) )
     print('selectedFigureType   ' + str(selectedFigureType) + '   selectedFeature1   ' + str(selectedFeature1)  + '     selectedFeature3   ' + str(selectedFeature3) )
     
-    graphs = plotClassOverview( int(groupMain), selectedFeature, selectedAxis, selectedFigureType, selectedFeature1, selectedFeature3 )
+    graphs = plotClassOverview( int(groupMain), selectedFeature, selectedAxis, selectedFigureType, selectedFeature1, selectedFeature3,
+                               selectedDistribution = selectedDistribution)
     
     if not(None is containerChildren):
         if isinstance(containerChildren, list):
@@ -302,6 +309,38 @@ def update_feature_size_disabled(selectedFigureType, initialClass):
         initialClassS.discard('disabled')
 
     return  ' '.join(initialClassS)
+
+
+@app.callback(
+    Output(idApp + "-form-feature-distribution", "className"),
+    [
+        Input(idApp + "-form-figure-type", "value")
+    ],
+    state=[ State(component_id = idApp +"-form-feature-distribution", component_property='className') ]
+)
+def update_feature_distribution_disabled(selectedFigureType, initialClass):   
+    if None is selectedFigureType or '' == selectedFigureType:
+        return initialClass
+
+    initialClassS = set()
+    
+    if not None is initialClass:
+        initialClassS = set(initialClass.split(' '))
+
+    if selectedFigureType in FigureTypes and   not FigureTypes.get(selectedFigureType).get(constants.keyIsDistributionEnabled):
+        initialClassS.add('disabled')
+    else:
+        initialClassS.discard('disabled')
+
+    return  ' '.join(initialClassS)
+
+
+
+
+
+
+
+
 
 
 

@@ -23,7 +23,7 @@ import math
 import constants
 
 
-
+featureDescription = constants.featureDescription
 
 
 #-----------------------------------  DATA INFO  START ----------------------------
@@ -308,6 +308,7 @@ def generateCardDetail2(label, value1 = '', value2 = '',
 
 feature2Default            = "Name"
 feature3SizeDefault        = "SessionDuration"
+colorDefault                = "Name"
 def generateControlCardCustomPlotForm(idApp                 = "", 
                                       feature1Options       = [], 
                                       feature2Options       = [], 
@@ -316,7 +317,8 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                                       feature2ValueDefault  = feature2Default,
                                       feature3ValueDefault  = feature3SizeDefault,
                                       figureTypeDefault     = constants.FigureTypeBar,
-                                      featureAxisDefault    = constants.AxisH
+                                      featureAxisDefault    = constants.AxisH,
+                                      colorDefault          = colorDefault
                                       ):
     """
     :return: A Div containing controls for feature selection for plotting graphs.
@@ -369,22 +371,78 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                     )
             ])
             
-            , dcc.RadioItems(
-                id          = idApp + "-form-figure-type",
-                options     = constants.getFigureTypesOptions(),
-                value       = figureTypeDefault ,
-                className   = "radio-items-inline"
-            ), 
-            dcc.RadioItems(
-                id      =   idApp + "-form-feature-axis",
-                options = [
-                    {'label': 'Horizontal (x-axis)', 'value': constants.AxisH},
-                    {'label': 'Vertical (y-axis)', 'value': constants.AxisV},
-                ],
-                value       = featureAxisDefault ,
-                className   = "radio-items-inline"
-            ), 
-            html.Button(children=[
+            , dbc.Row([
+                    dbc.Col(
+                      html.Div([ dcc.RadioItems(
+                                id          = idApp + "-form-figure-type",
+                                options     = constants.getFigureTypesOptions(),
+                                value       = figureTypeDefault ,
+                                className   = "radio-items-inline"
+                             )
+                            ],
+                            className = "c-container"
+                       ) , width=6
+                ),
+            ])
+            
+            , dbc.Row([
+                    dbc.Col(
+                      html.Div([
+                                dcc.RadioItems(
+                                    id      =   idApp + "-form-feature-axis",
+                                    options = [
+                                        {'label': 'Horizontal (x-axis)', 'value': constants.AxisH},
+                                        {'label': 'Vertical (y-axis)', 'value': constants.AxisV},
+                                    ],
+                                    value       = featureAxisDefault ,
+                                    className   = "radio-items-inline"
+                                )
+                            ],
+                            className = "c-container"
+                       )
+                        , width=6
+                    ),
+                    dbc.Col(
+                        html.Div([
+                            dbc.FormGroup([
+#                                    dbc.Label("Distribution"),
+                                    dbc.Checklist(
+                                        options=[
+                                            {"label": constants.labelMean, "value": constants.PlotDistributionMean},
+                                            {"label": constants.labelStd, "value": constants.PlotDistributionStd},
+                                            {"label": constants.labelMedian, "value": constants.PlotDistributionMedian},
+                                        ],
+                                        value   = [],
+                                        id      = idApp + "-form-feature-distribution",
+                                        inline  = True,
+                                        switch  = True,
+                                    ),
+                                ])
+                            ],
+                            className   = "c-container",
+                            title       = "This can work only when both features are Numerical (default SessionDuration).",
+                        )
+                        , width=3
+                    ),
+                    dbc.Col(
+                      html.Div([
+                                dcc.RadioItems(
+                                    id      =   idApp + "-form-feature-color-group",
+                                    options = [
+                                        {'label': 'Student', 'value': 'Name'  },
+                                        {'label': 'Group', 'value': 'GroupId'  },
+                                    ],
+                                    value       = colorDefault ,
+                                    className   = "radio-items-inline"
+                                )
+                            ],
+                            className = "c-container"
+                       )
+                        , width=3
+                    ),
+            ])
+
+            , html.Button(children=[
                     html.I(className="fas fa-plus font-size_medium p-right_xx-small"),
                     'Add Plot',  ], 
                         id  =   idApp + "-form-submit-btn", 
@@ -407,19 +465,27 @@ def getCustomPlot( df,
                   marginalX             = '',
                   marginalY             = '',
                   hoverData             = [],
-                  color                 = "Name"
+                  color                 = colorDefault,
+                  selectedDistribution  = [],
+                  isThemeSizePlot       = False
     ):
     
     rows = []
     
     
-    if df is None  or df.empty   or    featureX == None     or     featureY == None :
+    print('getCustomPlot')
+    
+    if df is None  or df.empty   or    featureX == None :
         return rows
+    
+    if ( '' == featureY     and    not selectedFigureType == constants.FigureTypePie ):
+        return rows
+    
     
     if not featureX in df.columns  :
         return rows.append(html.H3('Feature not in data ' + str(featureX ) + '  . Select another! ' ))
 
-    if not featureY in df.columns :
+    if not featureY in df.columns     and    not selectedFigureType == constants.FigureTypePie  :
         return rows.append(html.H3('Feature not in data ' + str(featureY ) + '  . Select another! ' ))
     
     
@@ -438,53 +504,134 @@ def getCustomPlot( df,
     plotTitle = plotTitle + str( constants.feature2UserNamesDict.get(featureX2Plot) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot )
     plotTitle = plotTitle + ' vs ' + str( constants.feature2UserNamesDict.get(featureY2Plot) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot )
     
+    
     try:
+        
+        studentDataDfSumMean        = df.mean().round(decimals=2)
+        studentDataDfSumStd         = df.std().round(decimals=2)
+        studentDataDfSumMedian      = df.median().round(decimals=2)
+
+        df[featureDescription]      = getDataFeatureDescription(df, hoverData, featureTitle = color)
+
+
         if selectedFigureType == constants.FigureTypeScatter:
-            
+
             if checkIsFeatureNumeric(df, featureX2Plot):
                  marginalX = constants.MarginalPlotDefault
-                 
+     
             if checkIsFeatureNumeric(df, featureY2Plot):
                  marginalY = constants.MarginalPlotDefault
-            
-            
-            figStudents = px.scatter(df, x = featureX2Plot, y = featureY2Plot
-                 , title        =   plotTitle
-                 , labels       =   constants.feature2UserNamesDict # customize axis label
-                 , hover_name   =   hoverName
-                 , hover_data   =   hoverData
-                 , marginal_x   =   marginalX
-                 , marginal_y   =   marginalY
-#                     , height       =   constants.graphHeight
-                 , template     =   constants.graphTemplete
-                )
-            figStudents.update_traces(marker=dict(size = 16
-                                        , showscale    = False
-                                        ,  line = dict(width=1,
-                                                    color='DarkSlateGrey')),
-                              selector=dict(mode='markers'))
-            figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
-            print('Scatter Chart figure   Made Success ! ' )
+
+
+            if not selectedDistribution is None  and len(selectedDistribution) > 0:
+    
+                if featureY == 'Name' :
+                    featureY2Plot   = constants.featureSessionDuration
+    
+                featureX2Plot = featureX
+    
+                plotTitle = ' Details of ' 
+                plotTitle = plotTitle + str( constants.feature2UserNamesDict.get(featureX2Plot) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot )
+                plotTitle = plotTitle + ' vs ' + str( constants.feature2UserNamesDict.get(featureY2Plot) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot )
+
+
+                mean_featureX = studentDataDfSumMean[featureX2Plot]
+                std_featureX = studentDataDfSumStd[featureX2Plot]
+                med_featureX = studentDataDfSumMedian[featureX2Plot]
+
+                figStudents = getCustomPlotScatter(df, featureX2Plot, featureY2Plot, 
+                                 selectedDistribution = selectedDistribution,
+                                 mean_featureX      = mean_featureX,
+                                 std_featureX       = std_featureX,
+                                 med_featureX       = med_featureX,
+                                 mean_featureY      = 0,
+                                 std_featureY       = 0,
+                                 med_featureY       = 0,
+                                 textFeature        = featureDescription,
+                                 plotTitle          = plotTitle
+                         )
+
+            else :
+#                if not color == 'Name' :
+#                    figStudents = px.scatter(df, x = featureX2Plot, y = featureY2Plot
+#                         , title        =   plotTitle
+#                         , labels       =   constants.feature2UserNamesDict # customize axis label
+#                         , hover_name   =   hoverName
+#                         , color        =   color
+#                         , hover_data   =   hoverData
+#                         , marginal_x   =   marginalX
+#                         , marginal_y   =   marginalY
+#        #                     , height       =   constants.graphHeight
+#                         , template     =   constants.graphTemplete
+#                        )
+#                else :
+#                    figStudents = px.scatter(df, x = featureX2Plot, y = featureY2Plot
+#                         , title        =   plotTitle
+#                         , labels       =   constants.feature2UserNamesDict # customize axis label
+#                         , hover_name   =   hoverName
+#                         , hover_data   =   hoverData
+#                         , marginal_x   =   marginalX
+#                         , marginal_y   =   marginalY
+#        #                     , height       =   constants.graphHeight
+#                         , template     =   constants.graphTemplete
+#                        )
+                figStudents = px.scatter(df, x = featureX2Plot, y = featureY2Plot
+                     , title        =   plotTitle
+                     , labels       =   constants.feature2UserNamesDict # customize axis label
+                     , hover_name   =   hoverName
+                     , hover_data   =   hoverData
+                     , marginal_x   =   marginalX
+                     , marginal_y   =   marginalY
+    #                     , height       =   constants.graphHeight
+                     , template     =   constants.graphTemplete
+                    )
+
+                figStudents.update_traces(marker    =  constants.THEME_MARKER,
+                                  selector          = dict(mode='markers') )
+                figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
+                print('Scatter Chart figure   Made Success ! ' )
        
     
     
 #            Error when plotting pie charts !!!
         elif selectedFigureType == constants.FigureTypePie:
             
-            print('Pie Chart figure   featureX2Plot  ' + str(featureX) + '   plotTitle   ' + str(plotTitle)  )
+            plotTitle = ' Details of ' 
+            plotTitle = plotTitle + str( constants.feature2UserNamesDict.get(featureX) if featureX in constants.feature2UserNamesDict.keys() else featureX )
 
-            figStudents = px.pie(df
-                                 , values       = featureX
-#                                 , names        =  'Name'
-                                 , title        =   plotTitle
-                                 , labels       =   constants.feature2UserNamesDict # customize axis label
-                                 , hover_name   =   hoverName
-                                 , hover_data   =   hoverData
-                                 , height       =   constants.graphHeight
-                                 , template     =   constants.graphTemplete
-                                 )
-            figStudents.update_traces(textposition='inside', textinfo='percent+label+value')
+
+    
+    
+            figStudents = go.Figure(data =  [go.Pie(
+                                         labels         =   df[color],
+                                         values         =   df[featureX]  ,
+#                                         hovertext      =   df[featureDescription],
+                                    )])
+            figStudents.update_traces(
+                                hoverinfo       =  'label+percent', 
+                              textinfo          ='percent+label+value'     
+                        )
+            figStudents.update_layout(title_text    = plotTitle)
             figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
+            
+            if isThemeSizePlot:
+                figStudents.update_layout(autosize  =  False,
+                                          height    =   constants.graphHeight,
+                                          width     =   constants.graphWidth)
+                
+
+#            figStudents = px.pie(df
+#                                 , values       = featureX
+#                                 , names        =  'Name'
+#                                 , title        =   plotTitle
+#                                 , labels       =   constants.feature2UserNamesDict # customize axis label
+#                                 , hover_name   =   hoverName
+#                                 , hover_data   =   hoverData
+##                                 , height       =   constants.graphHeight
+#                                 , template     =   constants.graphTemplete
+#                                 )
+#            figStudents.update_traces(textposition='inside', textinfo='percent+label+value')
+#            figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
                 
             print('Pie Chart figure   Made Success ' )
             
@@ -502,11 +649,13 @@ def getCustomPlot( df,
                 , hover_data    =   hoverData
 #                    , height        =   constants.graphHeight
             )
+            
             figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
             print('Baar Chart figure   Made Success ! ' )
         
         
         elif selectedFigureType == constants.FigureTypeBubble :
+            df.loc[df[feature3] < 0, feature3] = 0
             
             figStudents = px.scatter(df
                  , x            =   featureX2Plot
@@ -548,35 +697,35 @@ def getCustomPlot( df,
         
         
         
+        
+        
         rows.append( html.Div( dcc.Graph(
-                figure = figStudents,
-                className = "  "
+                figure = figStudents
         ) ) )
         
         print('Before Mean and Std calculation ! ' )
-
         
-        studentDataDfSumMean    = df.mean().round(decimals=2)
-        studentDataDfSumStd     = df.std().round(decimals=2)
-
         print('After Mean and Std calculation ! ' )
         
         try :
-            if   not 'Name' == featureX2Plot   and  featureX2Plot is not None and featureX2Plot in studentDataDfSumMean:
+            if   featureX2Plot is not None   and     not featureX2Plot == ''   and   not 'Name' == featureX2Plot    and      featureX2Plot in studentDataDfSumMean:
                 rows.append( html.Div(children=[
-                            html.P(constants.labelMean + ' ' + ((constants.feature2UserNamesDict.get(featureX2Plot)) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot )  + ' = ' + str(studentDataDfSumMean[featureX2Plot]) ),
-                            html.P(constants.labelStd + ' ' + ((constants.feature2UserNamesDict.get(featureX2Plot)) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot ) + ' = ' + str(studentDataDfSumStd[featureX2Plot]) ),
-                            ]) )
+                        html.P(constants.labelMean + ' ' + ((constants.feature2UserNamesDict.get(featureX2Plot)) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot )  + ' = ' + str(studentDataDfSumMean[featureX2Plot]) ),
+                        html.P(constants.labelStd + ' ' + ((constants.feature2UserNamesDict.get(featureX2Plot)) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot ) + ' = ' + str(studentDataDfSumStd[featureX2Plot]) ),
+                        html.P(constants.labelMedian + ' ' + ((constants.feature2UserNamesDict.get(featureX2Plot)) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot ) + ' = ' + str(studentDataDfSumMedian[featureX2Plot]) ),
+                    ]) )
         except Exception as e: 
+            print('Exception Mean and Std calculation for feature1 ! ' )
             print(e)
         try :
-            if  not 'Name' == featureY2Plot   and   featureY2Plot is not None and featureY2Plot in studentDataDfSumMean:
+            if  featureY2Plot is not None   and   not featureY2Plot == ''  and    not 'Name' == featureY2Plot   and     featureY2Plot in studentDataDfSumMean:
                 rows.append( html.Div(children=[
-                                html.P(constants.labelMean + ' ' + ((constants.feature2UserNamesDict.get(featureY2Plot)) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot )  + ' = ' + str(studentDataDfSumMean[featureY2Plot]) ),
-                                html.P(constants.labelStd + ' ' + ((constants.feature2UserNamesDict.get(featureY2Plot)) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot ) + ' = ' + str(studentDataDfSumStd[featureY2Plot]) ),
-                                ]) )
+                        html.P(constants.labelMean + ' ' + ((constants.feature2UserNamesDict.get(featureY2Plot)) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot )  + ' = ' + str(studentDataDfSumMean[featureY2Plot]) ),
+                        html.P(constants.labelStd + ' ' + ((constants.feature2UserNamesDict.get(featureY2Plot)) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot ) + ' = ' + str(studentDataDfSumStd[featureY2Plot]) ),
+                        html.P(constants.labelMedian + ' ' + ((constants.feature2UserNamesDict.get(featureY2Plot)) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot ) + ' = ' + str(studentDataDfSumMedian[featureY2Plot]) ),
+                    ]) )
         except Exception as e: 
-            print('Exception Mean and Std calculation for 2 ! ' )
+            print('Exception Mean and Std calculation for feature2 ! ' )
             print(e)
     
     except Exception as e: 
@@ -586,11 +735,107 @@ def getCustomPlot( df,
                 
     return rows         
                 
-                
+
+def getCustomPlotScatter(df, featureX2Plot, featureY2Plot, 
+                         selectedDistribution = [],
+                         mean_featureX = 0,
+                         std_featureX = 0,
+                         med_featureX = 0,
+                         mean_featureY = 0,
+                         std_featureY = 0,
+                         med_featureY = 0,
+                         textFeature = featureDescription,
+                         plotTitle = '') :
+    data_comp = []
+    trace_comp0 = go.Scatter(
+            x               = df[featureX2Plot],
+            y               = df[featureY2Plot],
+            mode            = 'markers',
+            marker          =  constants.THEME_MARKER,
+    #                    name            = 'Name',
+            text            = df[textFeature],
+            legendgroup     = "a",
+        )
+    data_comp.append(trace_comp0)
+    
+    if constants.PlotDistributionMean in  selectedDistribution:
+        trace_median0 =  go.Scatter(x               = [mean_featureX, mean_featureX],
+                                    y               = [0, df[featureY2Plot].max() ],
+                                    mode            = "lines",
+                                    legendgroup     = "a",
+                                    showlegend      = False,
+    #                                                marker = dict(size  = 12,
+    #                                                           line     = dict(width=0.8),
+    #                                                           color    = "navy"
+    #                                                           ),
+                                    name            = "Mean ",
+                                    )
+        data_comp.append(trace_median0)
+        
+    
+    if constants.PlotDistributionStd in  selectedDistribution:
+        trace_median0 =  go.Scatter(x           = [std_featureX, std_featureX ],
+                                    y           = [0, df[featureY2Plot].max() ],
+                                    mode        = "lines",
+                                    legendgroup = "a",
+                                    showlegend  = False,
+    #                                                marker = dict(size  = 12,
+    #                                                           line     = dict(width=0.8),
+    #                                                           color    = "navy"
+    #                                                           ),
+                                    name        = "Std",
+                                    )
+        data_comp.append(trace_median0)
+        
+     
+    if constants.PlotDistributionMedian in  selectedDistribution:
+        trace_median0 =  go.Scatter(x           = [med_featureX, med_featureX ],
+                                    y           = [0, df[featureY2Plot].max() ],
+                                    mode        = "lines",
+                                    legendgroup = "a",
+                                    showlegend  = False,
+#                                    marker = dict(size  = 12,
+#                                               line     = dict(width=0.8),
+#    #                                                           color    = "navy"
+#                                               ),
+                                    name        = "Median",
+                                    )
+    data_comp.append(trace_median0)
+
+    layout_comp = go.Layout(
+        title       = plotTitle,
+        hovermode   = 'closest',
+        xaxis       = dict(
+            title   = str( constants.feature2UserNamesDict.get(featureX2Plot) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot )
+        ),
+        yaxis       = dict(
+            title   = str( constants.feature2UserNamesDict.get(featureY2Plot) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot )
+        ),
+        template    = constants.graphTemplete,
+    )
+    fig = go.Figure(data = data_comp, layout = layout_comp)
+    fig.update_layout(constants.THEME_EXPRESS_LAYOUT)
+    
+    return fig
+
+
                 
 #---------------------------- UI CONTROLS END ---------------------------------
-                
-                
+
+def getDataFeatureDescription(df, hoverData, featureTitle = "Name"):
+    df[featureDescription] = ''
+    
+    
+    if featureTitle in df.columns:
+        df[featureDescription] = '<b>' + df[featureTitle].astype(str) + '</b>' + '<br>'
+        
+    for feature in hoverData:
+        if feature in df.columns:
+            df[featureDescription] = df[featureDescription] + '<br><b>' + str(constants.feature2UserNamesDict.get(feature)) + '</b>: ' + df[feature].astype(str)
+    
+    return df[featureDescription]
+
+
 
 #------------------------------GENERIC START-------------------------------------------
                       

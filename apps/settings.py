@@ -81,11 +81,14 @@ layoutModalBodyHelp = [
     
     html.H5( children = [ html.I(className="fas " + iconNameDetails + " p-right_xx-small"),   "Details"  ] ),
     html.P("Group details"),
+    html.P("Information about the group selected. Information like task completed, points etc as a Group."),
     
     html.Br(),
     
     html.H5( children = [ html.I(className="fas " + iconNameStudents + " p-right_xx-small"),   "Students"  ] ),
     html.P("Group Student details"),
+    html.P("Information about a student in a Group. Detailed information about the student. Select features to view more information from multi select picklist"),
+    html.P("Student Timeline :- shows the student game interactions at time details for each interaction"),
     
     html.Br(),
     
@@ -93,8 +96,8 @@ layoutModalBodyHelp = [
     html.P("Create custom figures specifying various parameters"),
     html.P( children = [ html.I(className="fas fa-chart-bar font-size_medium p-right_xx-small"),   "Bar"  ]),
     html.P( children = [ html.I(className="fas fa-circle font-size_medium p-right_xx-small"),   "Scatter"  ] ),
-    html.P( children = [ html.I(className="fas fa-chart-pie font-size_medium p-right_xx-small"),   "Pie"  ] ),
-    html.P( children = [ html.I(className="fas fa-ellipsis-h font-size_medium p-right_xx-small"),   "Bubble" ] ),
+    html.P( children = [ html.I(className="fas fa-chart-pie font-size_medium p-right_xx-small"),   "Pie"   ] ),
+    html.P( children = [ html.I(className="fas fa-ellipsis-h font-size_medium p-right_xx-small"),   "Bubble" , " : values in third feature determines the size of points in the bubble plot (for e.g. Points1 = 50 has a larger point in the graph than Points2 = 10) " ] ),
     html.P( children = [ html.I(className="fas fa-chart-line font-size_medium p-right_xx-small"),   "Line" ] ),
     
        
@@ -109,11 +112,23 @@ layoutModalBodyHelp = [
     ),
     
     html.P("The ast module helps Python applications to process trees of the Python abstract syntax grammar. The abstract syntax itself might change with each Python release; this module helps to find out programmatically what the current grammar looks like."),
-    html.P("expr   =   BoolOp , NamedExpr, BinOp, UnaryOp"),
-    html.P("operator    =   Add , Sub , Mult , MatMult , Div , Mod , Pow , LShift , RShift , BitOr , BitXor , BitAnd , FloorDiv"),
+    html.P("Expr   =   Expr,  UnaryOp, UAdd, USub,  Not, Invert, BinOp,  Add, Sub, Mult, Div, FloorDiv,  " +
+           "Mod, Pow,  LShift, RShift,  BitOr, BitXor, BitAnd,  MatMult, BoolOp,  And, Or, " +
+           "Compare,  Eq,  NotEq, Lt,  LtE, Gt, GtE,  Is, IsNot,  In, NotIn,  Call, keyword, IfExp, Attribute"),
+    html.P("Operator    =   Add , Sub , Mult , MatMult , Div , Mod , Pow , LShift , RShift , BitOr , BitXor , BitAnd , FloorDiv"),
+    html.P("Subscripting    =   Subscript , Slice"),
+    html.P("Comprehensions    =   ListComp , SetComp, GeneratorExp, DictComp, comprehension"),
+    html.P("Statements    =   Assign , AnnAssign, AugAssign, Raise, Assert, Delete, Pass"),
+    html.P("imports    =   Import , ImportFrom, alias"),
+    html.P("Control Flows    =   If, For, While, Break, Continue, Try, ExceptHandler, With, withitem"),
+    html.P("Function Class    =   FunctionDef, Lambda,  arguments, arg, Return, Yield, YieldFrom, Global,  Nonlocal,  ClassDef"),
+    html.P("Async    =   AsyncFunctionDef, Await,  AsyncFor, AsyncWith"),
        
     html.Br(),
 ]
+
+
+
 
 
 

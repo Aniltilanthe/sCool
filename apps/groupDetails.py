@@ -58,7 +58,10 @@ TaskTypePractice                    = constants.TaskTypePractice
 TaskTypeTheory                      = constants.TaskTypeTheory
 
 
-hasFeatures =  studentGrouped.hasFeatures
+hasFeatures                         =  studentGrouped.hasFeatures
+
+labelSuccess                        = constants.labelSuccess
+labelFail                           = constants.labelFail
 
 #    [  X ,  Y   ]
 featurePairsToPlotSingle = [
@@ -160,7 +163,7 @@ def plotSingleClass( titleTextAdd, school ):
                     ))        
 
 #---------------------------        Datatable task wise success fail    ---------------------------
-        dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', 'Success', 'Others', 'Type', 'TaskId'])
+        dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', labelSuccess, labelFail, 'Type', 'TaskId'])
         
         
         pieDataTaskWisePractice = groupOriginal.groupby(['PracticeTaskId', 'StudentId'], as_index=False).sum()
@@ -187,8 +190,8 @@ def plotSingleClass( titleTextAdd, school ):
                 print(e)   
         
         # convert column of DataFrame to Numeric Int
-        dfTaskWiseSuccessFail["Success"] = pd.to_numeric(dfTaskWiseSuccessFail["Success"], downcast='integer')
-        dfTaskWiseSuccessFail["Others"] = pd.to_numeric(dfTaskWiseSuccessFail["Others"], downcast='integer')
+        dfTaskWiseSuccessFail[labelSuccess] = pd.to_numeric(dfTaskWiseSuccessFail[labelSuccess], downcast='integer')
+        dfTaskWiseSuccessFail[labelFail] = pd.to_numeric(dfTaskWiseSuccessFail[labelFail], downcast='integer')
         
         figStudents =  dash_table.DataTable(
                 id='datatable-taskwise-successfail',

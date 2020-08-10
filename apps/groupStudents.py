@@ -517,7 +517,8 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
                           show_colorbar = True , 
                           bar_width = 0.8 , 
                           showgrid_x = True , showgrid_y = True,
-                          height =   graphHeightRows  
+                          height =   graphHeightRows ,
+                         # width = 2000 
                           )
     
     graphs.append(

@@ -290,7 +290,7 @@ graphHeightMin  = 400
 graphTemplete = 'seaborn'
 
 successPieFigClassSuccess = "Successfully completed a task"
-successPieFigClassOthers = "Others"
+successPieFigClassOthers = "Fail"
 
 StudentResultExplanation = '        (*has student completed this task in any runs)'
 
@@ -327,6 +327,8 @@ labelMedian                 = 'median'
 labelMean                   = 'mean'
 labelStd                    = 'std'
 labelTotal                  = 'total'
+labelSuccess                = "Success"
+labelFail                   = "Fail"
 
 
 FigureTypeScatter           = 'Scatter'

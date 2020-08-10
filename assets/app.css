@@ -1,6 +1,8 @@
 :root {
   --theme-background-color: #3aaab2;
   --theme-color: white;
+  --theme-type-practice: rgb(76, 114, 176);
+  --theme-type-theory: rgb(214,12,140);
 }
 
 
@@ -177,9 +179,13 @@ html {
 	
 
 .c-table {
-	font-size : 1.2em;
+	font-size : 1em;
 }
-.c-table tr:nth-child(1)  {
+.c-table .table th, 
+.c-table .table td {
+    padding: 0.4rem;
+}
+.c-table thead tr:nth-child(1)  {
 	background-color: rgb(230, 230, 230);
     font-weight: bold;
     border-width: 1px;
@@ -189,8 +195,16 @@ html {
 .c-table tr:nth-child(1) .column-header-name {
 	font-weight: bold;
 }
-.c-table .c-table-oddeven tr:nth-child(odd) {
+.c-table .c-table-oddeven tbody tr:nth-child(odd) {
 	background: rgb(248, 248, 248);
+}
+.c-table .type-practice {
+	color : var(--theme-type-practice);
+	font-weight: 450;
+}
+.c-table .type-theory {
+	color : var(--theme-type-theory);
+	font-weight: 400;
 }
 .table-comparision td:nth-child(1) {  
   font-weight: bold;

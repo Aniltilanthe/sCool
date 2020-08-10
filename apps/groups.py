@@ -81,14 +81,13 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
     
     return dash_table.DataTable(
             columns=[
-                {"name": (constants.feature2UserNamesDict.get(i) + featureAdder) if i in constants.feature2UserNamesDict.keys() else i , "id": i, "deletable": True, "selectable": True} for i in df.columns
+                {"name": (constants.feature2UserNamesDict.get(i) + featureAdder) if i in constants.feature2UserNamesDict.keys() else i , "id": i, "selectable": True} for i in df.columns
             ],
             data            = df.to_dict('records'),
-            editable        = True,
             filter_action       = "native",
             sort_action             = "native",
             sort_mode           = "multi",
-            style_data_conditional=(   
+            style_data_conditional=(
             [
                         {
                             'if': {'row_index': 'odd'},

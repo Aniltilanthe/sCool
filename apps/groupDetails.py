@@ -160,10 +160,10 @@ def plotSingleClass( titleTextAdd, school ):
         graphs.append(html.Div(id='Task-Information',
                                children = [html.H2('Task Information')], 
                                className = "c-container p_medium p-top_xx-large", 
-                    ))        
+                    ))
 
 #---------------------------        Datatable task wise success fail    ---------------------------
-        dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', labelSuccess, labelFail, 'Type', 'TaskId'])
+        dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', constants.featureDescription, labelSuccess, labelFail, 'Type', 'TaskId'])
         
         
         pieDataTaskWisePractice = groupOriginal.groupby(['PracticeTaskId', 'StudentId'], as_index=False).sum()
@@ -186,36 +186,63 @@ def plotSingleClass( titleTextAdd, school ):
                 index_dfTaskWiseSuccessFail += 1
 
         except Exception as e: 
-                print('in the theory exception ')   
-                print(e)   
+                print('in the theory exception ')
+                print(e)
         
         # convert column of DataFrame to Numeric Int
         dfTaskWiseSuccessFail[labelSuccess] = pd.to_numeric(dfTaskWiseSuccessFail[labelSuccess], downcast='integer')
         dfTaskWiseSuccessFail[labelFail] = pd.to_numeric(dfTaskWiseSuccessFail[labelFail], downcast='integer')
         
-        figStudents =  dash_table.DataTable(
-                id='datatable-taskwise-successfail',
-                columns=[
-                    {"name": i, "id": i, "deletable": True, "selectable": True} for i in dfTaskWiseSuccessFail.columns
-                ],
-                data            =   dfTaskWiseSuccessFail.to_dict('records'),
-                editable        =   True,
-                filter_action   =   "native",
-                sort_action     =   "native",
-                sort_mode       =   "multi",
-                style_data_conditional = ([
-                            {
-                                'if': {'row_index': 'odd'},
-                                'backgroundColor': constants.THEME_TABLE_ODDROW_COLOR_STYLE
-                            },
-                 ]) 
-            )
+        
+        
+        table_header = [
+            html.Thead(html.Tr([html.Th("Task"), html.Th(labelSuccess), html.Th(labelFail), html.Th('Type'), html.Th('TaskId') ]))
+        ]
+        rows = []
+        for index, row in dfTaskWiseSuccessFail.iterrows():
+
+            tds = []
+            for feature in dfTaskWiseSuccessFail.columns:
+                if not feature == constants.featureDescription :
+                    tds.append( html.Td(  str(  row[feature]  )  ) )
+
+            rows.append(  html.Tr(  tds ,
+                                  className =  (   "type-practice"  if row['Type'] == constants.TaskTypePractice else "type-theory"  )
+                                  ) )
+            rows.append( html.Tr([ html.Td(  row[constants.featureDescription]  , colSpan  = len(dfTaskWiseSuccessFail.columns) - 1   )  ]) )
             
-        graphs.append(  
-                html.Div([ figStudents ],
-                         className = "c-table ")
-        )
-        graphIndex = graphIndex + 1
+        
+        table_body = [html.Tbody(  rows   )]
+        
+        table = dbc.Table(table_header + table_body, bordered=True)
+        
+        graphs.append(html.Div(table ,
+                         className = "c-table c-table-oddeven font-size_small"
+                    ))
+        
+        
+#        figStudents =  dash_table.DataTable(
+#                id='datatable-taskwise-successfail',
+#                columns=[
+#                    {"name": i, "id": i, "selectable": True} for i in dfTaskWiseSuccessFail.columns
+#                ],
+#                data            =   dfTaskWiseSuccessFail.to_dict('records'),
+#                filter_action   =   "native",
+#                sort_action     =   "native",
+#                sort_mode       =   "multi",
+#                style_data_conditional = ([
+#                            {
+#                                'if': {'row_index': 'odd'},
+#                                'backgroundColor': constants.THEME_TABLE_ODDROW_COLOR_STYLE
+#                            },
+#                 ]) 
+#            )
+#            
+#        graphs.append(  
+#                html.Div([ figStudents ],
+#                         className = "c-table ")
+#        )
+#        graphIndex = graphIndex + 1
         
 
         
@@ -908,10 +935,9 @@ def plotClassOverview(schoolKey):
             ]) ) )
     fig1Table = dash_table.DataTable(
         columns=[
-            {"name": constants.feature2UserNamesDict.get(i) if i in constants.feature2UserNamesDict.keys() else i , "id": i, "deletable": True, "selectable": True} for i in studentDataDfSum[features2Plot].columns
+            {"name": constants.feature2UserNamesDict.get(i) if i in constants.feature2UserNamesDict.keys() else i , "id": i, "selectable": True} for i in studentDataDfSum[features2Plot].columns
         ],
         data            = studentDataDfSum[features2Plot].to_dict('records'),
-        editable        = True,
         filter_action       = "native",
         sort_action         = "native",
         sort_mode           = "multi",

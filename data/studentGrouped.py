@@ -88,13 +88,15 @@ def getTaskWiseSuccessFail(groupData, taskId, dfTaskDetails, featureTaskId, type
     groupData = groupData.sort_values(['StudentId','Result'], ascending=False)
     
     taskTitle = ' missing '
+    taskDescription = ''
     
     try :
-        taskTitle = dfTaskDetails[ dfTaskDetails[featureTaskId] == int(taskId) ]['Title'].values[0]
+        taskTitle = dfTaskDetails[ dfTaskDetails[featureTaskId] == int(taskId) ]['Title'].values[0] 
+        taskDescription = dfTaskDetails[ dfTaskDetails[featureTaskId] == int(taskId) ][constants.featureDescription].values[0]
     except Exception as e: 
-        print(e)   
+        print(e)
         
-    return  [str(taskTitle)] + [groupData[groupData['Result'] == 1].count()[0], 
+    return  [str(taskTitle)] + [str(taskDescription)] + [groupData[groupData['Result'] == 1].count()[0], 
                                   groupData[groupData['Result'] == 0].count()[0]] + [  str(typeOfTask) ] + [ taskId ]
 
 

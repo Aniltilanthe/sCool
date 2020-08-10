@@ -461,8 +461,9 @@ html {
 	}
 	.font-size_medium,
 	.c-card .card_label,
-	.c-card.c-card-small .card_label  {
-		font-size: 0.9rem;
+	.c-card.c-card-small .card_label,
+	.c-table {
+		font-size: 0.8rem;
 	}
 	.c-card.c-card-small .card_value,
 	.c-card .card_value1, .c-card .card_value2,

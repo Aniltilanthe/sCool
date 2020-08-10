@@ -15,9 +15,9 @@ html {
 .page-main {
 	margin-left: 16rem;
     padding: 2rem 1rem;
+    padding-bottom: 5rem;
 	overflow-x: scroll;
 	min-height: 100vh;
-	
 }
 .page-sidebar {
 	position: fixed;
@@ -458,12 +458,14 @@ html {
 	.font-size_small,
 	.c-card .card_value_label	{
 		font-size: 0.6em;
+	}	
+	.c-table {
+		font-size: 0.8rem;
 	}
 	.font-size_medium,
 	.c-card .card_label,
-	.c-card.c-card-small .card_label,
-	.c-table {
-		font-size: 0.8rem;
+	.c-card.c-card-small .card_label  {
+		font-size: 0.9rem;
 	}
 	.c-card.c-card-small .card_value,
 	.c-card .card_value1, .c-card .card_value2,
@@ -611,6 +613,9 @@ html {
 .m-bottom_large {
 	margin-bottom: 3rem;
 }
+.m-top_x-small {
+	margin-top: 0.5rem;
+}
 .m-top_small {
 	margin-top: 1rem;
 }
@@ -752,6 +757,9 @@ html {
 	}
 	.m_large {
 		margin: 1rem;	
+	}
+	.m-top_x-small {
+		margin-top: 0.1rem;
 	}
 	.m-top_small {
 		margin-top: 0.25rem;	

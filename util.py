@@ -313,6 +313,7 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                                       feature1Options       = [], 
                                       feature2Options       = [], 
                                       feature3Options       = [], 
+                                      featureMultiOptions   = [], 
                                       feature1ValueDefault  = "",
                                       feature2ValueDefault  = feature2Default,
                                       feature3ValueDefault  = feature3SizeDefault,
@@ -442,12 +443,34 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                         , width=3
                     ),
             ])
-
-            , html.Button(children=[
-                    html.I(className="fas fa-plus font-size_medium p-right_xx-small"),
-                    'Add Plot',  ], 
-                        id  =   idApp + "-form-submit-btn", 
-                        className="c-button btn btn-outline-primary", n_clicks=0),
+                                
+            , dbc.Row([
+                    dbc.Col(
+                      html.Div([
+                                dcc.Dropdown(
+                                    id              = idApp + "-form-feature-multi",
+                                    placeholder     = "Select features",
+                                    options         = BuildOptionsFeatures( featureMultiOptions ),
+                                    multi           = True
+                                )
+                            ],
+                            className = "c-container"
+                       )
+                        , width=12
+                    ),
+            ])
+            , dbc.Row([
+                    dbc.Col(
+                        html.Button(children=[
+                                    html.I(className="fas fa-plus font-size_medium p-right_xx-small"),
+                                    'Add Plot',  ], 
+                                id  =   idApp + "-form-submit-btn", 
+                                className="c-button btn btn-outline-primary", n_clicks=0)
+                        
+                        , width=8
+                    ),
+            ], className = "m-top_small" )
+            ,
             html.Br(),
         ],
         className = "form"
@@ -466,9 +489,10 @@ def getCustomPlot( df,
                   marginalX             = '',
                   marginalY             = '',
                   hoverData             = [],
-                  color                 = colorDefault,
+                  groupBy               = colorDefault,
                   selectedDistribution  = [],
-                  isThemeSizePlot       = False
+                  isThemeSizePlot       = False,
+                  selectedFeatureMulti  = []
     ):
     
     rows = []
@@ -476,22 +500,40 @@ def getCustomPlot( df,
     
     print('getCustomPlot')
     
-    if df is None  or df.empty   or    featureX == None :
+    if df is None  or df.empty :
         return rows
     
-    if ( '' == featureY     and    not selectedFigureType == constants.FigureTypePie ):
-        return rows
+    
+    if (selectedFigureType in constants.FigureTypes  and 
+            constants.keyIsMultiFeatureEnabled in constants.FigureTypes.get(selectedFigureType) and 
+            constants.FigureTypes.get(selectedFigureType).get(constants.keyIsMultiFeatureEnabled) ):
+        
+        if ( (featureX is None    or   '' == featureX ) and  (featureY is None    or   '' == featureY ) and
+            (feature3 is None    or   '' == feature3 ) and
+            len(selectedFeatureMulti) == 0 ):
+            print('getCustomPlot in condition 1st 1')
+            return rows.append( getMsgSelectFeature() )
+        
+    else:
+        print('getCustomPlot in condition 1st 2')
+        if featureX is None    or   '' == featureX :
+            return rows.append( getMsgSelectFeature() )
+    
+        if ( '' == featureY     and    not selectedFigureType == constants.FigureTypePie ):
+            return rows.append( getMsgSelectFeature() )
+    
+        if not featureX in df.columns  :
+            return rows.append( getMsgFeatureNotInDF(featureY) )
+    
+        if not featureY in df.columns     and    not selectedFigureType == constants.FigureTypePie  :
+            return rows.append( getMsgFeatureNotInDF(featureY) )
+    
     
     if ( '' == feature3     and   constants.FigureTypes.get(selectedFigureType).get(constants.keyIsFeature3Enabled) ):
         return rows
     
     
-    if not featureX in df.columns  :
-        return rows.append(html.H3('Feature not in data ' + str(featureX ) + '  . Select another! ' ))
-
-    if not featureY in df.columns     and    not selectedFigureType == constants.FigureTypePie  :
-        return rows.append(html.H3('Feature not in data ' + str(featureY ) + '  . Select another! ' ))
-    
+    print('getCustomPlot initialize variables !')
     
     featureX2Plot = featureX
     featureY2Plot = featureY
@@ -503,20 +545,31 @@ def getCustomPlot( df,
         featureY2Plot   = featureX
         orientation     = constants.AxisV
 
+    if (selectedFigureType in constants.FigureTypes  and 
+            constants.keyIsMultiFeatureEnabled in constants.FigureTypes.get(selectedFigureType) and 
+            constants.FigureTypes.get(selectedFigureType).get(constants.keyIsMultiFeatureEnabled) ) :
+        if   not feature3  == ''  and    feature3 not in  selectedFeatureMulti :
+            selectedFeatureMulti.insert(0, feature3)
+        if   not featureY  == ''  and    featureY not in  selectedFeatureMulti :
+            selectedFeatureMulti.insert(0, featureY)
+        if   not featureX  == ''  and    featureX not in  selectedFeatureMulti :
+            selectedFeatureMulti.insert(0, featureX)
+
     
     plotTitle = ' Details of ' 
     plotTitle = plotTitle + str( constants.feature2UserNamesDict.get(featureX2Plot) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot )
     plotTitle = plotTitle + ' vs ' + str( constants.feature2UserNamesDict.get(featureY2Plot) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot )
     
-    
+
     try:
         
         studentDataDfSumMean        = df.mean().round(decimals=2)
         studentDataDfSumStd         = df.std().round(decimals=2)
         studentDataDfSumMedian      = df.median().round(decimals=2)
 
-        df[featureDescription]      = getDataFeatureDescription(df, hoverData, featureTitle = color)
+        df[featureDescription]      = getDataFeatureDescription(df, hoverData, featureTitle = groupBy)
 
+        print('Switch case for Figure types !')
 
         if selectedFigureType == constants.FigureTypeScatter:
 
@@ -556,29 +609,6 @@ def getCustomPlot( df,
                          )
 
             else :
-#                if not color == 'Name' :
-#                    figStudents = px.scatter(df, x = featureX2Plot, y = featureY2Plot
-#                         , title        =   plotTitle
-#                         , labels       =   constants.feature2UserNamesDict # customize axis label
-#                         , hover_name   =   hoverName
-#                         , color        =   color
-#                         , hover_data   =   hoverData
-#                         , marginal_x   =   marginalX
-#                         , marginal_y   =   marginalY
-#        #                     , height       =   constants.graphHeight
-#                         , template     =   constants.graphTemplete
-#                        )
-#                else :
-#                    figStudents = px.scatter(df, x = featureX2Plot, y = featureY2Plot
-#                         , title        =   plotTitle
-#                         , labels       =   constants.feature2UserNamesDict # customize axis label
-#                         , hover_name   =   hoverName
-#                         , hover_data   =   hoverData
-#                         , marginal_x   =   marginalX
-#                         , marginal_y   =   marginalY
-#        #                     , height       =   constants.graphHeight
-#                         , template     =   constants.graphTemplete
-#                        )
                 figStudents = px.scatter(df, x = featureX2Plot, y = featureY2Plot
                      , title        =   plotTitle
                      , labels       =   constants.feature2UserNamesDict # customize axis label
@@ -607,7 +637,7 @@ def getCustomPlot( df,
     
     
             figStudents = go.Figure(data =  [go.Pie(
-                                         labels         =   df[color],
+                                         labels         =   df[groupBy],
                                          values         =   df[featureX]  ,
 #                                         hovertext      =   df[featureDescription],
                                     )])
@@ -669,7 +699,7 @@ def getCustomPlot( df,
                  , hover_name   =   hoverName
                  , hover_data   =   hoverData
                  , size         =   feature3
-                 , color        =   color
+                 , color        =   groupBy
                  , size_max     =   60
 #                     , height       =   constants.graphHeight
                  , template     =   constants.graphTemplete
@@ -690,7 +720,7 @@ def getCustomPlot( df,
             figStudents = px.line(df
                 , x             =   featureX2Plot
                 , y             =   featureY2Plot
-                , color         =   color
+                , color         =   groupBy
                 , hover_name    =   hoverName
                 , hover_data    =   hoverData
 #                    , height        =   constants.graphHeight
@@ -701,37 +731,76 @@ def getCustomPlot( df,
         
         
         
+            
+        elif selectedFigureType == constants.FigureTypeTable :            
+            print('Inside Table Figure')
+            
+            if   not groupBy == ''    and    groupBy  in selectedFeatureMulti  :
+                selectedFeatureMulti.remove(groupBy)
+            
+            if   not groupBy == ''    and    groupBy not in selectedFeatureMulti :
+                selectedFeatureMulti.insert(0, groupBy)
+                
+                
+            
+            figStudents =  dash_table.DataTable(
+                    columns=[
+                        {"name": i, "id": i, "deletable": True, "selectable": True} for i in df[selectedFeatureMulti].columns
+                    ],
+                    data            =   df[selectedFeatureMulti].to_dict('records'),
+                    filter_action   =   "native",
+                    sort_action     =   "native",
+                    sort_mode       =   "multi",
+                    style_data_conditional = ([
+                                {
+                                    'if': {'row_index': 'odd'},
+                                    'backgroundColor': constants.THEME_TABLE_ODDROW_COLOR_STYLE
+                                },
+                     ])
+                )
         
         
-        rows.append( html.Div( dcc.Graph(
-                figure = figStudents
-        ) ) )
+#default is Dcc Graph        
+        if (selectedFigureType in constants.FigureTypes  and 
+            constants.keyIsDccGraph in constants.FigureTypes.get(selectedFigureType) and 
+            not constants.FigureTypes.get(selectedFigureType).get(constants.keyIsDccGraph) ):
+                    
+            rows.append(
+                    html.Div([ figStudents ],
+                             className = "c-table ")
+            )
+        else :
+            rows.append( html.Div( dcc.Graph(
+                    figure = figStudents
+            ) ) )
         
         print('Before Mean and Std calculation ! ' )
         
         print('After Mean and Std calculation ! ' )
         
-        try :
-            if   featureX2Plot is not None   and     not featureX2Plot == ''   and   not 'Name' == featureX2Plot    and      featureX2Plot in studentDataDfSumMean:
-                rows.append( html.Div(children=[
-                        html.P(constants.labelMean + ' ' + ((constants.feature2UserNamesDict.get(featureX2Plot)) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot )  + ' = ' + str(studentDataDfSumMean[featureX2Plot]) ),
-                        html.P(constants.labelStd + ' ' + ((constants.feature2UserNamesDict.get(featureX2Plot)) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot ) + ' = ' + str(studentDataDfSumStd[featureX2Plot]) ),
-                        html.P(constants.labelMedian + ' ' + ((constants.feature2UserNamesDict.get(featureX2Plot)) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot ) + ' = ' + str(studentDataDfSumMedian[featureX2Plot]) ),
-                    ]) )
-        except Exception as e: 
-            print('Exception Mean and Std calculation for feature1 ! ' )
-            print(e)
-        try :
-            if  featureY2Plot is not None   and   not featureY2Plot == ''  and    not 'Name' == featureY2Plot   and     featureY2Plot in studentDataDfSumMean:
-                rows.append( html.Div(children=[
-                        html.P(constants.labelMean + ' ' + ((constants.feature2UserNamesDict.get(featureY2Plot)) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot )  + ' = ' + str(studentDataDfSumMean[featureY2Plot]) ),
-                        html.P(constants.labelStd + ' ' + ((constants.feature2UserNamesDict.get(featureY2Plot)) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot ) + ' = ' + str(studentDataDfSumStd[featureY2Plot]) ),
-                        html.P(constants.labelMedian + ' ' + ((constants.feature2UserNamesDict.get(featureY2Plot)) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot ) + ' = ' + str(studentDataDfSumMedian[featureY2Plot]) ),
-                    ]) )
-        except Exception as e: 
-            print('Exception Mean and Std calculation for feature2 ! ' )
-            print(e)
-    
+#        for multi features - No Mean and Std data is supported
+        if not (constants.keyIsMultiFeatureEnabled in constants.FigureTypes.get(selectedFigureType) and 
+            constants.FigureTypes.get(selectedFigureType).get(constants.keyIsMultiFeatureEnabled) ) :
+            try :
+                if  not featureX2Plot == ''   and   not 'Name' == featureX2Plot    and      featureX2Plot in studentDataDfSumMean:
+                    rows.append( getDistributionForFeature(studentDataDfSumMedian, featureX2Plot)  )
+            except Exception as e: 
+                print('Exception Mean and Std calculation for feature1 ! ' )
+                print(e)
+            try :
+                if  not featureY2Plot == ''  and    not 'Name' == featureY2Plot   and     featureY2Plot in studentDataDfSumMean:
+                    rows.append( getDistributionForFeature(studentDataDfSumMedian, featureY2Plot)  )
+            except Exception as e: 
+                print('Exception Mean and Std calculation for feature2 ! ' )
+                print(e)
+        else :
+            for featureDist in selectedFeatureMulti:
+                try :
+                    if  not 'Name' == featureDist    and      featureDist in studentDataDfSumMean:
+                        rows.append( getDistributionForFeature(studentDataDfSumMedian, featureDist)  )
+                except Exception as e: 
+                    print('Exception Mean and Std calculation for feature =  ' + featureDist )
+                    print(e)
     except Exception as e: 
         print('Add Graph exception ! ' )
         print(e)
@@ -739,6 +808,41 @@ def getCustomPlot( df,
                 
     return rows         
                 
+
+def getMsgSelectFeature():
+    return html.H4('Select Features' )
+
+def getMsgFeatureNotInDF(feature):
+    return html.H4('Feature not in data ' + str(feature) + '  . Select another! ' )
+
+def getDistributionForFeature(df, featureDist):
+    return html.P( children= [
+                                    html.Span(((constants.feature2UserNamesDict.get(featureDist)) if featureDist in constants.feature2UserNamesDict.keys() else featureDist ),
+                                              className = "p-right_medium" ),
+                                    html.Span(constants.labelMean + ' '  + ' = ' + str(df[featureDist]),
+                                              className = "p-right_medium" ),
+                                    html.Span(constants.labelStd + ' ' + ' = ' + str(df[featureDist]),
+                                              className = "p-right_medium"  ),
+                                    html.Span(constants.labelMedian + ' ' + ' = ' + str(df[featureDist]),
+                                              className = "p-right_medium"  ),
+                            ])
+                                    
+def updateSelectorDisabled(selectedFigureType, initialClass, isEnabledKey):   
+    if None is selectedFigureType or '' == selectedFigureType:
+        return initialClass
+ 
+    initialClassS = set()
+    
+    if not None is initialClass:
+        initialClassS = set(initialClass.split(' '))  
+    
+    if selectedFigureType in constants.FigureTypes   and   not  constants.FigureTypes.get(selectedFigureType).get(isEnabledKey):
+        initialClassS.add('disabled')
+    else:
+        initialClassS.discard('disabled')
+
+    return  ' '.join(initialClassS)
+
 
 def getCustomPlotScatter(df, featureX2Plot, featureY2Plot, 
                          selectedDistribution = [],

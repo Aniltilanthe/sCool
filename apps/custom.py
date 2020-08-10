@@ -97,7 +97,8 @@ Feature3Size        = "SessionDuration"
 
 #Student Interaction with Game - TIMELINE
 def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType, feature2 = Feature1, feature3 = Feature3Size,
-                      plotClassName = " col-sm-6 ", selectedDistribution = [] ):
+                      plotClassName = " col-12 col-xl-6 ", selectedDistribution = [],
+                      selectedFeatureMulti = [] ):
 
     graphs = []
     rows = []
@@ -105,14 +106,11 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType, fea
     if (None == schoolKey) :
         return graphs
     
-    if (None == feature1) :
-        return graphs
-    
     studentDataDf = studentGrouped.getStudentsOfSchoolDF(schoolKey)
     
     print(' plotClassOverview got studentDataDf   ' )
 
-    if 'studentDataDf' in locals()     and    ( studentDataDf is not None  )    and    ( feature1 in studentDataDf.columns )   :
+    if 'studentDataDf' in locals()     and    ( studentDataDf is not None  )  :
         
         studentDataDf[constants.featureConceptsUsedDetailsStr]     = getPracticeConceptsUsedDetailsStr(studentDataDf)
                 
@@ -129,7 +127,7 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType, fea
         
         
         hoverName   = "Name"
-        color       = "Name"
+        groupBy     = "Name"
         
         marginalX   = ''
         marginalY   = ''
@@ -148,9 +146,15 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType, fea
                           marginalX             = marginalX,
                           marginalY             = marginalY,
                           hoverData             = hoverData,
-                          color                 = color,
-                          selectedDistribution  = selectedDistribution
+                          groupBy               = groupBy,
+                          selectedDistribution  = selectedDistribution,
+                          selectedFeatureMulti  = selectedFeatureMulti
             )
+        
+        
+        if (constants.keyClassName in constants.FigureTypes.get(selectedFigureType)   ):
+            plotClassName = constants.FigureTypes.get(selectedFigureType).get(constants.keyClassName)
+        
        
         graphs.append( html.Div( rows ,
                                 className = plotClassName ) )
@@ -171,7 +175,8 @@ def generateControlCardCustomPlotForm():
             feature1ValueDefault    = "",
             feature2ValueDefault    = Feature1,
             feature3ValueDefault    = Feature3Size,
-            colorGroupIsDisabled    = True
+            colorGroupIsDisabled    = True,
+            featureMultiOptions     = FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory,
     )
 
 #------------------------------------------------------------------------------------------------
@@ -220,11 +225,14 @@ layout = [
                 State(component_id = idApp + "-form-feature-axis", component_property='value'),
                 State(component_id = idApp + "-form-figure-type", component_property='value'),
                 State(component_id = idApp + "-form-feature-distribution", component_property='value'),
+                State(component_id = idApp + "-form-feature-multi", component_property='value'),
                 State(component_id = idApp + "-main-container", component_property='children'),
                 ]
 )
-def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedFeature3, selectedAxis, selectedFigureType, 
+def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedFeature3, selectedAxis, 
+               selectedFigureType, 
                selectedDistribution,
+               selectedFeatureMulti,
                containerChildren 
                ):    
     graphs = []
@@ -232,7 +240,7 @@ def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedF
     print('update_bar')
     print(selectedDistribution)
     
-    if n_clicks == 0 or groupMain is None or not int(groupMain) >= 0  or None is selectedFeature or '' == selectedFeature:
+    if n_clicks == 0 or groupMain is None or not int(groupMain) >= 0:
         return html.Div(graphs)
     
     if selectedFeature1 is None or  '' == selectedFeature1:
@@ -245,7 +253,8 @@ def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedF
     print('selectedFigureType   ' + str(selectedFigureType) + '   selectedFeature1   ' + str(selectedFeature1)  + '     selectedFeature3   ' + str(selectedFeature3) )
     
     graphs = plotClassOverview( int(groupMain), selectedFeature, selectedAxis, selectedFigureType, selectedFeature1, selectedFeature3,
-                               selectedDistribution = selectedDistribution)
+                               selectedDistribution = selectedDistribution,
+                               selectedFeatureMulti = selectedFeatureMulti)
     
     if not(None is containerChildren):
         if isinstance(containerChildren, list):
@@ -271,21 +280,8 @@ def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedF
     ],
     state=[ State(component_id = idApp + "-form-feature-axis", component_property='className') ]
 )
-def update_axis_selector_disabled(selectedFigureType, initialClass):   
-    if None is selectedFigureType or '' == selectedFigureType:
-        return initialClass
- 
-    initialClassS = set()
-    
-    if not None is initialClass:
-        initialClassS = set(initialClass.split(' '))
-    
-    if selectedFigureType in FigureTypes   and   not FigureTypes.get(selectedFigureType).get(constants.keyIsAxisEnabled):
-        initialClassS.add('disabled')
-    else:
-        initialClassS.discard('disabled')
-
-    return  ' '.join(initialClassS)
+def update_axis_selector_disabled(selectedFigureType, initialClass):  
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsAxisEnabled) 
 
 
 @app.callback(
@@ -296,20 +292,7 @@ def update_axis_selector_disabled(selectedFigureType, initialClass):
     state=[ State(component_id = idApp +"-form-feature-3", component_property='className') ]
 )
 def update_feature_size_disabled(selectedFigureType, initialClass):   
-    if None is selectedFigureType or '' == selectedFigureType:
-        return initialClass
-
-    initialClassS = set()
-    
-    if not None is initialClass:
-        initialClassS = set(initialClass.split(' '))
-
-    if selectedFigureType in FigureTypes and   not FigureTypes.get(selectedFigureType).get(constants.keyIsFeature3Enabled):
-        initialClassS.add('disabled')
-    else:
-        initialClassS.discard('disabled')
-
-    return  ' '.join(initialClassS)
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsFeature3Enabled)
 
 
 @app.callback(
@@ -320,20 +303,21 @@ def update_feature_size_disabled(selectedFigureType, initialClass):
     state=[ State(component_id = idApp +"-form-feature-distribution", component_property='className') ]
 )
 def update_feature_distribution_disabled(selectedFigureType, initialClass):   
-    if None is selectedFigureType or '' == selectedFigureType:
-        return initialClass
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsDistributionEnabled)
 
-    initialClassS = set()
-    
-    if not None is initialClass:
-        initialClassS = set(initialClass.split(' '))
 
-    if selectedFigureType in FigureTypes and   not FigureTypes.get(selectedFigureType).get(constants.keyIsDistributionEnabled):
-        initialClassS.add('disabled')
-    else:
-        initialClassS.discard('disabled')
+@app.callback(
+    Output(idApp + "-form-feature-multi", "className"),
+    [
+        Input(idApp + "-form-figure-type", "value")
+    ],
+    state=[ State(component_id = idApp + "-form-feature-multi", component_property='className') ]
+)
+def update_feature_multi_disabled(selectedFigureType, initialClass): 
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsMultiFeatureEnabled)
 
-    return  ' '.join(initialClassS)
+
+
 
 
 

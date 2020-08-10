@@ -181,25 +181,19 @@ def plotGameOverview():
 
 
 def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '', 
-                   selectedAxis = constants.AxisH, 
-                   selectedFigureType = constants.FigureTypeBar,
-                   plotClassName = " col-sm-6 ", selectedDistribution = [],
-                   selectedColorGroup        = selectedColorGroupDefault  ) :
+                   selectedAxis         = constants.AxisH, 
+                   selectedFigureType   = constants.FigureTypeBar,
+                   plotClassName        = " col-sm-12 ", selectedDistribution = [],
+                   groupBy              = selectedColorGroupDefault  ,
+                   selectedFeatureMulti = []      ):
 
     graphs = []
     rows = []
     
     print('   plotGamePlots  in home !!!! ' )
     
-    
-    if (None == feature1   or  '' == feature1 ) :
-        return graphs
-    
-    if ( '' == feature2    and   not selectedFigureType == constants.FigureTypePie ) :
-        return graphs
-    
-    hoverName   = selectedColorGroup
-    color       = selectedColorGroup
+    hoverName   = groupBy
+    color       = groupBy
     
     marginalX   = ''
     marginalY   = ''
@@ -218,7 +212,7 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
     
     
 #    for the Pie figures - we show data Grouped by Groups ! - so no StudentId information
-    if selectedFigureType == constants.FigureTypePie   or    selectedColorGroup == "GroupId"  :
+    if selectedFigureType == constants.FigureTypePie   or    groupBy == "GroupId"  :
         gameDataDfGroupedStudent = gameData.groupby([constants.GROUPBY_FEATURE], as_index=False).sum()
         gameDataDfGroupedStudent['Group'] = 'Group ' + gameDataDfGroupedStudent['GroupId'].astype(str)
         hoverName   = "Group"
@@ -234,7 +228,7 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
             hoverData.append("StudentId")
         
     
-    if 'gameDataDfGroupedStudent' in locals()     and    ( gameDataDfGroupedStudent is not None  )    and    ( feature1 in gameDataDfGroupedStudent.columns ):
+    if 'gameDataDfGroupedStudent' in locals()     and    ( gameDataDfGroupedStudent is not None  )    and   ( not  gameDataDfGroupedStudent.empty ) :
         
         
         plotTitle   = ' Details of students ' 
@@ -257,9 +251,10 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
                           marginalX             = marginalX,
                           marginalY             = marginalY,
                           hoverData             = hoverData,
-                          color                 = color,
+                          groupBy                 = groupBy,
                           isThemeSizePlot       = True,
-                          selectedDistribution  = selectedDistribution
+                          selectedDistribution  = selectedDistribution,
+                          selectedFeatureMulti  = selectedFeatureMulti
             )
        
         graphs.append( html.Div( rows ,
@@ -280,7 +275,9 @@ def generateControlCardCustomPlot():
             feature1ValueDefault    = "",
             feature2ValueDefault    = "",
             feature3ValueDefault    = "",
-            figureTypeDefault       = constants.FigureTypeScatter
+            figureTypeDefault       = constants.FigureTypeScatter,
+            featureMultiOptions     = FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory,
+            colorDefault            =  constants.GROUPBY_FEATURE ,
     )
 
 #----------------------------------Functions END --------------------------------------------
@@ -346,22 +343,28 @@ layout = [
                 State(component_id = idApp + "-form-figure-type", component_property='value'),
                 State(component_id = idApp + "-form-feature-distribution", component_property='value'),
                 State(component_id = idApp + "-form-feature-color-group", component_property='value'),
+                State(component_id = idApp + "-form-feature-multi", component_property='value'),
                 State(component_id = idApp + "-custom-plot-container", component_property='children'),
                 ]
 )
 def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, selectedAxis, selectedFigureType,  
-               selectedDistribution, selectedColorGroup,
+               selectedDistribution, 
+               selectedColorGroup,
+               selectedFeatureMulti,
                containerChildren 
                ):    
     graphs = []
     
-    if n_clicks == 0 or None is selectedFeature1 or '' == selectedFeature1:
+    if n_clicks == 0:
         return html.Div(graphs)
     
-    if selectedFeature2 is None or  '' == selectedFeature2:
+    if selectedFeature1 is None :
+        selectedFeature1 = ''
+    
+    if selectedFeature2 is None :
         selectedFeature2 = ''
     
-    if selectedFeature3 is None or '' == selectedFeature3:
+    if selectedFeature3 is None:
         selectedFeature3 = ''
         
     print('   selectedFeature2   ' + str(selectedFeature2)  + '   selectedAxis   ' + str(selectedAxis) )
@@ -375,7 +378,8 @@ def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, s
                            selectedFigureType   = selectedFigureType, 
                            plotClassName        = " col-sm-12 ",
                            selectedDistribution = selectedDistribution,
-                           selectedColorGroup        = selectedColorGroup )
+                           groupBy              = selectedColorGroup,
+                           selectedFeatureMulti = selectedFeatureMulti   )
     
     if not(None is containerChildren):
         if isinstance(containerChildren, list):
@@ -402,20 +406,7 @@ def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, s
     state=[ State(component_id = idApp + "-form-feature-axis", component_property='className') ]
 )
 def update_axis_selector_disabled(selectedFigureType, initialClass):   
-    if None is selectedFigureType or '' == selectedFigureType:
-        return initialClass
- 
-    initialClassS = set()
-    
-    if not None is initialClass:
-        initialClassS = set(initialClass.split(' '))  
-    
-    if selectedFigureType in FigureTypes   and   not FigureTypes.get(selectedFigureType).get(constants.keyIsAxisEnabled):
-        initialClassS.add('disabled')  
-    else:
-        initialClassS.discard('disabled') 
-
-    return  ' '.join(initialClassS)
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsAxisEnabled)
 
 
 @app.callback(
@@ -426,20 +417,7 @@ def update_axis_selector_disabled(selectedFigureType, initialClass):
     state=[ State(component_id = idApp +"-form-feature-3", component_property='className') ]
 )
 def update_feature_size_disabled(selectedFigureType, initialClass):   
-    if None is selectedFigureType or '' == selectedFigureType:
-        return initialClass
-
-    initialClassS = set()
-    
-    if not None is initialClass:
-        initialClassS = set(initialClass.split(' ')) 
-
-    if selectedFigureType in FigureTypes and   not FigureTypes.get(selectedFigureType).get(constants.keyIsFeature3Enabled):
-        initialClassS.add('disabled') 
-    else:
-        initialClassS.discard('disabled') 
-
-    return  ' '.join(initialClassS)
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsFeature3Enabled)
 
 @app.callback(
     Output(idApp + "-form-feature-distribution", "className"),
@@ -449,18 +427,16 @@ def update_feature_size_disabled(selectedFigureType, initialClass):
     state=[ State(component_id = idApp +"-form-feature-distribution", component_property='className') ]
 )
 def update_feature_distribution_disabled(selectedFigureType, initialClass):   
-    if None is selectedFigureType or '' == selectedFigureType:
-        return initialClass
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsDistributionEnabled)
 
-    initialClassS = set()
-    
-    if not None is initialClass:
-        initialClassS = set(initialClass.split(' '))
 
-    if selectedFigureType in FigureTypes and   not FigureTypes.get(selectedFigureType).get(constants.keyIsDistributionEnabled):
-        initialClassS.add('disabled')
-    else:
-        initialClassS.discard('disabled')
-
-    return  ' '.join(initialClassS)
+@app.callback(
+    Output(idApp + "-form-feature-multi", "className"),
+    [
+        Input(idApp + "-form-figure-type", "value")
+    ],
+    state=[ State(component_id = idApp + "-form-feature-multi", component_property='className') ]
+)
+def update_feature_multi_disabled(selectedFigureType, initialClass):   
+    return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsMultiFeatureEnabled)
 

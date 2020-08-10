@@ -17,7 +17,9 @@ keyClassName                = 'className'
 keyHasMeanStd               = 'hasMeanStd'
 keyIsAxisEnabled            = 'isAxisEnabled'
 keyIsFeature3Enabled        = 'isFeature3Enabled'
-keyIsDistributionEnabled        = 'isDistributionEnabled'
+keyIsDistributionEnabled    = 'isDistributionEnabled'
+keyIsMultiFeatureEnabled    = 'isMultiFeatureEnabled'
+keyIsDccGraph               = 'isDccGraph'
 keyColor                    = 'color'
 keyBackgroundColor          = 'backgroundColor'
 keyExpress                  = 'express'
@@ -336,7 +338,7 @@ FigureTypePie               = 'Pie.'
 FigureTypeBar               = 'Bar'
 FigureTypeLine              = 'Line'
 FigureTypeBubble            = 'Bubble'
-FigureTypeScatterMedian            = 'ScatterMedian'
+FigureTypeTable             = 'Table'
      
 AxisV                       = 'v'
 AxisH                       = 'h'
@@ -347,34 +349,50 @@ PlotDistributionMean        = "mean"
 PlotDistributionStd         = "std"
 
 FigureTypes                 = {
-     FigureTypeBar      : { keyLabel      : FigureTypeBar, 
-                   keyValue     : FigureTypeBar,
-                  keyIsAxisEnabled : True,
-                  keyIsFeature3Enabled : False,
-                  keyIsDistributionEnabled : False  }
+     FigureTypeBar      : { keyLabel        : FigureTypeBar, 
+                   keyValue                 : FigureTypeBar,
+                  keyIsAxisEnabled          : True,
+                  keyIsFeature3Enabled      : False,
+                  keyIsDistributionEnabled  : False  ,
+                  keyIsMultiFeatureEnabled  : False ,
+                  keyIsDccGraph             : True,       }
     ,   
-     FigureTypeScatter : { keyLabel           : FigureTypeScatter, 
-                  keyValue      : FigureTypeScatter,
-                  keyIsAxisEnabled : True,
-                  keyIsFeature3Enabled : False,
-                  keyIsDistributionEnabled : True   }
+     FigureTypeScatter : { keyLabel             : FigureTypeScatter, 
+                  keyValue                      : FigureTypeScatter,
+                  keyIsAxisEnabled              : True,
+                  keyIsFeature3Enabled          : False,
+                  keyIsDistributionEnabled      : True  ,
+                  keyIsMultiFeatureEnabled      : False  ,
+                  keyIsDccGraph                 : True,       }
 #    ,   
 #     FigureTypePie      : { keyLabel      : FigureTypePie, 
 #                   keyValue     : FigureTypePie,
 #                  keyIsAxisEnabled : False,
 #                  keyIsFeature3Enabled : False  }
     ,   
-     FigureTypeBubble     : { keyLabel       : FigureTypeBubble, 
-                   keyValue     : FigureTypeBubble,
-                  keyIsAxisEnabled : True,
-                  keyIsFeature3Enabled : True,
-                  keyIsDistributionEnabled : False  }
+     FigureTypeBubble     : { keyLabel      : FigureTypeBubble, 
+                   keyValue                 : FigureTypeBubble,
+                  keyIsAxisEnabled          : True,
+                  keyIsFeature3Enabled      : True,
+                  keyIsDistributionEnabled  : False ,
+                  keyIsMultiFeatureEnabled  : False   }
     ,   
-     FigureTypeLine     : { keyLabel       : FigureTypeLine, 
-                   keyValue     : FigureTypeLine,
-                  keyIsAxisEnabled : True,
-                  keyIsFeature3Enabled : False ,
-                  keyIsDistributionEnabled : False }
+     FigureTypeLine     : { keyLabel        : FigureTypeLine, 
+                   keyValue                 : FigureTypeLine,
+                  keyIsAxisEnabled          : True,
+                  keyIsFeature3Enabled      : False ,
+                  keyIsDistributionEnabled  : False ,
+                  keyIsMultiFeatureEnabled  : False,
+                  keyIsDccGraph             : True,      }
+    ,   
+     FigureTypeTable     : { keyLabel       : FigureTypeTable, 
+                   keyValue                 : FigureTypeTable,
+                  keyIsAxisEnabled          : False,
+                  keyIsFeature3Enabled      : False ,
+                  keyIsDistributionEnabled  : False ,
+                  keyIsMultiFeatureEnabled  : True,
+                  keyIsDccGraph             : False, 
+                  keyClassName              : " col-sm-12 " }
 }
      
      

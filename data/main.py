@@ -143,6 +143,7 @@ conceptFeaturesMap = {
     'hasVariablesNamed': 'hasVariablesNamed',
     'hasConstantsUseful': 'hasConstantsUseful', 
     'hasExpressionsKeyword' : 'hasExpressionsKeyword' ,
+    'hasExpressionsFunctionCall' : 'hasExpressionsFunctionCall',
     
     'hasExpressions': 'hasExpressions',
     'hasAsyncOrAwait': 'hasAsyncOrAwait',
@@ -235,9 +236,7 @@ def getConceptFeaturesFromCode(df, featureCode, featureError, featureOutput):
                 
         else:
             dFeature.append( len(newConceptFeatures) * [0] )    
-    
-#    dFeature = np.array(dFeature, dtype='object')
-#    dfFeature = pd.DataFrame(dFeature, columns=columnsFeatures)    
+
     dfFeature = pd.DataFrame.from_records(dFeature,  columns = columnsFeatures )
     
     return dfFeature    
@@ -933,6 +932,12 @@ class PythonParser:
     def hasExpressionsKeyword(self):    
         for node in [n for n in ast.walk(self.tree)]:
                 if isinstance(node, ( ast.keyword )):
+                    return True
+        return False
+
+    def hasExpressionsFunctionCall(self):    
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, ( ast.Call )):
                     return True
         return False
     

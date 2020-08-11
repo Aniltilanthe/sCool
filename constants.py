@@ -284,6 +284,7 @@ feature2UserNamesDict = {
 		,"hasExpressionsBitwise" : "Used Bitwise Operators"
 		,"hasExpressionsDict" : "Used Dictionary Or Map (Dict)"
 		,"hasExpressionsDataStructure" : "Used Data Structure (e.g. Dict, List, Set)"
+        ,"hasExpressionsFunctionCall" : "Used function call (e.g. call('friend') )"
 		,"hasControlFlowConditional" : "Used Conditional Flows (e.g. If, continue, Break)"
 		,"hasControlFlowTryException" : "Used Try exception"
 		,"hasVariablesNamed" : "Used Variables"
@@ -394,7 +395,9 @@ StudentResultExplanation = '        (*has student completed this task in any run
 colorError = 'rgb(255,127,80)'
 colorSuccess = 'rgb(0,128,0)'
 colorPractice = 'rgb(76, 114, 176)'
+colorPracticeError = 'rgb(204, 204, 255)'
 colorTheory = 'rgb(214,12,140)'
+colorTheoryError = 'rgb(255,127,80)'
 
 
 sortOrderDescending = 'Desc'

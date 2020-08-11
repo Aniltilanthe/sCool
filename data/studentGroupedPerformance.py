@@ -46,7 +46,7 @@ featuresToInt = ['coinCollectedCount', 'keyboardKeyPressedCount', 'robotCollisio
               , 'runsHasExpressionsArithematicCount'
               , 'runsHasExpressionsBoolCount', 'runsHasExpressionsLogicalCount'
               , 'runsHasExpressionsUnaryCount', 'runsHasExpressionsBitwiseCount'
-              , 'runsHasExpressionsDictCount', 'runsHasExpressionsDataStructureCount'
+              , 'runsHasExpressionsDictCount', 'runsHasExpressionsDataStructureCount', 'runsHasExpressionsFunctionCall'
               , 'runsHasControlFlowConditionalCount', 'runsHasExpressionsKeywordCount'
               , 'runsHasControlFlowTryExceptionCount', 'runsHasVariablesNamedCount'
               , 'runsHasConstantsUsefulCount', 'runsHasConstantsCount'
@@ -58,7 +58,7 @@ hasFeatures = [
        
        'hasExpressionsArithematic', 'hasExpressionsBool', 'hasExpressionsLogical', 'hasExpressionsUnary',
        
-       'hasExpressionsBitwise', 'hasExpressionsDict', 'hasExpressionsDataStructure', 'hasControlFlowConditional', 'hasExpressionsKeyword' ,
+       'hasExpressionsBitwise', 'hasExpressionsDict', 'hasExpressionsDataStructure', 'hasControlFlowConditional', 'hasExpressionsKeyword' , 'hasExpressionsFunctionCall',
        
        'hasControlFlowTryException', 'hasConstantsUseful', 
        
@@ -151,6 +151,7 @@ runsHasExpressionsBitwiseCount = dfRuns[dfRuns.hasExpressionsBitwise == 1].Pract
 runsHasExpressionsDictCount = dfRuns[dfRuns.hasExpressionsDict == 1].PracticeStatisticsId.value_counts()
 runsHasExpressionsDataStructureCount = dfRuns[dfRuns.hasExpressionsDataStructure == 1].PracticeStatisticsId.value_counts()
 runsHasExpressionsKeywordCount = dfRuns[dfRuns.hasExpressionsKeyword == 1].PracticeStatisticsId.value_counts()
+runsHasExpressionsFunctionCall = dfRuns[dfRuns.hasExpressionsFunctionCall == 1].PracticeStatisticsId.value_counts()
 runsHasControlFlowConditionalCount = dfRuns[dfRuns.hasControlFlowConditional == 1].PracticeStatisticsId.value_counts()
 runsHasControlFlowTryExceptionCount = dfRuns[dfRuns.hasControlFlowTryException == 1].PracticeStatisticsId.value_counts()
 runsHasVariablesNamedCount = dfRuns[dfRuns.hasVariablesNamed == 1].PracticeStatisticsId.value_counts()
@@ -322,6 +323,9 @@ dfPlayerStrategyPractice['runsHasExpressionsDataStructureCount'] = dfPlayerStrat
 
 countDict = runsHasExpressionsKeywordCount.to_dict() #converts to dictionary
 dfPlayerStrategyPractice['runsHasExpressionsKeywordCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
+countDict = runsHasExpressionsFunctionCall.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasExpressionsFunctionCall'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
 
 countDict = runsHasControlFlowConditionalCount.to_dict() #converts to dictionary
 dfPlayerStrategyPractice['runsHasControlFlowConditionalCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)

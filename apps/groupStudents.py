@@ -135,6 +135,7 @@ def getStudentData(StudentId, schoolKey, selectedDate = ''):
         
         studentData = studentData.sort_values(by='Start')
         
+        studentData['GroupBy']       = constants.TaskTypePractice + '-' + studentData['PracticeTaskId'].astype(str) 
         studentData['Task']       = constants.TaskTypePractice + '-' + studentData['PracticeTaskId'].astype(str) 
         studentData['IndexCol']   = studentData['Task'] + '-' + studentData['Result'].astype('Int64').astype(str) 
         
@@ -171,6 +172,7 @@ def getStudentData(StudentId, schoolKey, selectedDate = ''):
         schoolTheoryStudent[featureDescription] = getTheoryDescription(schoolTheoryStudent, False)  
         schoolTheoryStudent[featureDescription] = '<b>Title</b>:' + schoolTheoryStudent['Title'].astype(str)  + '<br>'+ schoolTheoryStudent[featureDescription].astype(str) 
     
+        schoolTheoryStudent['GroupBy'] = constants.TaskTypeTheory + '-' + schoolTheoryStudent['TheoryTaskId'].astype(str) 
         schoolTheoryStudent['Task'] = constants.TaskTypeTheory + '-' + schoolTheoryStudent['TheoryTaskId'].astype(str) 
         schoolTheoryStudent['IndexCol'] = schoolTheoryStudent['Task'] + '-' + schoolTheoryStudent['Result'].astype(str)
         
@@ -457,28 +459,29 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
         
     studentData.sort_values(by = 'Start', inplace=True, ascending = isAscending )
     
-#    studentData['color']                                            =   constants.colorError
-#    studentData.loc[studentData['Result']  == 1, 'color']           =   constants.colorSuccess
     studentData.loc[studentData[constants.featureTaskType]  == constants.TaskTypePractice, 'color']      =   constants.colorPractice
     studentData.loc[studentData[constants.featureTaskType]  == constants.TaskTypeTheory, 'color']        =   constants.colorTheory
-    studentData.loc[studentData['Result']  == 0, 'color']                                                =   constants.colorError
+    studentData.loc[(studentData[constants.featureTaskType]  == constants.TaskTypePractice ) & 
+                    (studentData['Result']  == 0), 'color']                                              =   constants.colorPracticeError
+    studentData.loc[(studentData[constants.featureTaskType]  == constants.TaskTypeTheory ) & 
+                    (studentData['Result']  == 0), 'color']                                              =   constants.colorTheoryError
 
     studentData['Task'] = studentData['IndexCol']
     studentData['Text'] = studentData['Difference'].astype(str) + 's for ' + studentData[constants.featureTaskType].astype(str) + ' Task : ' +  studentData['Title' ]  + ' Result : ' +  studentData['Result'].astype(str)
 
-    colors  = { 
+    colors  = {
             constants.TaskTypePractice  : constants.colorPractice,
             constants.TaskTypeTheory : constants.colorTheory,
             constants.TaskTypePractice + '-1' : constants.colorPractice,
             constants.TaskTypeTheory + '-1' : constants.colorTheory,
-            constants.TaskTypePractice + '-0' : constants.colorError,
-            constants.TaskTypeTheory + '-0' : constants.colorError,
+            constants.TaskTypePractice + '-0' : constants.colorPracticeError,
+            constants.TaskTypeTheory + '-0' : constants.colorTheoryError,
     }
     
     studentData['IndexSuccFail'] = studentData[constants.featureTaskType] + '-' + studentData['Result'].astype(str)
     
     
-    graphHeightRows =  ( studentData.shape[0] * 35 )    
+    graphHeightRows =  ( studentData.shape[0] * 35 )
     graphHeightRows = graphHeightRows if (graphHeightRows > 500) else 500  
     
     
@@ -520,13 +523,23 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
     
     
 #    gantt chart for timeline 
-#    if studentData is not None and studentData.empty == False :
-    fig = ff.create_gantt(studentData, title = 'Student Schedule' , colors = colors, index_col= 'IndexSuccFail' , 
-                          show_colorbar = True , 
-                          bar_width = 0.8 , 
-                          showgrid_x = True , showgrid_y = True,
-                          height =   graphHeightRows ,
-                         # width = 2000 
+#    if studentData is not None and studentData.empty == False :    
+    studentData['Task'] = studentData['GroupBy']
+    
+    graphHeightRows =  ( len(studentData['Task'].unique()) * 35 )
+    graphHeightRows = graphHeightRows if (graphHeightRows > (constants.graphHeight - 100) ) else (constants.graphHeight - 100)
+
+    fig = ff.create_gantt(studentData, 
+                          title             =   'Student Schedule' , 
+                          colors            =   colors ,
+                          index_col         =   'IndexSuccFail' , 
+                          group_tasks       =   True ,
+                          show_colorbar     =   True , 
+                          bar_width         =   0.8 , 
+                          showgrid_x        =   True , 
+                          showgrid_y        =   True ,
+                          show_hover_fill   =   True ,
+                          height            =   graphHeightRows ,
                           )
     
     graphs.append(

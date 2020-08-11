@@ -214,17 +214,19 @@ feature2UserNamesDict = {
 		,featureRobotCollisionsBoxCount : "Robot Collision Box (No. of times)"
 		,featureCollectedCoins :  "Coins Collected"
 		,"coinCollectedCount" : "Coins Collected"
-		,"keyboardKeyPressedCount" : "Keyboard Key Pressed (No. of times)"
+		
+        ,"keyboardKeyPressedCount" : "Keyboard Key Pressed (No. of times)"
 		,"deletedCodesCount" : "Deleted Codes (No. of times)"
-		,"tabsSwitchedCodeCount" : "Switched Tabs (No. of times)"
+        ,"tabsSwitchedOutputCount" : "Switched Tabs to Output (No. of times)"
+		,"tabsSwitchedCodeCount" : "Switched Tabs to Code (No. of times)"
 		,"tabsSwitchedDescriptionCount" : "Switched to read Description (No. of times)"
 		,"tabsSwitchedCount" : "Switched tabs (No. of times)"
 		,"draggedCount" : "Dragged (No. of times)"
-		,"NumberOfBoxes" : "No. of Boxes"
+		
+        ,"NumberOfBoxes" : "No. of Boxes"
 		,"NumberOfCoins" : "No. of Coins"
 		,"NumberOfHidden" : "No. of Hidden items"
-		,featureLineOfCodeCount : "Count of Lines of Code"
-		,"runsLineOfCodeCountAvg" : "Avg. Count of Lines of Code"   
+		,featureLineOfCodeCount : "Count of Lines of Code" 
         ,featureConceptsUsedDetailsStr : "Concepts used details"
         ,"StudentId" : "StudentId"
         , "Result" : "Result"
@@ -234,14 +236,15 @@ feature2UserNamesDict = {
 		,"runsErrorNameCount" : "Name Errors in runs (No. of times)"
 		,"runsErrorSyntaxCount" : "Syntax Errors in runs (No. of times)"
         
-		,"runsSuccessCount" : "Successful code (No. of times)"
-		,"runsErrorCount" : "Errors in Code (No. of times)"
-		,"runsCount" : "Code executed (No. of times)"
+		,"runsSuccessCount" : "Successful code (No. of times in all code runs)"
+		,"runsErrorCount" : "Errors in Code (No. of times in all code runs)"
+		,"runsCount" : "Code executed (No. of times in all code runs)"
         
-		,"runsHasVariableCount" : "Used Variables"
-		,"runsHasConditionCount" : "Used Conditions"
-		,"runsHasNestedLoopCount" : "Used Nested Loop"
-		,"runsHasLoopCount" : "Used Loop"
+		,"runsLineOfCodeCountAvg" : "Avg. Count of Lines of Code (No. of times in all code runs)"  
+		,"runsHasVariableCount" : "Used Variables (No. of times in all code runs)"
+		,"runsHasConditionCount" : "Used Conditions (No. of times in all code runs)"
+		,"runsHasNestedLoopCount" : "Used Nested Loop (No. of times in all code runs)"
+		,"runsHasLoopCount" : "Used Loop (No. of times in all code runs)"
 		,"runsHasExpressionsCount" : "Used Expressions (no. of time in all code runs)"
 		,"runsHasAsyncOrAwaitCount" : "Used Async (no. of time in all code runs)"
 		,"runsHasFunctionClassCount" : "Used Function or Class (no. of time in all code runs)"
@@ -295,12 +298,19 @@ feature2UserNamesDict = {
         
         
         
-		,"PracticeSessionDuration" : "Session D. Practice(s)"
-		,"TheorySessionDuration" : "Session D. Theory(s)"
-        ,featureSessionDuration : "Session Duration(s)"
-        ,COUNT_STUDENT_FEATURE : "No. of Students"
+		, "PracticeSessionDuration" : "Session D. Practice(s)"
+		, "TheorySessionDuration" : "Session D. Theory(s)"
+        , featureSessionDuration : "Session Duration(s)"
+        , COUNT_STUDENT_FEATURE : "No. of Students"
         
-        ,featurePlayerShootEndEnemyHitCount : "Player Shoot Enemy Hit Count"
+        
+        , featurePlayerShootEndEnemyHitCount : "Player Shoot Enemy Hit Count"
+        , "enemiesCount" : "Count of Enemies"
+        , "playerShootCount" : "Player Shoot Count"
+        , "playerShootEndCount" : "Player Shoot End Count"
+        , "playerShootEndEnemyMissedHitCount" : "Player Shoot Enemy Missed Count"
+        , "enemysShootEndPlayerHitCount" : "Enemies Shoot Player Hit Count"
+        , "enemysShootEndPlayerNotHitCount" : "Enemies Shoot Player Missed Count"
 	}
 
 
@@ -429,6 +439,8 @@ labelStd                    = 'std'
 labelTotal                  = 'total'
 labelSuccess                = "Success"
 labelFail                   = "Fail"
+
+labelStudentTimeline        = "Student Timeline"
 
 
 FigureTypeScatter           = 'Scatter'

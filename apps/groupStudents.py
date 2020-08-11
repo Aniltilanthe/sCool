@@ -135,13 +135,13 @@ def getStudentData(StudentId, schoolKey, selectedDate = ''):
         
         studentData = studentData.sort_values(by='Start')
         
-        studentData['GroupBy']       = constants.TaskTypePractice + '-' + studentData['PracticeTaskId'].astype(str) 
-        studentData['Task']       = constants.TaskTypePractice + '-' + studentData['PracticeTaskId'].astype(str) 
-        studentData['IndexCol']   = studentData['Task'] + '-' + studentData['Result'].astype('Int64').astype(str) 
+        studentData['GroupBy']              = constants.TaskTypePractice + '-' + studentData['PracticeTaskId'].astype(str) 
+        studentData['Task']                 = constants.TaskTypePractice + '-' + studentData['PracticeTaskId'].astype(str) 
+        studentData['IndexCol']             = studentData['Task'] + '-' + studentData['Result'].astype('Int64').astype(str) 
         
-        studentData['Finish'] = np.where(studentData['Finish'].isnull(), studentData['Start'].shift(-1), studentData['Finish'])
+        studentData['Finish']               = np.where(studentData['Finish'].isnull(), studentData['Start'].shift(-1), studentData['Finish'])
         
-        studentData['Difference'] = (studentData['Finish'] - studentData['Start']).astype('timedelta64[s]')
+        studentData['Difference']           = (studentData['Finish'] - studentData['Start']).astype('timedelta64[s]')
         
         studentData[constants.featureTaskType] = constants.TaskTypePractice
     except Exception as e: 
@@ -153,28 +153,29 @@ def getStudentData(StudentId, schoolKey, selectedDate = ''):
         schoolTheoryStudent = schoolTheory[schoolTheory['StudentId'] == StudentId]
         
         
-        schoolTheoryStudent['Finish']   =   schoolTheoryStudent['CreatedAt']
-        schoolTheoryStudent['Start']    =   schoolTheoryStudent['Finish'] - pd.to_timedelta(schoolTheoryStudent[featureSessionDuration], unit='s')
-        schoolTheoryStudent             =   schoolTheoryStudent.sort_values(by='Start')
+        schoolTheoryStudent['Finish']       =   schoolTheoryStudent['CreatedAt']
+        schoolTheoryStudent['Start']        =   schoolTheoryStudent['Finish'] - pd.to_timedelta(schoolTheoryStudent[featureSessionDuration], unit='s')
+        schoolTheoryStudent                 =   schoolTheoryStudent.sort_values(by='Start')
         
         
-        schoolTheoryStudent['Difference'] = (schoolTheoryStudent['Finish'] - schoolTheoryStudent['Start']).astype('timedelta64[s]')
+        schoolTheoryStudent['Difference']   = (schoolTheoryStudent['Finish'] - schoolTheoryStudent['Start']).astype('timedelta64[s]')
         
         schoolTheoryStudent.loc[schoolTheoryStudent['Difference'] > schoolTheoryStudent[featureSessionDuration], 'Difference'] =  schoolTheoryStudent[
                 schoolTheoryStudent['Difference'] > schoolTheoryStudent[featureSessionDuration] ][featureSessionDuration]        
         
-        schoolTheoryStudent = schoolTheoryStudent.merge(right= dfTheoryTaskDetails[ ['TheoryTaskId', 'Title', 'Description' ] ]
-                                          , left_on='TheoryTaskId', right_on='TheoryTaskId'
-                                            , left_index=False, right_index=False
-                                            , how='inner')
+        
+        schoolTheoryStudent                 = schoolTheoryStudent.merge(right= dfTheoryTaskDetails[ ['TheoryTaskId', 'Title', 'Description' ] ]
+                                                  , left_on='TheoryTaskId', right_on='TheoryTaskId'
+                                                  , left_index=False, right_index=False
+                                                  , how='inner')
         schoolTheoryStudent.rename(columns={'Description': 'TheoryTaskDescription'}, inplace=True)
         
         schoolTheoryStudent[featureDescription] = getTheoryDescription(schoolTheoryStudent, False)  
         schoolTheoryStudent[featureDescription] = '<b>Title</b>:' + schoolTheoryStudent['Title'].astype(str)  + '<br>'+ schoolTheoryStudent[featureDescription].astype(str) 
     
-        schoolTheoryStudent['GroupBy'] = constants.TaskTypeTheory + '-' + schoolTheoryStudent['TheoryTaskId'].astype(str) 
-        schoolTheoryStudent['Task'] = constants.TaskTypeTheory + '-' + schoolTheoryStudent['TheoryTaskId'].astype(str) 
-        schoolTheoryStudent['IndexCol'] = schoolTheoryStudent['Task'] + '-' + schoolTheoryStudent['Result'].astype(str)
+        schoolTheoryStudent['GroupBy']      = constants.TaskTypeTheory + '-' + schoolTheoryStudent['TheoryTaskId'].astype(str) 
+        schoolTheoryStudent['Task']         = constants.TaskTypeTheory + '-' + schoolTheoryStudent['TheoryTaskId'].astype(str) 
+        schoolTheoryStudent['IndexCol']     = schoolTheoryStudent['Task'] + '-' + schoolTheoryStudent['Result'].astype(str)
         
         schoolTheoryStudent[constants.featureTaskType] = [  constants.TaskTypeTheory ] * schoolTheoryStudent.shape[0]
         
@@ -190,8 +191,8 @@ def getStudentData(StudentId, schoolKey, selectedDate = ''):
     
     
     if     None is not selectedDate         and         not selectedDate == ''     and   util.is_valid_date(selectedDate) :
-        studentDataGroupedDate  = studentData.groupby(  [studentData['Start'].dt.date] )
-        studentData = studentDataGroupedDate.get_group(selectedDate)
+        studentDataGroupedDate      = studentData.groupby(  [studentData['Start'].dt.date] )
+        studentData                 = studentDataGroupedDate.get_group(selectedDate)
     
     
     studentData['StartStr']         = '@' + studentData['Start'].dt.strftime('%Y-%m-%d %H:%M:%S') + '-' + studentData['IndexCol'].astype(str)
@@ -394,8 +395,8 @@ def plotStudentOverviewFeatures( StudentId, groupId, features2Overview ):
     studentDataDf.fillna(0, inplace=True)
     
     try:
-        studentDataDfMean    = studentDataDf.mean().round(decimals=2)
-        studentDataDfStd    = studentDataDf.std().round(decimals=2)
+        studentDataDfMean           = studentDataDf.mean().round(decimals=2)
+        studentDataDfStd            = studentDataDf.std().round(decimals=2)
         
         studentDataDfMean.fillna(0, inplace=True)
         studentDataDfStd.fillna(0, inplace=True)
@@ -434,7 +435,6 @@ def plotStudentOverviewFeatures( StudentId, groupId, features2Overview ):
 def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDirection = sortOrderDescending ):
     
     graphs = []
-    graphIndex = 1
     
     
 #    the student is not in the group
@@ -481,8 +481,8 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
     studentData['IndexSuccFail'] = studentData[constants.featureTaskType] + '-' + studentData['Result'].astype(str)
     
     
-    graphHeightRows =  ( studentData.shape[0] * 35 )
-    graphHeightRows = graphHeightRows if (graphHeightRows > 500) else 500  
+    graphHeightRows =  ( studentData.shape[0] * 40 )
+    graphHeightRows = graphHeightRows if (graphHeightRows > (constants.graphHeightMin + 100) ) else (constants.graphHeightMin + 100)
     
     
     #type 2 
@@ -515,10 +515,8 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
                             ))
     graphs.append(
             dcc.Graph(
-                id='graphStudent-' + str(graphIndex),
                 figure= fig
         ))
-    graphIndex = graphIndex + 1
     
     
     
@@ -526,11 +524,11 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
 #    if studentData is not None and studentData.empty == False :    
     studentData['Task'] = studentData['GroupBy']
     
-    graphHeightRows =  ( len(studentData['Task'].unique()) * 35 )
-    graphHeightRows = graphHeightRows if (graphHeightRows > (constants.graphHeight - 100) ) else (constants.graphHeight - 100)
+    graphHeightRows =  ( len(studentData['Task'].unique()) * 40 )
+    graphHeightRows = graphHeightRows if (graphHeightRows > (constants.graphHeightMin + 100) ) else (constants.graphHeightMin + 100)
 
     fig = ff.create_gantt(studentData, 
-                          title             =   'Student Schedule' , 
+                          title             =   constants.labelStudentTimeline , 
                           colors            =   colors ,
                           index_col         =   'IndexSuccFail' , 
                           group_tasks       =   True ,
@@ -544,10 +542,8 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
     
     graphs.append(
             dcc.Graph(
-                id='graphStudent-' + str(graphIndex),
                 figure= fig
         ))
-    graphIndex = graphIndex + 1
 
 # **** IMPORTANT - ff.create_gantt is deprecated -> moved to px.timeline 
 #    studentData['StartStr'] = studentData['Start'].dt.strftime('%Y-%m-%d %H:%M:%S')
@@ -560,10 +556,8 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
 #    )
 #    graphs.append(
 #            dcc.Graph(
-#                id='graphStudent-' + str(graphIndex),
 #                figure= fig
 #        ))
-#    graphIndex = graphIndex + 1
     
     
     
@@ -588,6 +582,35 @@ featureOptionsOverview = [
      'runsErrorNameCount',
      'runsErrorTypeCount',
      'runsErrorAttribiteCount',
+     
+     'hasLoop',
+     'hasNestedLoop',
+     'hasCondition',
+     'hasVariable',
+     'hasExpressions',
+     'hasAsyncOrAwait',
+     'hasFunctionClass',
+     'hasControlFlow',
+     'hasImports',
+     'hasStatements',
+     'hasComprehensions',
+     'hasSubscripting',
+     'hasExpressionsArithematic',
+     'hasExpressionsBool',
+     'hasExpressionsLogical',
+     'hasExpressionsBitwise',
+     'hasExpressionsDict',
+     'hasExpressionsDataStructure',
+     'hasExpressionsFunctionCall',
+     'hasControlFlowConditional',
+     'hasControlFlowTryException',
+     'hasExpressionsDict',
+     'hasVariablesNamed',
+     'hasConstantsUseful',
+     'hasExpressionsKeyword',
+     'hasConstants',
+     'hasVariables',
+     
      'runsHasLoopCount',
      'runsHasNestedLoopCount',
      'runsHasConditionCount',
@@ -601,6 +624,8 @@ featureOptionsOverview = [
      'runsHasComprehensionsCount',
      'runsHasSubscriptingCount',
      'runsLineOfCodeCountAvg',
+     
+     
      'draggedCount',
      'tabsSwitchedCount',
      'tabsSwitchedDescriptionCount',

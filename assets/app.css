@@ -335,6 +335,15 @@ html {
 	opacity: initial;
 }
 
+.theme-app .c-pre,
+.theme-app pre {
+	margin: 0;
+}
+.theme-app .c-pre span,
+.theme-app pre  span{
+	white-space: pre-wrap;
+}
+
 
 /* GLOBAL LOADING */
 ._dash-loading-callback {

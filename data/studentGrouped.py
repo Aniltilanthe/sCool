@@ -63,12 +63,14 @@ dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrate
 #-----------------------functions from Main -------------------------------------------------
 
 getAllNodeTypesUsefull                  = main.getAllNodeTypesUsefull
-ProgramConceptsUsefull2UserNames        = main.ProgramConceptsUsefull2UserNames
             
 #----------------------------functions from Main  END ---------------------------------------
 
 
 #----------------------------------
+
+ProgramConceptsUsefull2UserNames        = constants.ProgramConceptsUsefull2UserNames
+
 
 featureDescription      = constants.featureDescription
 feature2UserNamesDict   = constants.feature2UserNamesDict
@@ -239,7 +241,7 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
         
         studentDF['ConceptsUsed']    = studentDF['Code'].apply(main.getAllNodeTypesUsefull)
         studentDF["ConceptsUsedDetails"] = studentDF['ConceptsUsed'].replace(
-                main.ProgramConceptsUsefull2UserNames, regex=True)
+                constants.ProgramConceptsUsefull2UserNames, regex=True)
         
         studentDF[featureDescription] = getPracticeDescription(studentDF)  
         

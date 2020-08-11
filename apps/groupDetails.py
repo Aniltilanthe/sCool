@@ -221,31 +221,6 @@ def plotSingleClass( titleTextAdd, school ):
                     ))
         
         
-#        figStudents =  dash_table.DataTable(
-#                id='datatable-taskwise-successfail',
-#                columns=[
-#                    {"name": i, "id": i, "selectable": True} for i in dfTaskWiseSuccessFail.columns
-#                ],
-#                data            =   dfTaskWiseSuccessFail.to_dict('records'),
-#                filter_action   =   "native",
-#                sort_action     =   "native",
-#                sort_mode       =   "multi",
-#                style_data_conditional = ([
-#                            {
-#                                'if': {'row_index': 'odd'},
-#                                'backgroundColor': constants.THEME_TABLE_ODDROW_COLOR_STYLE
-#                            },
-#                 ]) 
-#            )
-#            
-#        graphs.append(  
-#                html.Div([ figStudents ],
-#                         className = "c-table ")
-#        )
-#        graphIndex = graphIndex + 1
-        
-
-        
     #            CHECKED     
     #            count of students completing a task
     
@@ -406,12 +381,83 @@ featureX = 'Count (no. of students used)'
 featureY = 'Details'
 featurePracticeTaskGroup = 'Task-Id'            
 
+def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 ) :
+    
+    graphs = []
+    
+    
+    
+#     Step 1 : add the code of each student in table
+    try :
+        currentGroupData = dfGroupedOriginal.get_group(groupId)
+        currentGroupDataNoDup = currentGroupData.drop_duplicates(subset=['PracticeTaskId', 'StudentId'], keep='last')
+        
+        taskWiseConceptPracticeGrouped = currentGroupDataNoDup.groupby(['PracticeTaskId'])
+        
+        featureToPlotTask = ['Name', 'Code', 'SessionDuration']
+        
+        if not taskId is None and  taskId > 0 and taskId in taskWiseConceptPracticeGrouped.groups.keys():
+            taskData = taskWiseConceptPracticeGrouped.get_group(taskId)
+            
+            headThs = []
+            for feat in featureToPlotTask:
+                headThs.append(html.Th(feat))
+            
+            table_header = [
+                html.Thead(html.Tr( headThs  ))
+            ]
+            
+            rows = []
+            for index, row in taskData.iterrows():
+    
+                tds = []
+                for feature in featureToPlotTask:
+                    if feature == "Code":
+                        codeWithBreaks = str(  row[feature]  ).split('\n')
+                        codeLined = []
+                        for codeLine in codeWithBreaks:
+                            codeLined.append( html.Pre( html.Span(codeLine) ,
+                                                       className = "c-pre" 
+                                                ))
+                        
+                        tds.append( html.Td(  codeLined  ) )
+                    else :
+                        tds.append( html.Td(  str(  row[feature]  )  ) )
+    
+                rows.append(  html.Tr(  tds 
+                                      ) )
+
+            table_body = [html.Tbody(  rows   )]            
+            table = dbc.Table(table_header + table_body, bordered=True)
+            
+            graphs.append(html.Div(table ,
+                             className = "c-table c-table-oddeven font-size_small m-top_small"
+                        ))
+            
+            
+    except Exception as e: 
+                print('plotGroupTaskWiseConcepts 1 ')
+                print(e)
+            
+    
+#    Step 2 :- add the plot - concepts used by count of students
+    graphs = graphs + plotGroupTaskWiseConcepts( groupId, isGrouped = isGrouped, taskId = taskId )
+    
+    
+    return graphs
+    
+    
+    
 def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 ) :
     
     graphs = []
     
     try :
-        taskWiseConceptPracticeGrouped = dfGroupedPracticeTaskWise.get_group(groupId).groupby(['PracticeTaskId'])
+        currentGroupData = dfGroupedOriginal.get_group(groupId)
+        currentGroupDataNoDup = currentGroupData.drop_duplicates(subset=['PracticeTaskId', 'StudentId'], keep='last')
+
+        taskWiseConceptPracticeGrouped = currentGroupDataNoDup.groupby(['PracticeTaskId'])
+        
         
         studentWiseTaskWiseConceptPractice = pd.DataFrame()
         
@@ -420,7 +466,7 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 ) :
         if not taskId is None and  taskId > 0 and taskId in taskWiseConceptPracticeGrouped.groups.keys():
             
             groupTask = taskWiseConceptPracticeGrouped.get_group(taskId)
-            
+        
             studentWiseDataConceptsTask = groupTask.sum()
             
             colY = hasFeatures
@@ -435,7 +481,7 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 ) :
             
             studentWiseDataConceptsTask[featureY] = studentWiseDataConceptsTask[featureY].astype(str)
             studentWiseDataConceptsTask[featureY] = studentWiseDataConceptsTask[featureY].replace(
-                    feature2UserNamesDict, regex=True)
+                    {r'\b{}\b'.format(k):v for k, v in feature2UserNamesDict.items()} , regex=True  )
             
             taskTitle = str(taskId)
             try :
@@ -460,8 +506,10 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 ) :
                 )) 
             
             return graphs
-        
-        
+
+
+
+#  for Grouped data !!!
         for groupKeyTaskId, groupTask in taskWiseConceptPracticeGrouped:
             
             studentWiseDataConceptsTask = groupTask.sum()
@@ -478,7 +526,7 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 ) :
             
             studentWiseDataConceptsTask[featureY] = studentWiseDataConceptsTask[featureY].astype(str)
             studentWiseDataConceptsTask[featureY] = studentWiseDataConceptsTask[featureY].replace(
-                    feature2UserNamesDict, regex=True)
+                    {r'\b{}\b'.format(k):v for k, v in feature2UserNamesDict.items()} , regex=True  )
             
             if studentWiseTaskWiseConceptPractice is None or studentWiseTaskWiseConceptPractice.empty:
                 studentWiseTaskWiseConceptPractice = studentWiseDataConceptsTask
@@ -498,7 +546,7 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 ) :
                                 , x             =   featureY
                                 , y             =   featureX
                                 , height        =   constants.graphHeight - 100
-                                , hover_data  =  [ 'Title', 'PracticeTaskId',  ]
+                                , hover_data    =  [ 'Title', 'PracticeTaskId',  ]
                                 , template      =   constants.graphTemplete   
                                 , title         =   "(Practice) Concepts used by students in each task <br> (no. of students used a concept in code for a task)"
                                 , labels        =   feature2UserNamesDict # customize axis label
@@ -517,11 +565,16 @@ def getGroupPTaskDoneOptions(groupId) :
     options = []
     
     try :
-        taskWiseConceptPracticeGrouped = dfGroupedPracticeTaskWise.get_group(groupId).groupby(['PracticeTaskId'])
+        currentGroupData = dfGroupedOriginal.get_group(groupId)
+        currentGroupDataNoDup = currentGroupData.drop_duplicates(subset=['PracticeTaskId', 'StudentId'], keep='last')
+        
+        taskWiseConceptPracticeGrouped = currentGroupDataNoDup.groupby(['PracticeTaskId']) 
+        
+#        taskWiseConceptPracticeGrouped = dfGroupedOriginal.get_group(groupId).groupby(['PracticeTaskId'])
         
         for groupKeyTaskId, groupTask in taskWiseConceptPracticeGrouped:            
             options.append({
-                    'label' : '(TaskId ' + str(groupKeyTaskId) + ')' + dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == int(groupKeyTaskId) ]['Title'].astype(str).values[0],
+                    'label' : dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == int(groupKeyTaskId) ]['Title'].astype(str).values[0] + ' (TaskId ' + str(groupKeyTaskId) + ')',
                     'value' : groupKeyTaskId
                     
             })
@@ -558,7 +611,7 @@ def plotGroupConceptDetails(groupId):
         
         studentWiseDataConcepts[featureY] = studentWiseDataConcepts[featureY].astype(str)
         studentWiseDataConcepts[featureY] = studentWiseDataConcepts[featureY].replace(
-                feature2UserNamesDict, regex=True)
+                    {r'\b{}\b'.format(k):v for k, v in feature2UserNamesDict.items()} , regex=True  )
         
         
         figBar = px.bar(studentWiseDataConcepts
@@ -1141,7 +1194,8 @@ def onSelectTaskShowTaskWiseConcept(taskId, groupId):
     graphs = []
     
     if not taskId is None and int(taskId) >= 0 and groupId is not None and int(groupId) >= 0:
-        graphs = plotGroupTaskWiseConcepts( int(groupId), isGrouped = False, taskId = int(taskId) )  
+        graphs = getGroupTaskWiseDetails(int(groupId), isGrouped = False, taskId = int(taskId) )
+#        graphs = plotGroupTaskWiseConcepts( int(groupId), isGrouped = False, taskId = int(taskId) )  
         
     
     return  [html.Div(graphs)]

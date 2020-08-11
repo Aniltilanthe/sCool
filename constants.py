@@ -229,38 +229,70 @@ feature2UserNamesDict = {
         ,"StudentId" : "StudentId"
         , "Result" : "Result"
         
-		,"runsErrorAttribiteCount" : "Attribute Errors in Code (No. of times)"
-		,"runsErrorTypeCount" : "Type Errors in Code (No. of times)"
-		,"runsErrorNameCount" : "Name Errors in Code (No. of times)"
-		,"runsErrorSyntaxCount" : "Syntax Errors in Code (No. of times)"
+		,"runsErrorAttribiteCount" : "Attribute Errors in runs (No. of times)"
+		,"runsErrorTypeCount" : "Type Errors in runs (No. of times)"
+		,"runsErrorNameCount" : "Name Errors in runs (No. of times)"
+		,"runsErrorSyntaxCount" : "Syntax Errors in runs (No. of times)"
+        
 		,"runsSuccessCount" : "Successful code (No. of times)"
 		,"runsErrorCount" : "Errors in Code (No. of times)"
 		,"runsCount" : "Code executed (No. of times)"
-		,"runsHasVariableCount" : "Used Variables in Code"
-		,"runsHasConditionCount" : "Used Conditions in Code"
-		,"runsHasNestedLoopCount" : "Used Nested Loop in Code"
-		,"runsHasLoopCount" : "Used Loop in Code"
-		,"runsHasExpressionsCount" : "Used Expressions in Code (no. of time in all code runs)"
-		,"runsHasAsyncOrAwaitCount" : "Used Async in Code (no. of time in all code runs)"
-		,"runsHasFunctionClassCount" : "Used Function or Class in Code (no. of time in all code runs)"
-		,"runsHasControlFlowCount" : "Used Control Flows in Code (no. of time in all code runs)"
-		,"runsHasImportsCount" : "Used Imports in Code (no. of time in all code runs)"
-		,"runsHasStatementsCount" : "Used Statements in Code (no. of time in all code runs)"
-		,"runsHasComprehensionsCount" : "Used Comprehensions in Code (no. of time in all code runs)"
-		,"runsHasSubscriptingCount" : "Used Subscription in Code (no. of time in all code runs)"
+        
+		,"runsHasVariableCount" : "Used Variables"
+		,"runsHasConditionCount" : "Used Conditions"
+		,"runsHasNestedLoopCount" : "Used Nested Loop"
+		,"runsHasLoopCount" : "Used Loop"
+		,"runsHasExpressionsCount" : "Used Expressions (no. of time in all code runs)"
+		,"runsHasAsyncOrAwaitCount" : "Used Async (no. of time in all code runs)"
+		,"runsHasFunctionClassCount" : "Used Function or Class (no. of time in all code runs)"
+		,"runsHasControlFlowCount" : "Used Control Flows (no. of time in all code runs)"
+		,"runsHasImportsCount" : "Used Imports (no. of time in all code runs)"
+		,"runsHasStatementsCount" : "Used Statements  (e.g. Assignment, Assert, Delete) (no. of time in all code runs)"
+		,"runsHasComprehensionsCount" : "Used Comprehensions (ListComp, SetComp, GeneratorExp, DictComp, comprehension)(no. of time in all code runs)"
+		,"runsHasSubscriptingCount" : "Used Subscription (no. of time in all code runs)"
+		,"runsHasExpressionsArithematicCount" : "Used Arithematic Operators (no. of time in all code runs)"
+		,"runsHasExpressionsBoolCount" : "Used Boolean (no. of time in all code runs)"
+		,"runsHasExpressionsLogicalCount" : "Used Logical Operators (no. of time in all code runs)"
+		,"runsHasExpressionsUnaryCount" : "Used Unary Operators(no. of time in all code runs)"
+		,"runsHasExpressionsBitwiseCount" : "Used Bitwise Operators(no. of time in all code runs)"
+		,"runsHasExpressionsDictCount" : "Used Dictionary Or Map (no. of time in all code runs)"
+		,"runsHasExpressionsDataStructureCount" : "Used Data Structure (no. of time in all code runs)"
+		,"runsHasControlFlowConditionalCount" : "Used Conditional Flows (no. of time in all code runs)"
+		,"runsHasExpressionsKeywordCount" : "Used Keywords (no. of time in all code runs)"
+		,"runsHasControlFlowTryExceptionCount" : "Used Try exception (no. of time in all code runs)"        
+		,"runsHasVariablesNamedCount" : "Used Variables (no. of time in all code runs)"
+		,"runsHasConstantsUsefulCount" : "Used Constants (e.g. 3 or 'a') (no. of time in all code runs)"
+		,"runsHasConstantsCount" : "Used Constants (no. of time in all code runs)"
+		,"runsHasVariablesCount" : "Used Variables (Load, Store, Del, Name, Starred) (no. of time in all code runs)"
 
-		,"hasLoop" : "Used Loop in Code"
-		,"hasNestedLoop" : "Used Nested Loop in Code"
-		,"hasCondition" : "Used Condition in Code"
-		,"hasVariable" : "Used Variable in Code"
-		,"hasExpressions" : "Used Expressions in Code"
-		,"hasAsyncOrAwait" : "Used Async in Code"
-		,"hasFunctionClass" : "Used Function or Class in Code"
-		,"hasControlFlow" : "Used Control Flows in Code"
-		,"hasImports" : "Used Imports in Code"
-		,"hasStatements" : "Used Statements in Code"
-		,"hasComprehensions" : "Used Comprehensions in Code"
-		,"hasSubscripting" : "Used Subscription in Code"
+		,"hasLoop" : "Used Loop"
+		,"hasNestedLoop" : "Used Nested Loop"
+		,"hasCondition" : "Used Condition"
+		,"hasVariable" : "Used Variable"
+		,"hasExpressions" : "Used Expressions"
+		,"hasAsyncOrAwait" : "Used Async"
+		,"hasFunctionClass" : "Used Function or Class"
+		,"hasControlFlow" : "Used Control Flows"
+		,"hasImports" : "Used Imports"
+		,"hasStatements" : "Used Statements (e.g. Assignment, Assert, Delete)"
+		,"hasComprehensions" : "Used Comprehensions (ListComp, SetComp, GeneratorExp, DictComp, comprehension)"
+		,"hasSubscripting" : "Used Subscription (Subscript, Slice)"
+		,"hasExpressionsArithematic" : "Used Arithematic Operators (e.g. Add, Div, Mult)"
+		,"hasExpressionsBool" : "Used Boolean (And, Or)"
+		,"hasExpressionsLogical" : "Used Logical Operators (e.g. Eq, Lt, Gt)"
+		,"hasExpressionsUnary" : "Used Unary Operators"
+		,"hasExpressionsBitwise" : "Used Bitwise Operators"
+		,"hasExpressionsDict" : "Used Dictionary Or Map (Dict)"
+		,"hasExpressionsDataStructure" : "Used Data Structure (e.g. Dict, List, Set)"
+		,"hasControlFlowConditional" : "Used Conditional Flows (e.g. If, continue, Break)"
+		,"hasControlFlowTryException" : "Used Try exception"
+		,"hasVariablesNamed" : "Used Variables"
+		,"hasConstantsUseful" : "Used Constants (e.g. 3 or 'a' or None)"
+		,"hasExpressionsKeyword" : "Used Keyword (e.g. and, while, None)"
+		,"hasConstants" : "Used Constants (e.g. 3 or 'a' or JoinedStr or List)"
+		,"hasVariables" : "Used Variables (Load, Store, Del, Name, Starred)"
+        
+        
         
 		,"PracticeSessionDuration" : "Session D. Practice(s)"
 		,"TheorySessionDuration" : "Session D. Theory(s)"
@@ -278,6 +310,69 @@ feature2UserNamesDict[featureTaskType] = "Task Type"
 feature2UserNamesDict[featureItemsCollectedCount] = "No. Items Collected"
 feature2UserNamesDict[featureRobotCollisionsBoxCount] = "Robot box collision Count"
 feature2UserNamesDict[featureConceptsUsedDetailsStr] = "Concepts used details"
+
+
+
+
+
+
+
+
+
+
+
+#https://docs.python.org/dev/library/ast.html
+ProgramConceptsUsefull2UserNames =  {
+		"Name" : "Variable",
+		"Starred" : "Variable",
+        
+        "BinOp" : "Binary operation (Syntax: left operator right ; e.g. a + b ) ",
+		
+        "Expr" : "Expression (e.g. function call or Add or BitOr etc.)",
+		"Add" : "Addition ",
+		"Sub" : "Subtraction ",
+		"Mult" : "Multiplication",
+		"Div" : "Division",
+		"BoolOp" : "Boolean operation",
+		"And" : "Boolean And",
+		"Or" : "Boolean Or",
+		"Eq" : "Equal",
+		"NotEq" : "Not Equal",
+		"Lt" : "Less Than",
+		"Is" : "Is",
+		"In" : "In",
+        
+		"Num" : "Number",
+		"Str" : "String",
+		
+        "Assign" : "Assignment (e.g. a = 2)",
+		"For" : "For loop",
+		"While" : "While loop",
+		"If" : "If",
+		"Break" : "Break",
+		"Continue" : "Continue",
+        
+		"Try" : "Try",
+        "ExceptHandler" : "Exception handler",
+		
+        "Call" : "Function call",
+        "FunctionDef" : "Function definition",
+		"arguments" : "Arguments for a function",
+		"arg" : "Argument for a Function",
+		"Return" : "Return",
+		
+        "ClassDef" : "Class definition",
+        
+        "Dict" : "Dictionary (key value)",
+		
+        "Import" : "Import",
+		
+        "ListComp" : "List comprehension (Comprehensions)",
+		"SetComp" : "Set comprehension (Comprehensions)",
+		"DictComp" : "Dict comprehension (Comprehensions)",
+	}
+
+
 
 
 #------------------- feature related END -----------------------------------------------

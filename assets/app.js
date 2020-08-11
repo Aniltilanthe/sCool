@@ -26,6 +26,9 @@ window.dash_clientside.ui = {
 		bodyStyles.setProperty('--theme-background-color', newThemeBackgroundColor);
 		bodyStyles.setProperty('--theme-color', newThemeColor);
 	},
-
-	
 }
+
+
+$(document).ready(function(){
+  $('textarea').autoResize();
+});

@@ -37,3 +37,6 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.config.suppress_callback_exceptions = True
 
 
+
+#app.scripts.append_script({"external_url": ['https://code.jquery.com/jquery-3.2.1.min.js']})
+#app.layout += gdc.Import(src="https://code.jquery.com/jquery-3.3.1.min.js")

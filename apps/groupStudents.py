@@ -257,7 +257,7 @@ def plotStudentOverview(StudentId, groupId):
     
     groupOriginal['ConceptsUsed']           = groupOriginal['Code'].apply( studentGrouped.getAllNodeTypesUsefull )
     groupOriginal["ConceptsUsedDetails"]    = groupOriginal['ConceptsUsed'].replace(
-                                                    studentGrouped.ProgramConceptsUsefull2UserNames, regex=True )
+                                                    constants.ProgramConceptsUsefull2UserNames, regex=True )
     
     
     studentWiseData                         = groupOriginal.groupby(['StudentId'], as_index=False).sum()
@@ -331,11 +331,19 @@ def plotStudentOverview(StudentId, groupId):
     if groupOriginal[groupOriginal['StudentId'] == StudentId] is not None  and groupOriginal[groupOriginal['StudentId'] == StudentId]['ConceptsUsedDetails'].shape[0] > 0 :
         ConceptsUsedUnique                      = util.get_unique_list_feature_items(groupOriginal[groupOriginal['StudentId'] == StudentId], 'ConceptsUsedDetails')
         
-        if     ConceptsUsedUnique is not None          and         not ConceptsUsedUnique == '':        
+        if     ConceptsUsedUnique is not None  :        
+            
+            ConceptsUsedUniqueUserReadable = set()
+            for conceptUsed in ConceptsUsedUnique:
+                ConceptsUsedUniqueUserReadable.add(  constants.ProgramConceptsUsefull2UserNames.get(conceptUsed) if 
+                                                      conceptUsed in constants.ProgramConceptsUsefull2UserNames 
+                                                      else 
+                                                      conceptUsed  )
+            
             plotRow.append( html.Div([
                                         util.generateCardBase(
                                                  [html.I(className="fas fa-code m-right-small"),   'Concepts Used', ], 
-                                                ', '.join(ConceptsUsedUnique) ,
+                                                ', '.join(ConceptsUsedUniqueUserReadable) ,
                                                 classes = "c-card-small" )
                                     ],
                                     className="col-sm-6",

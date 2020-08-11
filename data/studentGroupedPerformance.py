@@ -12,31 +12,13 @@ import pandas as pd
 import xlwt as xls_write
 #import time
 
-import plotly as plotly
 from plotly.offline import plot 
 import plotly.express as px
-
-import dash
-import dash_html_components as html
 
 #main library
 from data import main
 import constants
 #from main import PythonParser
-
-
-#used for missing data fixes
-#from sklearn.preprocessing import Imputer
-#from sklearn.preprocessing import normalize
-#from sklearn.preprocessing import StandardScaler
-
-# visual libraries
-from matplotlib import pyplot as plt
-#import seaborn as sns
-#from mpl_toolkits.mplot3d import Axes3D 
-plt.style.use('ggplot')
-from plotly.subplots import make_subplots
-import plotly.graph_objects as go
 
 
 # Fixing random state for reproducibility
@@ -60,13 +42,34 @@ featuresToInt = ['coinCollectedCount', 'keyboardKeyPressedCount', 'robotCollisio
               , 'runsHasControlFlowCount', 'runsHasImportsCount'
               , 'runsHasStatementsCount', 'runsHasComprehensionsCount'
               , 'runsHasSubscriptingCount'
+              
+              , 'runsHasExpressionsArithematicCount'
+              , 'runsHasExpressionsBoolCount', 'runsHasExpressionsLogicalCount'
+              , 'runsHasExpressionsUnaryCount', 'runsHasExpressionsBitwiseCount'
+              , 'runsHasExpressionsDictCount', 'runsHasExpressionsDataStructureCount'
+              , 'runsHasControlFlowConditionalCount', 'runsHasExpressionsKeywordCount'
+              , 'runsHasControlFlowTryExceptionCount', 'runsHasVariablesNamedCount'
+              , 'runsHasConstantsUsefulCount', 'runsHasConstantsCount'
+              , 'runsHasVariablesCount'
               ]
-
                     
-hasFeatures = ['hasLoop',
-       'hasNestedLoop', 'hasCondition', 'hasVariable', 'hasExpressions',
-       'hasAsyncOrAwait', 'hasFunctionClass', 'hasControlFlow', 'hasImports',
-       'hasStatements', 'hasComprehensions', 'hasSubscripting']
+hasFeatures = [
+        'hasLoop', 'hasNestedLoop', 'hasCondition', 'hasVariable', 
+       
+       'hasExpressionsArithematic', 'hasExpressionsBool', 'hasExpressionsLogical', 'hasExpressionsUnary',
+       
+       'hasExpressionsBitwise', 'hasExpressionsDict', 'hasExpressionsDataStructure', 'hasControlFlowConditional', 'hasExpressionsKeyword' ,
+       
+       'hasControlFlowTryException', 'hasConstantsUseful', 
+       
+       'hasAsyncOrAwait', 
+       'hasFunctionClass', 
+#       'hasControlFlow', 
+#       'hasImports',
+       'hasStatements', 
+#       'hasComprehensions', 
+#       'hasSubscripting'     
+       ]
 
 featuresToInt = featuresToInt + hasFeatures
 
@@ -129,9 +132,6 @@ dfRuns[hasFeatures] =  dfRuns[hasFeatures].astype(np.int64)
 
 
 
-
-
-
 #No of Times ran code with Loop
 runsHasLoopCount = dfRuns[dfRuns.hasLoop == 1].PracticeStatisticsId.value_counts()
 #No of Times ran code with nested loop
@@ -141,6 +141,20 @@ runsHasConditionCount = dfRuns[dfRuns.hasCondition == 1].PracticeStatisticsId.va
 #No of Times ran code with variable
 runsHasVariableCount = dfRuns[dfRuns.hasVariable == 1].PracticeStatisticsId.value_counts()
 
+
+    
+runsHasExpressionsArithematicCount = dfRuns[dfRuns.hasExpressionsArithematic == 1].PracticeStatisticsId.value_counts()
+runsHasExpressionsBoolCount = dfRuns[dfRuns.hasExpressionsBool == 1].PracticeStatisticsId.value_counts()
+runsHasExpressionsLogicalCount = dfRuns[dfRuns.hasExpressionsLogical == 1].PracticeStatisticsId.value_counts()
+runsHasExpressionsUnaryCount = dfRuns[dfRuns.hasExpressionsUnary == 1].PracticeStatisticsId.value_counts()
+runsHasExpressionsBitwiseCount = dfRuns[dfRuns.hasExpressionsBitwise == 1].PracticeStatisticsId.value_counts()
+runsHasExpressionsDictCount = dfRuns[dfRuns.hasExpressionsDict == 1].PracticeStatisticsId.value_counts()
+runsHasExpressionsDataStructureCount = dfRuns[dfRuns.hasExpressionsDataStructure == 1].PracticeStatisticsId.value_counts()
+runsHasExpressionsKeywordCount = dfRuns[dfRuns.hasExpressionsKeyword == 1].PracticeStatisticsId.value_counts()
+runsHasControlFlowConditionalCount = dfRuns[dfRuns.hasControlFlowConditional == 1].PracticeStatisticsId.value_counts()
+runsHasControlFlowTryExceptionCount = dfRuns[dfRuns.hasControlFlowTryException == 1].PracticeStatisticsId.value_counts()
+runsHasVariablesNamedCount = dfRuns[dfRuns.hasVariablesNamed == 1].PracticeStatisticsId.value_counts()
+runsHasConstantsUsefulCount = dfRuns[dfRuns.hasConstantsUseful == 1].PracticeStatisticsId.value_counts()
 
 #generic programming concepts python ast parser
 #https://docs.python.org/dev/library/ast.html
@@ -152,9 +166,8 @@ runsHasImportsCount = dfRuns[dfRuns.hasImports == 1].PracticeStatisticsId.value_
 runsHasStatementsCount = dfRuns[dfRuns.hasStatements == 1].PracticeStatisticsId.value_counts()
 runsHasComprehensionsCount = dfRuns[dfRuns.hasComprehensions == 1].PracticeStatisticsId.value_counts()
 runsHasSubscriptingCount = dfRuns[dfRuns.hasSubscripting == 1].PracticeStatisticsId.value_counts()
-
-
-
+runsHasConstantsCount = dfRuns[dfRuns.hasConstants == 1].PracticeStatisticsId.value_counts()
+runsHasVariablesCount = dfRuns[dfRuns.hasVariables == 1].PracticeStatisticsId.value_counts()
 
 
 #line of code count for each code run - AVERAGE line of code per run
@@ -247,41 +260,81 @@ dfPlayerStrategyPractice = dfPractice
 
 #---Code -----------
 countDict = runsCount.to_dict() #converts to dictionary
-dfPlayerStrategyPractice['runsCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
+dfPlayerStrategyPractice['runsCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
 
 countDict = runsErrorCount.to_dict() #converts to dictionary
-dfPlayerStrategyPractice['runsErrorCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
+dfPlayerStrategyPractice['runsErrorCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
 
 countDict = runsSuccessCount.to_dict() #converts to dictionary
-dfPlayerStrategyPractice['runsSuccessCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
+dfPlayerStrategyPractice['runsSuccessCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
 
 countDict = runsErrorSyntaxCount.to_dict() #converts to dictionary
-dfPlayerStrategyPractice['runsErrorSyntaxCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
+dfPlayerStrategyPractice['runsErrorSyntaxCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
 
 countDict = runsErrorNameCount.to_dict() #converts to dictionary
-dfPlayerStrategyPractice['runsErrorNameCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
+dfPlayerStrategyPractice['runsErrorNameCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
 
 countDict = runsErrorTypeCount.to_dict() #converts to dictionary
-dfPlayerStrategyPractice['runsErrorTypeCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
+dfPlayerStrategyPractice['runsErrorTypeCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
 
 countDict = runsErrorAttribiteCount.to_dict() #converts to dictionary
-dfPlayerStrategyPractice['runsErrorAttribiteCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
+dfPlayerStrategyPractice['runsErrorAttribiteCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
 
 #countDict = runsConceptPointsCount.to_dict() #converts to dictionary
 #dfPlayerStrategyPractice['runsConceptPointsCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
 
 
 countDict = runsHasLoopCount.to_dict() #converts to dictionary
-dfPlayerStrategyPractice['runsHasLoopCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
+dfPlayerStrategyPractice['runsHasLoopCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
 
 countDict = runsHasNestedLoopCount.to_dict() #converts to dictionary
-dfPlayerStrategyPractice['runsHasNestedLoopCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
+dfPlayerStrategyPractice['runsHasNestedLoopCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
 
 countDict = runsHasConditionCount.to_dict() #converts to dictionary
-dfPlayerStrategyPractice['runsHasConditionCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
+dfPlayerStrategyPractice['runsHasConditionCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
 
 countDict = runsHasVariableCount.to_dict() #converts to dictionary
-dfPlayerStrategyPractice['runsHasVariableCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
+dfPlayerStrategyPractice['runsHasVariableCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
+
+
+
+countDict = runsHasExpressionsArithematicCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasExpressionsArithematicCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
+countDict = runsHasExpressionsBoolCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasExpressionsBoolCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
+countDict = runsHasExpressionsLogicalCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasExpressionsLogicalCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
+countDict = runsHasExpressionsUnaryCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasExpressionsUnaryCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
+countDict = runsHasExpressionsBitwiseCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasExpressionsBitwiseCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
+countDict = runsHasExpressionsDictCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasExpressionsDictCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
+countDict = runsHasExpressionsDataStructureCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasExpressionsDataStructureCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
+countDict = runsHasExpressionsKeywordCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasExpressionsKeywordCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
+countDict = runsHasControlFlowConditionalCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasControlFlowConditionalCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
+countDict = runsHasControlFlowTryExceptionCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasControlFlowTryExceptionCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
+countDict = runsHasVariablesNamedCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasVariablesNamedCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
+countDict = runsHasConstantsUsefulCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasConstantsUsefulCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict)
+
 
 
 countDict = runsHasExpressionsCount.to_dict() #converts to dictionary
@@ -307,6 +360,12 @@ dfPlayerStrategyPractice['runsHasComprehensionsCount'] = dfPlayerStrategyPractic
 
 countDict = runsHasSubscriptingCount.to_dict() #converts to dictionary
 dfPlayerStrategyPractice['runsHasSubscriptingCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
+
+countDict = runsHasConstantsCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasConstantsCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
+
+countDict = runsHasVariablesCount.to_dict() #converts to dictionary
+dfPlayerStrategyPractice['runsHasVariablesCount'] = dfPlayerStrategyPractice['PracticeStatisticsId'].map(countDict) 
 
 
 
@@ -419,7 +478,7 @@ dfPlayerStrategyPractice['ConceptsUsed']    = dfPlayerStrategyPractice['Code'].a
 #dfPlayerStrategyPractice["ConceptsUsed"] = dfPlayerStrategyPractice["ConceptsUsed"].astype(str)
 dfPlayerStrategyPractice["ConceptsUsed"] = dfPlayerStrategyPractice["ConceptsUsed"]
 dfPlayerStrategyPractice["ConceptsUsedDetails"] = dfPlayerStrategyPractice['ConceptsUsed'].replace(
-        main.ProgramConceptsUsefull2UserNames, regex=True)
+        constants.ProgramConceptsUsefull2UserNames, regex=True)
 
 
 
@@ -450,7 +509,7 @@ dfPlayerStrategyPracticeTask['ConceptsUsed']    = dfPlayerStrategyPracticeTask['
 #dfPlayerStrategyPracticeTask["ConceptsUsed"] = dfPlayerStrategyPracticeTask["ConceptsUsed"].astype(str)
 dfPlayerStrategyPracticeTask["ConceptsUsed"] = dfPlayerStrategyPracticeTask["ConceptsUsed"]
 dfPlayerStrategyPracticeTask["ConceptsUsedDetails"] = dfPlayerStrategyPracticeTask['ConceptsUsed'].replace(
-        main.ProgramConceptsUsefull2UserNames, regex=True)
+        constants.ProgramConceptsUsefull2UserNames, regex=True)
 
 for feature in hasFeatures:    
     dfPlayerStrategyPracticeTask[feature] = (dfPlayerStrategyPracticeTask[feature] >= 1 ).astype(int)

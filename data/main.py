@@ -117,6 +117,44 @@ def get_group(g, key):
      return pd.DataFrame()
 
 
+
+
+
+
+#****************************************************************
+# Concept extraction !!!!!!!!!
+#****************************************************************
+conceptFeaturesMap = {
+    'hasLoop' : 'hasLoop',
+    'hasNestedLoop': 'hasNestedLoop',
+    'hasCondition': 'hasCondition',
+    'hasVariable': 'hasVariable',
+    'lineOfCodeCount': 'countLinesOfCode',
+                
+    'hasExpressionsArithematic': 'hasExpressionsArithematic', 
+    'hasExpressionsBool': 'hasExpressionsBool', 
+    'hasExpressionsLogical': 'hasExpressionsLogical', 
+    'hasExpressionsUnary': 'hasExpressionsUnary', 
+    'hasExpressionsBitwise': 'hasExpressionsBitwise', 
+    'hasExpressionsDict': 'hasExpressionsDict', 
+    'hasExpressionsDataStructure': 'hasExpressionsDataStructure', 
+    'hasControlFlowConditional': 'hasControlFlowConditional', 
+    'hasControlFlowTryException': 'hasControlFlowTryException', 
+    'hasVariablesNamed': 'hasVariablesNamed',
+    'hasConstantsUseful': 'hasConstantsUseful', 
+    'hasExpressionsKeyword' : 'hasExpressionsKeyword' ,
+    
+    'hasExpressions': 'hasExpressions',
+    'hasAsyncOrAwait': 'hasAsyncOrAwait',
+    'hasFunctionClass': 'hasFunctionClass',
+    'hasControlFlow': 'hasControlFlow',
+    'hasImports': 'hasImports',
+    'hasStatements': 'hasStatements',
+    'hasComprehensions': 'hasComprehensions',
+    'hasSubscripting': 'hasSubscripting',
+    'hasConstants': 'hasConstants',
+    'hasVariables' : 'hasVariables'
+}
 def getConceptFeaturesFromCodeLines(df, featureCode):
     
     columnsFeatures = []
@@ -132,56 +170,22 @@ def getConceptFeaturesFromCodeLines(df, featureCode):
         
             newFeaturesArrForThisRow.append(j['PracticeStatisticsId'])
             columnsFeatures.append('PracticeStatisticsId')
-            
-            newFeaturesArrForThisRow.append(codeString.countLinesOfCode())
-            columnsFeatures.append('lineOfCodeCount')
-            
-            newFeaturesArrForThisRow.append(codeString.hasLoop())
-            columnsFeatures.append('hasLoop')
-            
-            newFeaturesArrForThisRow.append(codeString.hasNestedLoop())
-            columnsFeatures.append('hasNestedLoop')
-    
-            newFeaturesArrForThisRow.append(codeString.hasCondition())
-            columnsFeatures.append('hasCondition')
-    
-            newFeaturesArrForThisRow.append(codeString.hasVariable())
-            columnsFeatures.append('hasVariable')
-            
-            newFeaturesArrForThisRow.append(codeString.countLinesOfCode())
-            columnsFeatures.append('lineOfCodeCount')
-            
-#                generic concepts of python ast programming   -   https://docs.python.org/dev/library/ast.html
-            newFeaturesArrForThisRow.append(codeString.hasExpressions())
-            columnsFeatures.append('hasExpressions')
-            
-            
-            
-            newFeaturesArrForThisRow.append(codeString.hasAsyncOrAwait())
-            columnsFeatures.append('hasAsyncOrAwait')
-            
-            newFeaturesArrForThisRow.append(codeString.hasFunctionClass())
-            columnsFeatures.append('hasFunctionClass')
-            
-            newFeaturesArrForThisRow.append(codeString.hasControlFlow())
-            columnsFeatures.append('hasControlFlow')
-            
-            newFeaturesArrForThisRow.append(codeString.hasImports())
-            columnsFeatures.append('hasImports')
-            
-            newFeaturesArrForThisRow.append(codeString.hasStatements())
-            columnsFeatures.append('hasStatements')
-            
-            newFeaturesArrForThisRow.append(codeString.hasComprehensions())
-            columnsFeatures.append('hasComprehensions')
-            
-            newFeaturesArrForThisRow.append(codeString.hasSubscripting())
-            columnsFeatures.append('hasSubscripting')
-            
+
+            for featureName in conceptFeaturesMap:
+                columnsFeatures.append(featureName)
+
+                functionName = conceptFeaturesMap.get(featureName)
+
+                if hasattr(codeString, functionName):
+                    codeStringParsedFunction = getattr(codeString, functionName, None)
+                    newFeaturesArrForThisRow.append(  codeStringParsedFunction()  )
+                else:
+                    newFeaturesArrForThisRow.append( 0 )
+
             dFeature.append(newFeaturesArrForThisRow)
             
         except SyntaxError:
-            dFeature.append([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ])
+            dFeature.append( (len(conceptFeaturesMap) + 1) * [0]    ) 
                 
                 
     dFeature = np.array(dFeature)
@@ -195,6 +199,12 @@ def getConceptFeaturesFromCode(df, featureCode, featureError, featureOutput):
     
     columnsFeatures = []
     dFeature  = []
+    newConceptFeatures = list(conceptFeaturesMap.keys())
+    
+#    add all column names to the list for new features
+    columnsFeatures.extend(df.columns)
+    columnsFeatures = columnsFeatures + newConceptFeatures
+
 
 
     for i, j in df.iterrows():
@@ -207,63 +217,24 @@ def getConceptFeaturesFromCode(df, featureCode, featureError, featureOutput):
             
             try:
                 codeString = PythonParser( j[featureCode] )
+
                 
-                newFeaturesArrForThisRow.append( int( codeString.hasLoop() ) )
-                
-                newFeaturesArrForThisRow.append( int( codeString.hasNestedLoop() ) )
-        
-                newFeaturesArrForThisRow.append( int( codeString.hasCondition() ) )
-        
-                newFeaturesArrForThisRow.append( int( codeString.hasVariable() ) )
-                
-                newFeaturesArrForThisRow.append( int( codeString.countLinesOfCode() ) )
-                
-#                generic concepts of python ast programming   -   https://docs.python.org/dev/library/ast.html
-                newFeaturesArrForThisRow.append( int( codeString.hasExpressions() ) )
-                
-                newFeaturesArrForThisRow.append( int( codeString.hasAsyncOrAwait() ) )
-                
-                newFeaturesArrForThisRow.append( int( codeString.hasFunctionClass() ) )
-                
-                newFeaturesArrForThisRow.append( int( codeString.hasControlFlow() ) )
-                
-                newFeaturesArrForThisRow.append( int( codeString.hasImports() ) )
-                
-                newFeaturesArrForThisRow.append( int( codeString.hasStatements() ) )
-                
-                newFeaturesArrForThisRow.append( int( codeString.hasComprehensions() ) )
-                
-                newFeaturesArrForThisRow.append( int( codeString.hasSubscripting() ) )
-                
+                for featureName in conceptFeaturesMap:
+                    functionName = conceptFeaturesMap.get(featureName)
+
+                    if hasattr(codeString, functionName):
+                        codeStringParsedFunction = getattr(codeString, functionName, None)
+                        newFeaturesArrForThisRow.append(  int( codeStringParsedFunction()  )  )
+                    else:
+                        newFeaturesArrForThisRow.append( 0 )
                 
                 dFeature.append(newFeaturesArrForThisRow)
                 
             except SyntaxError:
-                dFeature.append([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-#                dFeature.append([ np.zeros(13 , dtype=int) ])
+                dFeature.append( len(newConceptFeatures) * [0] )
                 
         else:
-            dFeature.append([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-#           dFeature.append([ np.zeros(13 , dtype=int) ])
-            
-    
-#    add all column names to the list for new features
-    columnsFeatures.extend(df.columns)
-    columnsFeatures.append('hasLoop')
-    columnsFeatures.append('hasNestedLoop')
-    columnsFeatures.append('hasCondition')
-    columnsFeatures.append('hasVariable')
-    columnsFeatures.append('lineOfCodeCount')
-    columnsFeatures.append('hasExpressions')
-    columnsFeatures.append('hasAsyncOrAwait')
-    columnsFeatures.append('hasFunctionClass')
-    columnsFeatures.append('hasControlFlow')
-    columnsFeatures.append('hasImports')
-    columnsFeatures.append('hasStatements')
-    columnsFeatures.append('hasComprehensions')
-    columnsFeatures.append('hasSubscripting')
-    
-    
+            dFeature.append( len(newConceptFeatures) * [0] )    
     
 #    dFeature = np.array(dFeature, dtype='object')
 #    dfFeature = pd.DataFrame(dFeature, columns=columnsFeatures)    
@@ -715,9 +686,11 @@ def getAllNodeTypesUsefull(expr):
 
 
 ProgramConceptsExpressions = [
-        'Expr'
-        
-        , 'UnaryOp', 'UAdd', 'USub'
+#        'Expr'
+#        
+#        , 
+ 
+        'UnaryOp', 'UAdd', 'USub'
         , 'Not', 'Invert', 'BinOp'
         , 'Add' , 'Sub', 'Mult' , 'Div', 'FloorDiv' 
         , 'Mod' , 'Pow' 
@@ -730,36 +703,36 @@ ProgramConceptsExpressions = [
         , 'Is' , 'IsNot' 
         , 'In' , 'NotIn'
         
-        , 'Call' , 'keyword' , 'IfExp', 'Attribute'         
+        , 'Call' , 'keyword' , 'IfExp',        
         ]
 
 
 ProgramConceptsSubscripting = [
-        'Subscript'        
-        , 'Slice'        
+        'Subscript'
+        , 'Slice'
         ]
 
 ProgramConceptsComprehensions = [
-        'ListComp'        
+        'ListComp'
         , 'SetComp' , 'GeneratorExp', 'DictComp', 'comprehension'        
         ]
 
 ProgramConceptsStatements = [
-        'Assign'        
+        'Assign'
         , 'AnnAssign' , 'AugAssign', 'Raise', 'Assert', 'Delete', 'Pass'
         ]
 
 ProgramConceptsImports = [
-        'Import'        
+        'Import'
         , 'ImportFrom' , 'alias'
         ]
 ProgramConceptsControlFlow = [
-        'If'        
+        'If'
         , 'For' , 'While', 'Break', 'Continue', 'Try', 'ExceptHandler'        
         , 'With' , 'withitem'
         ]
 ProgramConceptsFunctionClass  = [
-        'FunctionDef'        
+        'FunctionDef'  
         , 'Lambda' , 'arguments', 'arg', 'Return', 'Yield', 'YieldFrom'        
         , 'Global' , 'Nonlocal'
         
@@ -771,78 +744,44 @@ ProgramConceptsAsync   = [
         , 'Await' , 'AsyncFor', 'AsyncWith'
         ]
 
+ProgramConceptsVariables   = [
+        'Name'
+#        , 'Load' 
+        , 'Store', 'Del' , 'Starred'
+        ]
+    
+ProgramConstants   = [
+        'Constant'
+        , 'FormattedValue' , 'JoinedStr', 'Str' , 'List' , 'Tuple' , 'Set' , 'Dict'
+        ]
+
+
 
 ProgramConceptsUsefull = [
-#            'BinOp'
-#               ,
+
                    'BitAnd', 'BitOr', 'BitXor', 'BoolOp', 'LShift', 'BoolOp', 'UAdd', 'USub', 'UnaryOp',
                    'Add', 'Div', 'Gt',  'GtE', 'Is',  'IsNot','Lt',  'LtE', 'MatMult',  'Mult',   'NotEq',  'NotIn', 'Sub', 
                    'And', 'Or', 'Not',
                    'Assert', 'Break', 'Compare', 'Constant', 'Del', 'Delete', 'If', 'IfExp',  'In',  'While',  
                    'ClassDef', 'Dict', 'FunctionDef', 'Global', 'List', 'ListComp', 'Mod', 
 #                   'Module',  
-                   'Param',  'Return', 'Set',  'Set', 
+                   'Param',  'Return', 'Set', 
                    'Continue', 'For', 
                    'ExceptHandler',  'Import', 'Invert', 'JoinedStr', 'Name', 'NameConstant',  'Try',
                    'Num', 'Str', 'Expression', 'Import', 'Invert', 'JoinedStr', 'Name', 'NameConstant'
                    
-                   , 'Expr', 'Assign' , 'AugAssign' , 'AnnAssign'   
+                   , 'Assign' , 'AugAssign' , 'AnnAssign'   
                    ]
+
 
 ProgramConceptsUsefull = ( ProgramConceptsUsefull + ProgramConceptsExpressions + ProgramConceptsAsync
                           + ProgramConceptsFunctionClass + ProgramConceptsControlFlow + ProgramConceptsImports + ProgramConceptsStatements
-                          + ProgramConceptsComprehensions + ProgramConceptsSubscripting )
+                          + ProgramConceptsComprehensions + ProgramConceptsSubscripting 
+                          + ProgramConceptsVariables + ProgramConstants)
 
 ProgramConceptsUsefull = set(ProgramConceptsUsefull)
 ProgramConceptsUsefull = list(ProgramConceptsUsefull)
 
-
-
-#https://docs.python.org/dev/library/ast.html
-ProgramConceptsUsefull2UserNames =  {
-		"Name" : "Variable",
-		"Starred" : "Variable",
-		
-        "Expr" : "Expression (e.g. function call or Add or BitOr etc.)",
-		"Add" : "Addition (Expressions)",
-		"Sub" : "Subtraction (Expressions)",
-		"Mult" : "Multiplication (Expressions)",
-		"Div" : "Division (Expressions)",
-		"BoolOp" : "Boolean operation (Expressions)",
-		"And" : "Boolean And (Expressions)",
-		"Or" : "Boolean Or (Expressions)",
-		"Eq" : "Equal (Expressions)",
-		"NotEq" : "Not Equal (Expressions)",
-		"Lt" : "Less Than (Expressions)",
-		"Is" : "Is (Expressions)",
-		"In" : "In (Expressions)",
-        
-		"Num" : "Number (Constant)",
-		"Str" : "String (Constant)",
-		
-        "Assign" : "Assignment (Statement)",
-		"For" : "For Loop (Control flow)",
-		"While" : "While Loop (Control flow)",
-		"If" : "If (Control flow)",
-		"Break" : "Break (Control flow)",
-		"Continue" : "Continue (Control flow)",
-		"Try" : "Try (Control flow)",
-		
-        "ExceptHandler" : "Exception Handler",
-		
-        "FunctionDef" : "Function Definition (Function)",
-		"arguments" : "Arguments for a Function (Function)",
-		"arg" : "Argument for a Function (Function)",
-		"Return" : "Return (Function)",
-		
-        "ClassDef" : "Class Definition (Class)",
-		
-        "Import" : "Import (Imports)",
-		
-        "ListComp" : "List Comprehension (Comprehensions)",
-		"SetComp" : "Set Comprehension (Comprehensions)",
-		"DictComp" : "Dict Comprehension (Comprehensions)",
-	}
 
 
 #-----------------------------------------------------------------------------------------
@@ -886,7 +825,7 @@ class PythonParser:
 
     def hasVariable(self):    
         for node in [n for n in ast.walk(self.tree)]:
-                if isinstance(node, (ast.Assign )):
+                if isinstance(node, ( ast.Name,   ast.Starred  )):
                     return True
         return False
     
@@ -945,7 +884,86 @@ class PythonParser:
         return self.nodeTypes
 
 
-# 4 :   Generic programming concepts
+# 4.1 Subset programming concepts Classes
+    def hasExpressionsArithematic(self):
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, ( ast.Add,  ast.Sub,  ast.Mult,  ast.Div,  ast.FloorDiv,  ast.Mod,  ast.Pow )):
+                    return True
+        return False
+
+    def hasExpressionsBool(self):
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, (  ast.And,  ast.Or )):
+                    return True
+        return False
+
+    def hasExpressionsLogical(self):
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, ( ast.Compare,  ast.Eq,  ast.NotEq,  ast.Lt
+                                     ,  ast.LtE,  ast.Gt,  ast.GtE,  ast.Is,  ast.IsNot,  ast.In,  ast.NotIn )):
+                    return True
+        return False
+   
+    def hasExpressionsUnary(self):
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, ( ast.UnaryOp, ast.Not,  ast.Invert
+                                     ,  ast.UAdd ,  ast.USub  )):
+                    return True
+        return False
+    
+    def hasExpressionsBitwise(self):
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, (  ast.LShift,  ast.RShift,  ast.BitOr,  ast.BitXor,  ast.BitAnd,  ast.MatMult
+                                     ,  ast.BoolOp )):
+                    return True
+        return False
+
+    def hasExpressionsDict(self):    
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, ( ast.Dict )):
+                    return True
+        return False
+
+    def hasExpressionsDataStructure(self):    
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, ( ast.Dict, ast.List, ast.Set )):
+                    return True
+        return False
+
+    def hasExpressionsKeyword(self):    
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, ( ast.keyword )):
+                    return True
+        return False
+    
+    def hasControlFlowConditional(self):    
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, ( ast.If,  ast.Break,  ast.Continue
+                                     , ast.With,  ast.withitem )):
+                    return True
+        return False
+
+    def hasControlFlowTryException(self):    
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, ( ast.Try,  ast.ExceptHandler )):
+                    return True
+        return False
+
+    def hasVariablesNamed(self):    
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, ( ast.Name,   ast.Starred  )):
+                    return True
+        return False
+
+    def hasConstantsUseful(self):
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, ( ast.Constant, ast.FormattedValue, ast.JoinedStr, ast.Str,
+                                     ast.NameConstant, ast.Num )):
+                    return True
+        return False
+
+
+# 4 :   Generic programming concepts Classes
     def hasExpressions(self):
         for node in [n for n in ast.walk(self.tree)]:
                 if isinstance(node, (ast.Expr,  ast.UnaryOp,  ast.UAdd,  ast.USub,  ast.Not,  ast.Invert
@@ -956,7 +974,6 @@ class PythonParser:
                                      ,  ast.keyword,  ast.IfExp,  ast.Attribute)):
                     return True
         return False
-   
 
     def hasAsyncOrAwait(self):
         for node in [n for n in ast.walk(self.tree)]:
@@ -1004,8 +1021,22 @@ class PythonParser:
                     return True
         return False
 
+    
+    def hasConstants(self):    
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, ( ast.Constant, ast.FormattedValue, ast.JoinedStr, ast.Str, ast.NameConstant, ast.Num
+                                     , ast.List  ,   ast.Tuple ,  ast.Set, ast.Dict  )):
+                    return True
+        return False
 
-
+    def hasVariables(self):    
+        for node in [n for n in ast.walk(self.tree)]:
+                if isinstance(node, ( ast.Name, ast.Load, ast.Store
+                                     , ast.Del  ,   ast.Starred  )):
+                    return True
+        return False
+    
+    
 #e.g.
 #expr="""
 #for i in 3:

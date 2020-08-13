@@ -69,6 +69,7 @@ hasFeatures = [
        'hasStatements', 
 #       'hasComprehensions', 
 #       'hasSubscripting'     
+#       'hasVariables'
        ]
 
 featuresToInt = featuresToInt + hasFeatures

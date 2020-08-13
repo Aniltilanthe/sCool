@@ -27,7 +27,11 @@ np.random.seed(19680801)
 
 #------------------ Database interactions START --------------------------------------------
 
-dfStudentDetails = main.getStudentDetails()
+dfStudentDetails        = main.getStudentDetails()
+
+dfSkillDetails          = main.getSkillDetails()
+dfPracticeTaskDetailsExtra          = main.getPracticeTaskDetailsExtra()
+
 
 
 
@@ -36,6 +40,7 @@ dfTheoryTaskDetails   = studentGroupedPerformanceTheory.dfTheoryTaskDetails
 
 dfPlayerStrategyPracticeOriginal        = studentGroupedPerformance.dfPlayerStrategyPracticeOriginal
 dfPlayerStrategyPracticeOriginal[constants.featureTaskType] = constants.TaskTypePractice
+dfPlayerStrategyPracticeOriginal['TaskId'] = constants.TaskTypePractice + '-' + dfPlayerStrategyPracticeOriginal['PracticeTaskId'].astype(str)
 
 
 dfPracticeDB                            = studentGroupedPerformance.dfPractice
@@ -53,6 +58,7 @@ dfRuns[constants.featureTaskType]       = constants.TaskTypePractice
 
 dfPlayerStrategyTheory = pd.concat([studentGroupedPerformanceTheory.dfPlayerStrategyNN, studentGroupedPerformanceTheory.dfPlayerStrategyN], ignore_index=True, sort =False)
 dfPlayerStrategyTheory[constants.featureTaskType]   = constants.TaskTypeTheory
+dfPlayerStrategyTheory['TaskId'] = constants.TaskTypeTheory + '-' + dfPlayerStrategyTheory['TheoryTaskId'].astype(str)
 #dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrategyTheory['CreatedAt'].dt.date] )
 dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrategyTheory[constants.GROUPBY_FEATURE]] )
 
@@ -91,15 +97,20 @@ def getTaskWiseSuccessFail(groupData, taskId, dfTaskDetails, featureTaskId, type
     
     taskTitle = ' missing '
     taskDescription = ''
+    skill = ''
     
+    print('getTaskWiseSuccessFail')
     try :
-        taskTitle = dfTaskDetails[ dfTaskDetails[featureTaskId] == int(taskId) ]['Title'].values[0] 
+        currentTask     = dfTaskDetails[ dfTaskDetails[featureTaskId] == int(taskId) ]
+        taskTitle       = currentTask['Title'].values[0] 
         taskDescription = dfTaskDetails[ dfTaskDetails[featureTaskId] == int(taskId) ][constants.featureDescription].values[0]
+        
+        str(groupData['SkillId'].values[0])
     except Exception as e: 
         print(e)
         
     return  [str(taskTitle)] + [str(taskDescription)] + [groupData[groupData['Result'] == 1].count()[0], 
-                                  groupData[groupData['Result'] == 0].count()[0]] + [  str(typeOfTask) ] + [ taskId ]
+                                  groupData[groupData['Result'] == 0].count()[0]] +   [  groupData['SessionDuration'].sum() ] + [  str(typeOfTask) ] + [ taskId ]
 
 
 
@@ -242,6 +253,10 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
         studentDF['ConceptsUsed']    = studentDF['Code'].apply(main.getAllNodeTypesUsefull)
         studentDF["ConceptsUsedDetails"] = studentDF['ConceptsUsed'].replace(
                 constants.ProgramConceptsUsefull2UserNames, regex=True)
+        
+        studentDF['ConceptsUsedGroup'] =  [ studentDF.ConceptsUsed.agg(get_merge_list) ] * studentDF.shape[0]
+        studentDF['ConceptsUsedDetailsGroup'] = [  studentDF.ConceptsUsedDetails.agg(get_merge_list) ] * studentDF.shape[0]
+        studentDF[constants.featureConceptsUsedDetailsStr]     = studentDF['ConceptsUsedDetailsGroup']
         
         studentDF[featureDescription] = getPracticeDescription(studentDF)  
         

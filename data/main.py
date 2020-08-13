@@ -577,10 +577,46 @@ def getPracticeTaskDetails():
      + ' , ptask.ShortDescription, ptask.NumberOfBoxes, ptask.NumberOfCoins, ptask.RobotStorage, ptask.NumberOfHidden ' 
     
      + '  FROM [sCool-2019-10-24].[dbo].[PracticeTasks] ptask ' 
+
      , conn)
                     
     return dfPracticeTaskDetails
-        
+
+
+def getPracticeTaskDetailsExtra():
+    
+    dfPracticeTaskDetails = pd.read_sql_query('SELECT  '
+                                   
+     + ' ptask.PracticeTaskId, ptask.Title, ptask.Description, ptask.Difficulty, ptask.IfEnabled, ptask.VarEnabled '
+     + ' , ptask.ForEnabled, ptask.LeftEnabled, ptask.RightEnabled, ptask.UpEnabled, ptask.DownEnabled, ptask.IfMin '
+     + ' , ptask.IfMax, ptask.VarMin, ptask.VarMax, ptask.ForMin, ptask.ForMax, ptask.LeftMin, ptask.LeftMax, ptask.RightMin, ptask.RightMax '
+     + ' , ptask.UpMin, ptask.UpMax, ptask.DownMin, ptask.DownMax '
+     + ' , ptask.Solution, ptask.PrintEnabled '
+     + ' , ptask.ShortDescription, ptask.NumberOfBoxes, ptask.NumberOfCoins, ptask.RobotStorage, ptask.NumberOfHidden ' 
+
+     + ' , skill.SkillId, skill.Title, skill.Description '
+     + ' , c.CourseId, c.Title, c.Description, c.isVisible '
+    
+     + '  FROM [sCool-2019-10-24].[dbo].[PracticeTasks] ptask ' 
+     
+     
+     + '  JOIN [sCool-2019-10-24].[dbo].[Skills] skill ON skill.SkillId = ptask.Skill_SkillId ' 
+     + '  JOIN [sCool-2019-10-24].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
+
+     , conn)
+                    
+    return dfPracticeTaskDetails
+
+def getSkillDetails():
+    
+    dfSkillDetails = pd.read_sql_query('SELECT  '
+                                   
+     + ' skill.SkillId, skill.Title, skill.Description, skill.CreatedAt , skill.UpdatedAt '
+    
+     + '  FROM [sCool-2019-10-24].[dbo].[Skills] skill ' 
+     , conn)
+                    
+    return dfSkillDetails
 
 def getStudentDetails():
     
@@ -689,64 +725,64 @@ ProgramConceptsExpressions = [
 #        
 #        , 
  
-        'UnaryOp', 'UAdd', 'USub'
-        , 'Not', 'Invert', 'BinOp'
-        , 'Add' , 'Sub', 'Mult' , 'Div', 'FloorDiv' 
-        , 'Mod' , 'Pow' 
-        , 'LShift' , 'RShift'
-        , 'BitOr' , 'BitXor' , 'BitAnd'
-        , 'MatMult' , 'BoolOp'
+            'UnaryOp', 'UAdd', 'USub' ,
+         'Not', 'Invert', 'BinOp' ,
+         'Add' , 'Sub', 'Mult' , 'Div', 'FloorDiv'  ,
+         'Mod' , 'Pow'  ,
+         'LShift' , 'RShift' ,
+         'BitOr' , 'BitXor' , 'BitAnd' ,
+         'MatMult' , 'BoolOp' ,
         
-        , 'And' , 'Or' , 'Compare'  , 'Eq'
-        , 'NotEq' , 'Lt'  , 'LtE' , 'Gt' , 'GtE'
-        , 'Is' , 'IsNot' 
-        , 'In' , 'NotIn'
+         'And' , 'Or' , 'Compare'  , 'Eq' ,
+         'NotEq' , 'Lt'  , 'LtE' , 'Gt' , 'GtE' ,
+         'Is' , 'IsNot'  ,
+         'In' , 'NotIn' ,
         
-        , 'Call' , 'keyword' , 'IfExp',        
+         'Call' , 'keyword' , 'IfExp',        
         ]
 
 
 ProgramConceptsSubscripting = [
-        'Subscript'
-        , 'Slice'
+        'Subscript' ,
+        'Slice' ,
         ]
 
 ProgramConceptsComprehensions = [
-        'ListComp'
-        , 'SetComp' , 'GeneratorExp', 'DictComp', 'comprehension'        
+        'ListComp' ,
+        'SetComp' , 'GeneratorExp', 'DictComp', 'comprehension'      ,   
         ]
 
 ProgramConceptsStatements = [
-        'Assign'
-        , 'AnnAssign' , 'AugAssign', 'Raise', 'Assert', 'Delete', 'Pass'
+        'Assign' ,
+        'AnnAssign' , 'AugAssign', 'Raise', 'Assert', 'Delete', 'Pass' ,
         ]
 
 ProgramConceptsImports = [
-        'Import'
-        , 'ImportFrom' , 'alias'
+        'Import' ,
+        'ImportFrom' , 'alias' ,
         ]
 ProgramConceptsControlFlow = [
-        'If'
-        , 'For' , 'While', 'Break', 'Continue', 'Try', 'ExceptHandler'        
-        , 'With' , 'withitem'
+        'If' ,
+        'For' , 'While', 'Break', 'Continue', 'Try', 'ExceptHandler'  ,      
+        'With' , 'withitem' ,
         ]
 ProgramConceptsFunctionClass  = [
-        'FunctionDef'  
-        , 'Lambda' , 'arguments', 'arg', 'Return', 'Yield', 'YieldFrom'        
-        , 'Global' , 'Nonlocal'
+        'FunctionDef'  ,
+        'Lambda' , 'arguments', 'arg', 'Return', 'Yield', 'YieldFrom'   ,      
+        'Global' , 'Nonlocal',
         
-        , 'ClassDef'
+        'ClassDef'
         ]
 
 ProgramConceptsAsync   = [
-        'AsyncFunctionDef'        
-        , 'Await' , 'AsyncFor', 'AsyncWith'
+        'AsyncFunctionDef'    ,     
+        'Await' , 'AsyncFor', 'AsyncWith'
         ]
 
 ProgramConceptsVariables   = [
-        'Name'
+#        'Name' ,
 #        , 'Load' 
-        , 'Store', 'Del' , 'Starred'
+        'Store', 'Del' , 'Starred' ,
         ]
     
 ProgramConstants   = [
@@ -766,10 +802,10 @@ ProgramConceptsUsefull = [
 #                   'Module',  
                    'Param',  'Return', 'Set', 
                    'Continue', 'For', 
-                   'ExceptHandler',  'Import', 'Invert', 'JoinedStr', 'Name', 'NameConstant',  'Try',
-                   'Num', 'Str', 'Expression', 'Import', 'Invert', 'JoinedStr', 'Name', 'NameConstant'
+                   'ExceptHandler',  'Import', 'Invert', 'JoinedStr', 'NameConstant',  'Try',
+                   'Num', 'Str', 'Expression', 'Import', 'Invert', 'JoinedStr',
                    
-                   , 'Assign' , 'AugAssign' , 'AnnAssign'   
+                   'Assign' , 'AugAssign' , 'AnnAssign'    ,
                    ]
 
 
@@ -824,7 +860,7 @@ class PythonParser:
 
     def hasVariable(self):    
         for node in [n for n in ast.walk(self.tree)]:
-                if isinstance(node, ( ast.Name,   ast.Starred  )):
+                if isinstance(node, ( ast.NameConstant,   ast.Starred  )):
                     return True
         return False
     
@@ -956,7 +992,7 @@ class PythonParser:
 
     def hasVariablesNamed(self):    
         for node in [n for n in ast.walk(self.tree)]:
-                if isinstance(node, ( ast.Name,   ast.Starred  )):
+                if isinstance(node, ( ast.Name,   ast.NameConstant,  ast.Starred ,  )):
                     return True
         return False
 

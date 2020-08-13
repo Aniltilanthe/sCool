@@ -163,7 +163,7 @@ def plotSingleClass( titleTextAdd, school ):
                     ))
 
 #---------------------------        Datatable task wise success fail    ---------------------------
-        dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', constants.featureDescription, labelSuccess, labelFail, 'Type', 'TaskId'])
+        dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', constants.featureDescription, labelSuccess, labelFail, 'SessionDuration', 'Type', 'TaskId'])
         
         
         pieDataTaskWisePractice = groupOriginal.groupby(['PracticeTaskId', 'StudentId'], as_index=False).sum()
@@ -196,7 +196,7 @@ def plotSingleClass( titleTextAdd, school ):
         
         
         table_header = [
-            html.Thead(html.Tr([html.Th("Task"), html.Th(labelSuccess), html.Th(labelFail), html.Th('Type'), html.Th('TaskId') ]))
+            html.Thead(html.Tr([html.Th("Task"), html.Th(labelSuccess), html.Th(labelFail), html.Th('Session Duration(s)'), html.Th('Type'), html.Th('TaskId') ]))
         ]
         rows = []
         for index, row in dfTaskWiseSuccessFail.iterrows():
@@ -323,7 +323,7 @@ def plotSingleClass( titleTextAdd, school ):
 
             graphIndex = graphIndex + 1
         except Exception as e:             
-            print( 'ERROR - ' + graphTitle )   
+            print( 'ERROR - ' + graphTitle )
             print(e)
         
         graphTitle = '(Theory) Count of tasks completed by students'
@@ -362,7 +362,7 @@ def plotSingleClass( titleTextAdd, school ):
         
 
     except Exception as e: 
-        print( 'ERROR - plotSingleClass ')  
+        print( 'ERROR - plotSingleClass ')
         print(e)
 
 
@@ -885,7 +885,7 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                     html.Div(
                                             children = featurePlot
                                     )
-                            )             
+                            )
                             graphs.append(  html.Div( getPlotDistributionPlotChildrens(graphDistributions, quantileIndex) ,
                                 className = "c-container"
                             ))

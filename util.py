@@ -308,7 +308,7 @@ def generateCardDetail2(label, value1 = '', value2 = '',
 
 feature2Default            = "Name"
 feature3SizeDefault        = "SessionDuration"
-colorDefault                = "Name"
+featureGroupByDefault      = "Name"
 def generateControlCardCustomPlotForm(idApp                 = "", 
                                       feature1Options       = [], 
                                       feature2Options       = [], 
@@ -319,8 +319,9 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                                       feature3ValueDefault  = feature3SizeDefault,
                                       figureTypeDefault     = constants.FigureTypeBar,
                                       featureAxisDefault    = constants.AxisH,
-                                      colorDefault          = colorDefault,
-                                      colorGroupIsDisabled  = False
+                                      featureGroupByDefault = featureGroupByDefault,
+                                      colorGroupIsDisabled  = False,
+                                      featureGroupByOptions = []
                                       ):
     """
     :return: A Div containing controls for feature selection for plotting graphs.
@@ -328,12 +329,69 @@ def generateControlCardCustomPlotForm(idApp                 = "",
     return html.Div(
         id = idApp + "-control-card-custom-plot-form",
         children=[
-
-            html.P("Select Features")
-            
-            , dbc.Row([
+                
+                                    
+            dbc.Row([
                     dbc.Col(
                       html.Div([
+                              
+                                html.Span("Select Group By ")  ,
+                                dcc.RadioItems(
+                                    id          =   idApp + "-form-feature-color-group",
+                                    options     =   BuildOptionsFeatures( featureGroupByOptions ),                                    
+                                    value       =   featureGroupByDefault ,
+                                    className   =   "radio-items-inline " + ( ' disabled ' if colorGroupIsDisabled else ' ')
+                                )
+                            ],
+                            className = "c-container"
+                       )
+                        , width=6
+                    ),
+                    dbc.Col(
+                      html.Div([
+                              
+                                html.Span("Select Sub Group By ")  ,
+                                dcc.Dropdown(
+                                    id              = idApp + "-form-feature-color-group-sub",
+                                    placeholder     = "Select features",
+                                    options         = BuildOptionsFeatures( featureGroupByOptions ), 
+                                    multi           = True ,
+                                    className   =   "radio-items-inline " + ( ' disabled ' if colorGroupIsDisabled else ' ')
+                                ),
+                            ],
+                            className = "c-container"
+                       )
+                        , width=4
+                    ),
+            ])  ,
+                    
+                                         
+#            dbc.Row([
+#                    dbc.Col(
+#                      html.Div([
+#                              
+#                                html.Span("Select Sub Group By ")  ,
+#                                dcc.Dropdown(
+#                                    id              = idApp + "-form-feature-color-group-sub",
+#                                    placeholder     = "Select features",
+#                                    options         = BuildOptionsFeatures( featureGroupByOptions ), 
+#                                    multi           = True ,
+#                                    className   =   "radio-items-inline " + ( ' disabled ' if colorGroupIsDisabled else ' ')
+#                                ),
+#                                
+#                            ],
+#                            className = "c-container"
+#                       )
+#                        , width=4
+#                    ),
+#            ])  ,
+            
+                 
+            html.P("Select Features")  ,   
+            
+            dbc.Row([
+                    dbc.Col(
+                      html.Div([ 
                                 dcc.Dropdown(
                                     id              = idApp + "-form-feature-1",
                                     placeholder     = "Select feature X",
@@ -343,7 +401,7 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                             ],
                             className = "c-container"
                        )
-                        , width=6
+                        , width=5
                     ),
                     dbc.Col(
                         html.Div([
@@ -356,7 +414,7 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                             ],
                             className = "c-container"
                         )
-                        , width=3
+                        , width=4
                     ),
                     dbc.Col(
                         html.Div([
@@ -371,23 +429,26 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                         )
                         , width=3
                     )
-            ])
+            ])  ,
             
-            , dbc.Row([
+            dbc.Row([
                     dbc.Col(
-                      html.Div([ dcc.RadioItems(
-                                id          = idApp + "-form-figure-type",
-                                options     = constants.getFigureTypesOptions(),
-                                value       = figureTypeDefault ,
-                                className   = "radio-items-inline"
-                             )
+                      html.Div([
+                              html.Span("Type")  ,
+                                
+                                dcc.RadioItems(
+                                    id          = idApp + "-form-figure-type",
+                                    options     = constants.getFigureTypesOptions(),
+                                    value       = figureTypeDefault ,
+                                    className   = "radio-items-inline"
+                                 )
                             ],
                             className = "c-container"
                        ) , width=6
                 ),
-            ])
+            ])  ,
             
-            , dbc.Row([
+            dbc.Row([
                     dbc.Col(
                       html.Div([
                                 dcc.RadioItems(
@@ -407,7 +468,7 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                     dbc.Col(
                         html.Div([
                             dbc.FormGroup([
-#                                    dbc.Label("Distribution"),
+                                    dbc.Label("Distribution"),
                                     dbc.Checklist(
                                         options=[
                                             {"label": constants.labelMean, "value": constants.PlotDistributionMean},
@@ -424,27 +485,11 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                             className   = "c-container",
                             title       = "This can work only when both features are Numerical (default SessionDuration).",
                         )
-                        , width=3
+                        , width = 6
                     ),
-                    dbc.Col(
-                      html.Div([
-                                dcc.RadioItems(
-                                    id      =   idApp + "-form-feature-color-group",
-                                    options = [
-                                        {'label': 'Student', 'value': 'Name'  },
-                                        {'label': 'Group', 'value': 'GroupId'  },
-                                    ],
-                                    value       = colorDefault ,
-                                    className   = "radio-items-inline " + ( ' disabled ' if colorGroupIsDisabled else ' ')
-                                )
-                            ],
-                            className = "c-container"
-                       )
-                        , width=3
-                    ),
-            ])
+            ])  ,
                                 
-            , dbc.Row([
+            dbc.Row([
                     dbc.Col(
                       html.Div([
                                 dcc.Dropdown(
@@ -458,8 +503,9 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                        )
                         , width=12
                     ),
-            ])
-            , dbc.Row([
+            ])  ,
+            
+            dbc.Row([
                     dbc.Col(
                         html.Button(children=[
                                     html.I(className="fas fa-plus font-size_medium p-right_xx-small"),
@@ -469,9 +515,9 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                         
                         , width=8
                     ),
-            ], className = "m-top_small" )
-            ,
-            html.Br(),
+            ], className = "m-top_small" )  ,
+            
+            html.Br()  ,
         ],
         className = "form"
     )
@@ -489,20 +535,23 @@ def getCustomPlot( df,
                   marginalX             = '',
                   marginalY             = '',
                   hoverData             = [],
-                  groupBy               = colorDefault,
+                  groupBy               = featureGroupByDefault,
                   selectedDistribution  = [],
                   isThemeSizePlot       = False,
-                  selectedFeatureMulti  = []
+                  selectedFeatureMulti  = [],
     ):
     
     rows = []
+    selectedFeatures = []
     
     
     print('getCustomPlot')
+    print('hoverData   ' + str(hoverData)  +  '    groupBy  ' +  groupBy)
     
     if df is None  or df.empty :
         return rows
     
+    print(df.columns)
     
     if (selectedFigureType in constants.FigureTypes  and 
             constants.keyIsMultiFeatureEnabled in constants.FigureTypes.get(selectedFigureType) and 
@@ -517,21 +566,39 @@ def getCustomPlot( df,
     else:
         print('getCustomPlot in condition 1st 2')
         if featureX is None    or   '' == featureX :
+            print('getCustomPlot in condition 1st 2 -----1')
             return rows.append( getMsgSelectFeature() )
     
         if ( '' == featureY     and    not selectedFigureType == constants.FigureTypePie ):
+            print('getCustomPlot in condition 1st 2---- 2')
             return rows.append( getMsgSelectFeature() )
     
         if not featureX in df.columns  :
+            print('getCustomPlot in condition 1st 2 ----3')
             return rows.append( getMsgFeatureNotInDF(featureY) )
     
         if not featureY in df.columns     and    not selectedFigureType == constants.FigureTypePie  :
+            print('getCustomPlot in condition 1st 2 ---4')
             return rows.append( getMsgFeatureNotInDF(featureY) )
     
     
     if ( '' == feature3     and   constants.FigureTypes.get(selectedFigureType).get(constants.keyIsFeature3Enabled) ):
+        print('getCustomPlot in condition 1st 3 ---1')
         return rows
     
+    
+    
+    print('getCustomPlot initialize selectedFeatures !')
+    if selectedFeatureMulti is not None :
+        selectedFeatures = list(set(selectedFeatures + selectedFeatureMulti))
+    if  feature3 :
+        selectedFeatures.insert(0, feature3)
+    if  featureY :
+        selectedFeatures.insert(0, featureY)
+    if  featureX :
+        selectedFeatures.insert(0, featureX)
+    selectedFeatures = list(set(selectedFeatures))
+    print(selectedFeatures)
     
     print('getCustomPlot initialize variables !')
     
@@ -540,20 +607,11 @@ def getCustomPlot( df,
 
     orientation = constants.AxisH
 
-    if not None == selectedAxis and selectedAxis == constants.AxisV:
+    if    selectedAxis == constants.AxisV  :
         featureX2Plot   = featureY
         featureY2Plot   = featureX
         orientation     = constants.AxisV
 
-    if (selectedFigureType in constants.FigureTypes  and 
-            constants.keyIsMultiFeatureEnabled in constants.FigureTypes.get(selectedFigureType) and 
-            constants.FigureTypes.get(selectedFigureType).get(constants.keyIsMultiFeatureEnabled) ) :
-        if   not feature3  == ''  and    feature3 not in  selectedFeatureMulti :
-            selectedFeatureMulti.insert(0, feature3)
-        if   not featureY  == ''  and    featureY not in  selectedFeatureMulti :
-            selectedFeatureMulti.insert(0, featureY)
-        if   not featureX  == ''  and    featureX not in  selectedFeatureMulti :
-            selectedFeatureMulti.insert(0, featureX)
 
     
     plotTitle = ' Details of ' 
@@ -561,6 +619,8 @@ def getCustomPlot( df,
     plotTitle = plotTitle + ' vs ' + str( constants.feature2UserNamesDict.get(featureY2Plot) if featureY2Plot in constants.feature2UserNamesDict.keys() else featureY2Plot )
     
 
+    numericFeatures = getNumericFeatures(df)
+        
     try:
         
         studentDataDfSumMean        = df.mean().round(decimals=2)
@@ -580,9 +640,13 @@ def getCustomPlot( df,
                  marginalY = constants.MarginalPlotDefault
 
 
-            if not selectedDistribution is None  and len(selectedDistribution) > 0:
+            if    selectedDistribution  and len(selectedDistribution) > 0:
+                
+                if   not  featureX in numericFeatures    and    not  featureY in numericFeatures:
+                    rows.append(html.Div('Features must be Numerical for Distribution Mean, Std, Median Plot'))
+                    return rows
     
-                if featureY == 'Name' :
+                if  not  featureY in numericFeatures :
                     featureY2Plot   = constants.featureSessionDuration
     
                 featureX2Plot = featureX
@@ -605,21 +669,37 @@ def getCustomPlot( df,
                                  std_featureY       = 0,
                                  med_featureY       = 0,
                                  textFeature        = featureDescription,
-                                 plotTitle          = plotTitle
+                                 plotTitle          = plotTitle,
+                                 isThemeSizePlot    = isThemeSizePlot
                          )
 
             else :
-                figStudents = px.scatter(df, x = featureX2Plot, y = featureY2Plot
-                     , title        =   plotTitle
-                     , labels       =   constants.feature2UserNamesDict # customize axis label
-                     , hover_name   =   hoverName
-                     , hover_data   =   hoverData
-                     , marginal_x   =   marginalX
-                     , marginal_y   =   marginalY
-    #                     , height       =   constants.graphHeight
-                     , template     =   constants.graphTemplete
+                if isThemeSizePlot : 
+                    figStudents = px.scatter(df, x = featureX2Plot, y = featureY2Plot
+                         , title        =   plotTitle
+                         , labels       =   constants.feature2UserNamesDict # customize axis label
+                         , hover_name   =   hoverName
+                         , color        =   groupBy
+                         , hover_data   =   hoverData
+                         , marginal_x   =   marginalX
+                         , marginal_y   =   marginalY
+                         , height       =   constants.graphHeight
+                         , template     =   constants.graphTemplete
+                        )
+                    
+                else:
+                    figStudents = px.scatter(df, x = featureX2Plot, y = featureY2Plot
+                         , title        =   plotTitle
+                         , labels       =   constants.feature2UserNamesDict # customize axis label
+                         , hover_name   =   hoverName
+                         , hover_data   =   hoverData
+                         , marginal_x   =   marginalX
+                         , marginal_y   =   marginalY
+                         , template     =   constants.graphTemplete
                     )
-
+                    
+                    
+    
                 figStudents.update_traces(marker    =  constants.THEME_MARKER,
                                   selector          = dict(mode='markers') )
                 figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
@@ -628,13 +708,9 @@ def getCustomPlot( df,
     
     
 #            Error when plotting pie charts !!!
-        elif selectedFigureType == constants.FigureTypePie:
-            
+        elif selectedFigureType == constants.FigureTypePie:       
             plotTitle = ' Details of ' 
             plotTitle = plotTitle + str( constants.feature2UserNamesDict.get(featureX) if featureX in constants.feature2UserNamesDict.keys() else featureX )
-
-
-    
     
             figStudents = go.Figure(data =  [go.Pie(
                                          labels         =   df[groupBy],
@@ -651,38 +727,37 @@ def getCustomPlot( df,
             if isThemeSizePlot:
                 figStudents.update_layout(autosize  =  False,
                                           height    =   constants.graphHeight,
-                                          width     =   constants.graphWidth)
-                
-
-#            figStudents = px.pie(df
-#                                 , values       = featureX
-#                                 , names        =  'Name'
-#                                 , title        =   plotTitle
-#                                 , labels       =   constants.feature2UserNamesDict # customize axis label
-#                                 , hover_name   =   hoverName
-#                                 , hover_data   =   hoverData
-##                                 , height       =   constants.graphHeight
-#                                 , template     =   constants.graphTemplete
-#                                 )
-#            figStudents.update_traces(textposition='inside', textinfo='percent+label+value')
-#            figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
-                
+                                          width     =   constants.graphWidth)                
             print('Pie Chart figure   Made Success ' )
             
             
         elif selectedFigureType == constants.FigureTypeBar :
             
-            figStudents = px.bar( df
-                , x             =   featureX2Plot
-                , y             =   featureY2Plot
-                , title         =   plotTitle
-                , labels        =   constants.feature2UserNamesDict # customize axis label
-                , template      =   constants.graphTemplete                              
-                , orientation   =   orientation
-                , hover_name    =   hoverName
-                , hover_data    =   hoverData
-#                    , height        =   constants.graphHeight
-            )
+            if isThemeSizePlot : 
+                figStudents = px.bar( df
+                    , x             =   featureX2Plot
+                    , y             =   featureY2Plot
+                    , title         =   plotTitle
+                    , labels        =   constants.feature2UserNamesDict # customize axis label
+                    , template      =   constants.graphTemplete                              
+                    , orientation   =   orientation
+                    , hover_name    =   hoverName
+                    , hover_data    =   hoverData
+                    , color         =   groupBy
+                    , height        =   constants.graphHeight
+                )
+                
+            else:
+                figStudents = px.bar( df
+                    , x             =   featureX2Plot
+                    , y             =   featureY2Plot
+                    , title         =   plotTitle
+                    , labels        =   constants.feature2UserNamesDict # customize axis label
+                    , template      =   constants.graphTemplete                              
+                    , orientation   =   orientation
+                    , hover_name    =   hoverName
+                    , hover_data    =   hoverData
+                )
             
             figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
             print('Baar Chart figure   Made Success ! ' )
@@ -691,19 +766,42 @@ def getCustomPlot( df,
         elif selectedFigureType == constants.FigureTypeBubble :
             df.loc[df[feature3] < 0, feature3] = 0
             
-            figStudents = px.scatter(df
-                 , x            =   featureX2Plot
-                 , y            =   featureY2Plot
-                 , title        =   plotTitle
-                 , labels       =   constants.feature2UserNamesDict # customize axis label
-                 , hover_name   =   hoverName
-                 , hover_data   =   hoverData
-                 , size         =   feature3
-                 , color        =   groupBy
-                 , size_max     =   60
-#                     , height       =   constants.graphHeight
-                 , template     =   constants.graphTemplete
+            if not feature3:
+                if featureX2Plot in numericFeatures:
+                    feature3 = featureX2Plot
+                else:
+                    feature3 = featureY2Plot
+                    
+
+            
+            if isThemeSizePlot : 
+                figStudents = px.scatter(df
+                     , x            =   featureX2Plot
+                     , y            =   featureY2Plot
+                     , title        =   plotTitle
+                     , labels       =   constants.feature2UserNamesDict # customize axis label
+                     , hover_name   =   hoverName
+                     , hover_data   =   hoverData
+                     , size         =   feature3
+                     , color        =   groupBy
+                     , size_max     =   60
+                     , height       =   constants.graphHeight
+                     , template     =   constants.graphTemplete
                 )
+                
+            else:
+                figStudents = px.scatter(df
+                     , x            =   featureX2Plot
+                     , y            =   featureY2Plot
+                     , title        =   plotTitle
+                     , labels       =   constants.feature2UserNamesDict # customize axis label
+                     , hover_name   =   hoverName
+                     , hover_data   =   hoverData
+                     , size         =   feature3
+                     , color        =   groupBy
+                     , size_max     =   60
+                     , template     =   constants.graphTemplete
+                    )
             figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
             
             rows.append( html.Div(children=[
@@ -713,41 +811,53 @@ def getCustomPlot( df,
             
         elif selectedFigureType == constants.FigureTypeLine :
 
-            if not None == selectedAxis and selectedAxis == constants.AxisV:
+            if    selectedAxis == constants.AxisV:
                 featureX2Plot   = featureY
                 featureY2Plot   = featureX
             
-            figStudents = px.line(df
-                , x             =   featureX2Plot
-                , y             =   featureY2Plot
-                , color         =   groupBy
-                , hover_name    =   hoverName
-                , hover_data    =   hoverData
-#                    , height        =   constants.graphHeight
-                , template      =   constants.graphTemplete                              
-            )
+            if    isThemeSizePlot : 
+                figStudents = px.line(df
+                    , x             =   featureX2Plot
+                    , y             =   featureY2Plot
+                    , color         =   groupBy
+                    , hover_name    =   hoverName
+                    , hover_data    =   hoverData
+                    , height        =   constants.graphHeight
+                    , template      =   constants.graphTemplete                              
+                )
+                
+            else:
+                figStudents = px.line(df
+                    , x             =   featureX2Plot
+                    , y             =   featureY2Plot
+                    , color         =   groupBy
+                    , hover_name    =   hoverName
+                    , hover_data    =   hoverData
+                    , template      =   constants.graphTemplete                              
+                )
             figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
         
         
         
         
             
-        elif selectedFigureType == constants.FigureTypeTable :            
+        elif     selectedFigureType == constants.FigureTypeTable :            
             print('Inside Table Figure')
             
-            if   not groupBy == ''    and    groupBy  in selectedFeatureMulti  :
-                selectedFeatureMulti.remove(groupBy)
+            if    groupBy  and    groupBy  in selectedFeatures  :
+                selectedFeatures.remove(groupBy)
             
-            if   not groupBy == ''    and    groupBy not in selectedFeatureMulti :
-                selectedFeatureMulti.insert(0, groupBy)
+            if    groupBy  and    groupBy not in selectedFeatures :
+                selectedFeatures.insert(0, groupBy)
                 
                 
             
             figStudents =  dash_table.DataTable(
                     columns=[
-                        {"name": i, "id": i, "deletable": True, "selectable": True} for i in df[selectedFeatureMulti].columns
+                        {"name": i, "id": i, "deletable": True, "selectable": True} for i in df[selectedFeatures].columns
                     ],
-                    data            =   df[selectedFeatureMulti].to_dict('records'),
+                    data            =   df[selectedFeatures].to_dict('records'),
+                    row_deletable   =   True,
                     filter_action   =   "native",
                     sort_action     =   "native",
                     sort_mode       =   "multi",
@@ -779,28 +889,33 @@ def getCustomPlot( df,
         print('After Mean and Std calculation ! ' )
         
 #        for multi features - No Mean and Std data is supported
-        if not (constants.keyIsMultiFeatureEnabled in constants.FigureTypes.get(selectedFigureType) and 
-            constants.FigureTypes.get(selectedFigureType).get(constants.keyIsMultiFeatureEnabled) ) :
+#        if not (constants.keyIsMultiFeatureEnabled in constants.FigureTypes.get(selectedFigureType) and 
+#            constants.FigureTypes.get(selectedFigureType).get(constants.keyIsMultiFeatureEnabled) ) :
+#            try :
+#                if  not featureX2Plot == ''   and   not 'Name' == featureX2Plot    and      featureX2Plot in studentDataDfSumMean:
+#                    rows.append( getDistributionForFeature(studentDataDfSumMedian, featureX2Plot)  )
+#            except Exception as e: 
+#                print('Exception Mean and Std calculation for feature1 ! ' )
+#                print(e)
+#            try :
+#                if  not featureY2Plot == ''  and    not 'Name' == featureY2Plot   and     featureY2Plot in studentDataDfSumMean:
+#                    rows.append( getDistributionForFeature(studentDataDfSumMedian, featureY2Plot)  )
+#            except Exception as e: 
+#                print('Exception Mean and Std calculation for feature2 ! ' )
+#                print(e)
+#        else :
+            
+        for featureDist in selectedFeatures:
             try :
-                if  not featureX2Plot == ''   and   not 'Name' == featureX2Plot    and      featureX2Plot in studentDataDfSumMean:
-                    rows.append( getDistributionForFeature(studentDataDfSumMedian, featureX2Plot)  )
+                if  featureDist   in     numericFeatures :
+                    rows.append( getDistributionForFeature(dfMean = studentDataDfSumMean, 
+                                                           dfStd = studentDataDfSumStd,
+                                                           dfMedian = studentDataDfSumMedian,
+                                                           featureDist = featureDist)  )
             except Exception as e: 
-                print('Exception Mean and Std calculation for feature1 ! ' )
+                print('Exception Mean and Std calculation for feature =  ' + featureDist )
                 print(e)
-            try :
-                if  not featureY2Plot == ''  and    not 'Name' == featureY2Plot   and     featureY2Plot in studentDataDfSumMean:
-                    rows.append( getDistributionForFeature(studentDataDfSumMedian, featureY2Plot)  )
-            except Exception as e: 
-                print('Exception Mean and Std calculation for feature2 ! ' )
-                print(e)
-        else :
-            for featureDist in selectedFeatureMulti:
-                try :
-                    if  not 'Name' == featureDist    and      featureDist in studentDataDfSumMean:
-                        rows.append( getDistributionForFeature(studentDataDfSumMedian, featureDist)  )
-                except Exception as e: 
-                    print('Exception Mean and Std calculation for feature =  ' + featureDist )
-                    print(e)
+                
     except Exception as e: 
         print('Add Graph exception ! ' )
         print(e)
@@ -815,15 +930,15 @@ def getMsgSelectFeature():
 def getMsgFeatureNotInDF(feature):
     return html.H4('Feature not in data ' + str(feature) + '  . Select another! ' )
 
-def getDistributionForFeature(df, featureDist):
+def getDistributionForFeature(dfMean, dfStd, dfMedian, featureDist):
     return html.P( children= [
                                     html.Span(((constants.feature2UserNamesDict.get(featureDist)) if featureDist in constants.feature2UserNamesDict.keys() else featureDist ),
                                               className = "p-right_medium" ),
-                                    html.Span(constants.labelMean + ' '  + ' = ' + str(df[featureDist]),
+                                    html.Span(constants.labelMean + ' '  + ' = ' + str(dfMean[featureDist]),
                                               className = "p-right_medium" ),
-                                    html.Span(constants.labelStd + ' ' + ' = ' + str(df[featureDist]),
+                                    html.Span(constants.labelStd + ' ' + ' = ' + str(dfStd[featureDist]),
                                               className = "p-right_medium"  ),
-                                    html.Span(constants.labelMedian + ' ' + ' = ' + str(df[featureDist]),
+                                    html.Span(constants.labelMedian + ' ' + ' = ' + str(dfMedian[featureDist]),
                                               className = "p-right_medium"  ),
                             ])
                                     
@@ -846,14 +961,15 @@ def updateSelectorDisabled(selectedFigureType, initialClass, isEnabledKey):
 
 def getCustomPlotScatter(df, featureX2Plot, featureY2Plot, 
                          selectedDistribution = [],
-                         mean_featureX = 0,
-                         std_featureX = 0,
-                         med_featureX = 0,
-                         mean_featureY = 0,
-                         std_featureY = 0,
-                         med_featureY = 0,
-                         textFeature = featureDescription,
-                         plotTitle = '') :
+                         mean_featureX      = 0,
+                         std_featureX       = 0,
+                         med_featureX       = 0,
+                         mean_featureY      = 0,
+                         std_featureY       = 0,
+                         med_featureY       = 0,
+                         textFeature        = featureDescription,
+                         plotTitle          = '',
+                         isThemeSizePlot    = False) :
     data_comp = []
     trace_comp0 = go.Scatter(
             x               = df[featureX2Plot],
@@ -872,10 +988,6 @@ def getCustomPlotScatter(df, featureX2Plot, featureY2Plot,
                                     mode            = "lines",
                                     legendgroup     = "a",
                                     showlegend      = False,
-    #                                                marker = dict(size  = 12,
-    #                                                           line     = dict(width=0.8),
-    #                                                           color    = "navy"
-    #                                                           ),
                                     name            = "Mean ",
                                     )
         data_comp.append(trace_median0)
@@ -887,10 +999,6 @@ def getCustomPlotScatter(df, featureX2Plot, featureY2Plot,
                                     mode        = "lines",
                                     legendgroup = "a",
                                     showlegend  = False,
-    #                                                marker = dict(size  = 12,
-    #                                                           line     = dict(width=0.8),
-    #                                                           color    = "navy"
-    #                                                           ),
                                     name        = "Std",
                                     )
         data_comp.append(trace_median0)
@@ -902,13 +1010,11 @@ def getCustomPlotScatter(df, featureX2Plot, featureY2Plot,
                                     mode        = "lines",
                                     legendgroup = "a",
                                     showlegend  = False,
-#                                    marker = dict(size  = 12,
-#                                               line     = dict(width=0.8),
-#    #                                                           color    = "navy"
-#                                               ),
                                     name        = "Median",
                                     )
-    data_comp.append(trace_median0)
+        data_comp.append(trace_median0)
+
+
 
     layout_comp = go.Layout(
         title       = plotTitle,
@@ -922,11 +1028,43 @@ def getCustomPlotScatter(df, featureX2Plot, featureY2Plot,
         template    = constants.graphTemplete,
     )
     fig = go.Figure(data = data_comp, layout = layout_comp)
+    
+    if isThemeSizePlot:
+        fig.update_layout(
+                autosize    =   False ,
+                height      =   constants.graphHeight ,
+        )
+    
     fig.update_layout(constants.THEME_EXPRESS_LAYOUT)
     
     return fig
 
 
+
+def groupedBySelectedFeaturesDf(df, groupBy = '', groupBySub = [], groupByAll = [], hoverData = []):
+    
+    if not groupBy in groupByAll:
+        groupByAll.append( groupBy )
+
+    groupByAll = list(set(groupByAll))
+
+    if groupBySub is not None  and  not groupBySub == [] :
+        if groupBy in groupBySub:
+            groupBySub.remove(groupBy)
+    
+        groupByAll = groupByAll + groupBySub
+    
+    
+    groupByAll = list(set(groupByAll))
+        
+    resultDfSum = df.groupby(groupByAll ,
+                                                as_index=False).sum()
+    
+    for hoverFeature in groupByAll:
+        if not hoverFeature in hoverData:
+            hoverData.insert(0, hoverFeature)
+            
+    return resultDfSum, hoverData, groupByAll
                 
 #---------------------------- UI CONTROLS END ---------------------------------
 
@@ -939,7 +1077,7 @@ def getDataFeatureDescription(df, hoverData, featureTitle = "Name"):
         
     for feature in hoverData:
         if feature in df.columns:
-            df[featureDescription] = df[featureDescription] + '<br><b>' + str(constants.feature2UserNamesDict.get(feature)) + '</b>: ' + df[feature].astype(str)
+            df[featureDescription] = df[featureDescription] + '<br><b>' + str(constants.feature2UserNamesDict.get(feature) if feature in constants.feature2UserNamesDict.keys() else feature  ) + '</b>: ' + df[feature].astype(str)
     
     return df[featureDescription]
 

@@ -39,7 +39,7 @@ iconNameCustom      = constants.iconNameCustom
 
 
 menuLink = {
-     "menu-link-0" : { keyLabel : 'Home', keyHref : '/Home',
+     "menu-link-0" : { keyLabel : 'Game Data', keyHref : '/Home',
                   keySubmenu : [ 
                           ],  keyClassName : 'fas ' + iconNameHome + ' m-right-small' }
     ,   "menu-link-1" : { keyLabel : 'Groups', keyHref : '/Groups',

@@ -61,7 +61,7 @@ graphHeight             =   graphHeight - 200
 
 
 hoverData               =  constants.hoverData.copy()
-hoverData.remove("lineOfCodeCount")
+#hoverData.remove("lineOfCodeCount")
 
 
 
@@ -179,13 +179,19 @@ def plotGameOverview():
     
     return plots
 
+featureGroupByOptions   = ['Student', 'Task', 'Group', 'Skill', 'Course']
+
+
 
 def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '', 
                    selectedAxis         = constants.AxisH, 
                    selectedFigureType   = constants.FigureTypeBar,
-                   plotClassName        = " col-sm-12 ", selectedDistribution = [],
+                   plotClassName        = " col-sm-12 ", 
+                   selectedDistribution = [],
                    groupBy              = selectedColorGroupDefault  ,
-                   selectedFeatureMulti = []      ):
+                   groupBySub           = [],
+                   selectedFeatureMulti = [],
+                   hoverData            = hoverData.copy() ):
 
     graphs = []
     rows = []
@@ -197,40 +203,86 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
     
     marginalX   = ''
     marginalY   = ''
+        
+    groupByAll = [ ]
+    if groupBySub is None :
+        groupBySub = []
+    if selectedFeatureMulti is None:
+        selectedFeatureMulti = []
+    if selectedDistribution is None:
+        selectedDistribution = []
     
         
     gameData = pd.concat([dfPlayerStrategyPracticeOriginal, dfPlayerStrategyTheory], ignore_index=True)
+    
+    gameData['Student']     = gameData['Name'].astype(str) + '-' + gameData['StudentId'].astype(str)
+    gameData['Group']       = 'Group-' + gameData['GroupId'].astype(str)
+    gameData['Course']      = 'Course-' + gameData['CourseId'].astype(str)
+    gameData['Skill']       = 'Skill-' + gameData['SkillId'].astype(str)
+    gameData['Task']        =  gameData['TaskId'].astype(str)
             
+    
+    gameData = gameData.drop_duplicates(subset=['Student', 'Task'], keep='last')
+    
+    
+    for hoverFeatureRemove in  featureGroupByOptions:
+        if hoverFeatureRemove in hoverData:
+            hoverData.remove( hoverFeatureRemove )
+        
+    
 #--------------------------------Total of each Features ----------------------------------     
     
-    gameDataDfGroupedStudent = gameData.groupby([constants.GROUPBY_FEATURE, 
-                                                 constants.STUDENT_ID_FEATURE], as_index=False).sum()
-
-    gameDataDfGroupedStudent = gameDataDfGroupedStudent.merge(
-            dfStudentDetails[['StudentId', 'Name']]
-            , how='inner', on=['StudentId'], left_index=False, right_index=False)
-    
-    
-#    for the Pie figures - we show data Grouped by Groups ! - so no StudentId information
-    if selectedFigureType == constants.FigureTypePie   or    groupBy == "GroupId"  :
-        gameDataDfGroupedStudent = gameData.groupby([constants.GROUPBY_FEATURE], as_index=False).sum()
-        gameDataDfGroupedStudent['Group'] = 'Group ' + gameDataDfGroupedStudent['GroupId'].astype(str)
-        hoverName   = "Group"
-        color       = "Group"
-
-        if "StudentId" in hoverData:
-            hoverData.remove("StudentId")
         
-        if not "GroupId" in hoverData:
-            hoverData.append("GroupId")
-    else :
-        if not "StudentId" in hoverData:
-            hoverData.append("StudentId")
+    if selectedFeatureMulti is not None:
+        selectedFeatureMulti = [groupBy] + groupBySub + selectedFeatureMulti
+        
+    
+    if    groupBy == 'Task'  :
+        groupByAll = [ groupBy, constants.featureTaskType ]
+        gameDataDfGroupedStudent, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(gameData, 
+                                                               groupBy = groupBy  , 
+                                                               groupBySub = groupBySub  , 
+                                                               groupByAll = groupByAll  , 
+                                                               hoverData = hoverData   )
+        hoverName   = groupBy
+        groupBy     = constants.featureTaskType
+        
+        if selectedFeatureMulti is not None:
+            selectedFeatureMulti = groupByAll + groupBySub + selectedFeatureMulti
+    
+    elif   groupBy  in  [ 'Group', 'Skill' , 'Course' , 'Student'     ]  :
+        
+        gameDataDfGroupedStudent, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(gameData, 
+                                                               groupBy = groupBy  , 
+                                                               groupBySub = groupBySub  , 
+                                                               groupByAll = groupByAll  , 
+                                                               hoverData = hoverData   )
+        hoverName   = groupBy
+        color       = groupBy
+        
+        
+    else  :
+        gameDataDfGroupedStudent = gameData.groupby([constants.GROUPBY_FEATURE, 'Group', 
+                                                 'Student' ], as_index=False).sum()
+
+        gameDataDfGroupedStudent = gameDataDfGroupedStudent.merge(
+                dfStudentDetails[['StudentId', 'Name']]
+                , how='inner', on=['StudentId'], left_index=False, right_index=False)
+        
+        for hoverFeature in groupBySub:
+            if hoverFeature in hoverData:
+                hoverData.remove(hoverFeature)
+                
+        if not 'Student' in hoverData:
+            hoverData.append('Student')
+        if not "Group" in hoverData:
+            hoverData.append("Group")
+            
         
     
     if 'gameDataDfGroupedStudent' in locals()     and    ( gameDataDfGroupedStudent is not None  )    and   ( not  gameDataDfGroupedStudent.empty ) :
         
-        
+            
         plotTitle   = ' Details of students ' 
         plotTitle   = plotTitle + str( constants.feature2UserNamesDict.get(feature1) if feature1 in constants.feature2UserNamesDict.keys() else feature1 )
         plotTitle   = plotTitle + ' vs ' + str( constants.feature2UserNamesDict.get(feature2) if feature2 in constants.feature2UserNamesDict.keys() else feature2 )
@@ -251,10 +303,10 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
                           marginalX             = marginalX,
                           marginalY             = marginalY,
                           hoverData             = hoverData,
-                          groupBy                 = groupBy,
-                          isThemeSizePlot       = True,
+                          groupBy               = groupBy,
                           selectedDistribution  = selectedDistribution,
-                          selectedFeatureMulti  = selectedFeatureMulti
+                          selectedFeatureMulti  = selectedFeatureMulti,
+                          isThemeSizePlot       = True,
             )
        
         graphs.append( html.Div( rows ,
@@ -267,17 +319,21 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
 
 def generateControlCardCustomPlot():
     
+#    featureGroupByOptionsCopyFeatures = featureGroupByOptions.copy()
+#    featureGroupByOptionsCopyFeatures = featureGroupByOptionsCopyFeatures.remove('Student')
+    
     return util.generateControlCardCustomPlotForm(
             idApp                   = idApp, 
             feature1Options         = FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory , 
-            feature2Options         = FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory, 
+            feature2Options         = featureGroupByOptions + FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory, 
             feature3Options         = FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory, 
             feature1ValueDefault    = "",
             feature2ValueDefault    = "",
             feature3ValueDefault    = "",
             figureTypeDefault       = constants.FigureTypeScatter,
-            featureMultiOptions     = FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory,
-            colorDefault            =  constants.GROUPBY_FEATURE ,
+            featureMultiOptions     = featureGroupByOptions + FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory,
+            featureGroupByDefault   = 'Group' ,
+            featureGroupByOptions   = featureGroupByOptions
     )
 
 #----------------------------------Functions END --------------------------------------------
@@ -343,13 +399,15 @@ layout = [
                 State(component_id = idApp + "-form-figure-type", component_property='value'),
                 State(component_id = idApp + "-form-feature-distribution", component_property='value'),
                 State(component_id = idApp + "-form-feature-color-group", component_property='value'),
+                State(component_id = idApp + "-form-feature-color-group-sub", component_property='value'),
                 State(component_id = idApp + "-form-feature-multi", component_property='value'),
                 State(component_id = idApp + "-custom-plot-container", component_property='children'),
                 ]
 )
 def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, selectedAxis, selectedFigureType,  
                selectedDistribution, 
-               selectedColorGroup,
+               selectedFeatureColorGroupBy,
+               selectedFeatureColorGroupBySub,
                selectedFeatureMulti,
                containerChildren 
                ):    
@@ -358,13 +416,13 @@ def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, s
     if n_clicks == 0:
         return html.Div(graphs)
     
-    if selectedFeature1 is None :
+    if not selectedFeature1 :
         selectedFeature1 = ''
     
-    if selectedFeature2 is None :
+    if not  selectedFeature2 :
         selectedFeature2 = ''
     
-    if selectedFeature3 is None:
+    if not selectedFeature3 :
         selectedFeature3 = ''
         
     print('   selectedFeature2   ' + str(selectedFeature2)  + '   selectedAxis   ' + str(selectedAxis) )
@@ -378,7 +436,8 @@ def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, s
                            selectedFigureType   = selectedFigureType, 
                            plotClassName        = " col-sm-12 ",
                            selectedDistribution = selectedDistribution,
-                           groupBy              = selectedColorGroup,
+                           groupBy              = selectedFeatureColorGroupBy,
+                           groupBySub           = selectedFeatureColorGroupBySub,
                            selectedFeatureMulti = selectedFeatureMulti   )
     
     if not(None is containerChildren):

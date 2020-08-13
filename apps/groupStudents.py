@@ -177,7 +177,7 @@ def getStudentData(StudentId, schoolKey, selectedDate = ''):
         schoolTheoryStudent['Task']         = constants.TaskTypeTheory + '-' + schoolTheoryStudent['TheoryTaskId'].astype(str) 
         schoolTheoryStudent['IndexCol']     = schoolTheoryStudent['Task'] + '-' + schoolTheoryStudent['Result'].astype(str)
         
-        schoolTheoryStudent[constants.featureTaskType] = [  constants.TaskTypeTheory ] * schoolTheoryStudent.shape[0]
+        schoolTheoryStudent[constants.featureTaskType] = constants.TaskTypeTheory
         
         
         if schoolTheoryStudent is not None and schoolTheoryStudent.empty == False :
@@ -245,7 +245,7 @@ def plotStudentOverview(StudentId, groupId):
                 util.getNoDataMsg()
         )
         return graphs
-    
+
     
     studentDataDf.fillna(0, inplace=True)
     graphs = util.plotStudentOverview(studentDataDf , classes = "c-card-small" )
@@ -284,8 +284,25 @@ def plotStudentOverview(StudentId, groupId):
                                         )
                                 ],
                                 className="col-sm-4",
+                        ))   
+        plotRow.append( html.Div([  
+                                    util.generateCardBase([html.I(className="fas fa-cubes m-right-small"),   'Tasks completed'], 
+                                                           
+                                                           ', '.join(studentDataDfSuccess['Task'].unique()), 
+                                                           
+                                                           classes = "c-card-small"),
+#                                    util.generateCardDetail([html.I(className="fas fa-cubes m-right-small"),   'No. of Tasks completed'], 
+#                                        '' + util.millify(len(studentDataDfSuccess['Task'].unique())), 
+#                                        '' + str(  len(studentDataDfSuccess[studentDataDfSuccess[constants.featureTaskType] == constants.TaskTypePractice ]['Task'].unique()) ), 
+#                                        '' + str(  len(studentDataDfSuccess[studentDataDfSuccess[constants.featureTaskType] == constants.TaskTypeTheory ]['Task'].unique()) ), 
+#                                        constants.labelTotal  ,
+#                                        constants.TaskTypePractice,
+#                                        constants.TaskTypeTheory ,
+#                                        classes = "c-card-small" 
+#                                        )
+                                ],
+                                className="col-sm-8",
                         ))
-    
         
     for feature2OKey in studentOverviewFeaturesDefault.keys():
         currentFeatureO = studentOverviewFeaturesDefault.get(feature2OKey)
@@ -392,6 +409,7 @@ def plotStudentOverviewFeatures( StudentId, groupId, features2Overview ):
         return graphs
     
     
+#    studentDataDf = studentDataDf.drop_duplicates(subset=['StudentId', 'Task'], keep='last')
     studentDataDf.fillna(0, inplace=True)
     
     try:
@@ -571,7 +589,9 @@ featureOptionsOverview = [
      'SessionDuration',
      'Attempts',
      'CollectedCoins',
+     
      'Difficulty',
+     
      'NumberOfCoins',
      'NumberOfHidden',
      'lineOfCodeCount',

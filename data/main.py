@@ -56,16 +56,6 @@ positionFeatureZ    = 'PositionZ'
 booleanDict         = {'true': True, 'True': True, 'TRUE': True,'false': False, 'False': False, 'FALSE': False}
 PlayerShootEndEnemyTypeDict = {'Bear': True, 'bear': True, 'BEAR': True,'Ground': False, 'ground': False, 'GROUND': False}
 
-clusterFeature      = 'Cluster'
-clusterCount           = 3
-
-
-colors = ['skyblue', 'palegreen', 'mistyrose', 'cadetblue', 'pink', 'lightcoral'
-         ,'violet' , 'lime', 'tomato', 'lightgrey', 'darkslategray']
-markers = ['.', 'o', 'v', '^', '<', '>', '*', 's', '+', 'x', 'D', 'H', '|', '-']
-markerfacecolors = ['navy', 'seagreen', 'red', 'cyan', 'magenta', 'maroon'
-                   ,'darkviolet' , 'green', 'tomato', 'grey', 'mediumturqoise']
-
 
 
 
@@ -451,8 +441,8 @@ def getTheoryData():
      + ' , ttask.Answer1, ttask.Answer2, ttask.ShortDescription '
 
      
-     + ' , skill.SkillId, skill.Title, skill.Description '
-     + ' , c.CourseId, c.Title, c.Description, c.User_Id, c.isVisible '
+     + ' , skill.SkillId '
+     + ' , c.CourseId, c.User_Id, c.isVisible '
     
      + '  FROM [sCool-2019-10-24].[dbo].[Students] s ' 
      
@@ -502,10 +492,17 @@ def getTheoryTaskDetails():
      + ' ttask.TheoryTaskId, ttask.Title, ttask.Description, ttask.Difficulty, ttask.Solution, ttask.Hint '
      + ' , ttask.Answer1, ttask.Answer2, ttask.ShortDescription '
 
+     + ' , skill.SkillId '
+     + ' , c.CourseId , c.isVisible '
+    
      + '  FROM [sCool-2019-10-24].[dbo].[TheoryTasks] ttask  ' 
+     
+     + '  JOIN [sCool-2019-10-24].[dbo].[Skills] skill ON skill.SkillId = ttask.Skill_SkillId ' 
+     + '  JOIN [sCool-2019-10-24].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
      , conn)
                     
     return dfTheoryTaskDetails
+
 
 #----------------------------------Practice Part Start-----------------------------------
     
@@ -522,6 +519,7 @@ def getPracticeData():
      + ' , pstat.DraggedOptions, pstat.Runs, pstat.Tabs, pstat.DeletedCodes, pstat.Obstacles '
      + ' , pstat.DiskPosition, pstat.RobotCollisions, pstat.Keyboard, pstat.InterfaceButton '
      + ' , pstat.CollectedCoins '
+     
      + ' , ptask.PracticeTaskId, ptask.Title, ptask.Description, ptask.Difficulty, ptask.IfEnabled, ptask.VarEnabled '
      + ' , ptask.ForEnabled, ptask.LeftEnabled, ptask.RightEnabled, ptask.UpEnabled, ptask.DownEnabled, ptask.IfMin '
      + ' , ptask.IfMax, ptask.VarMin, ptask.VarMax, ptask.ForMin, ptask.ForMax, ptask.LeftMin, ptask.LeftMax, ptask.RightMin, ptask.RightMax '
@@ -529,9 +527,9 @@ def getPracticeData():
      + ' , ptask.Skill_SkillId, ptask.Solution, ptask.PrintEnabled '
      + ' , ptask.ShortDescription, ptask.NumberOfBoxes, ptask.NumberOfCoins, ptask.RobotStorage, ptask.NumberOfHidden ' 
      
-     + ' , skill.SkillId, skill.Title, skill.Description '
+     + ' , skill.SkillId '
      + ' , skill.Course_CourseId '
-     + ' , c.CourseId, c.Title, c.Description, c.User_Id, c.isVisible '
+     + ' , c.CourseId, c.User_Id, c.isVisible '
     
      + '  FROM [sCool-2019-10-24].[dbo].[Students] s ' 
      
@@ -576,29 +574,10 @@ def getPracticeTaskDetails():
      + ' , ptask.Solution, ptask.PrintEnabled '
      + ' , ptask.ShortDescription, ptask.NumberOfBoxes, ptask.NumberOfCoins, ptask.RobotStorage, ptask.NumberOfHidden ' 
     
-     + '  FROM [sCool-2019-10-24].[dbo].[PracticeTasks] ptask ' 
-
-     , conn)
-                    
-    return dfPracticeTaskDetails
-
-
-def getPracticeTaskDetailsExtra():
-    
-    dfPracticeTaskDetails = pd.read_sql_query('SELECT  '
-                                   
-     + ' ptask.PracticeTaskId, ptask.Title, ptask.Description, ptask.Difficulty, ptask.IfEnabled, ptask.VarEnabled '
-     + ' , ptask.ForEnabled, ptask.LeftEnabled, ptask.RightEnabled, ptask.UpEnabled, ptask.DownEnabled, ptask.IfMin '
-     + ' , ptask.IfMax, ptask.VarMin, ptask.VarMax, ptask.ForMin, ptask.ForMax, ptask.LeftMin, ptask.LeftMax, ptask.RightMin, ptask.RightMax '
-     + ' , ptask.UpMin, ptask.UpMax, ptask.DownMin, ptask.DownMax '
-     + ' , ptask.Solution, ptask.PrintEnabled '
-     + ' , ptask.ShortDescription, ptask.NumberOfBoxes, ptask.NumberOfCoins, ptask.RobotStorage, ptask.NumberOfHidden ' 
-
-     + ' , skill.SkillId, skill.Title, skill.Description '
-     + ' , c.CourseId, c.Title, c.Description, c.isVisible '
-    
-     + '  FROM [sCool-2019-10-24].[dbo].[PracticeTasks] ptask ' 
+     + ' , skill.SkillId '
+     + ' , c.CourseId, c.isVisible '
      
+     + '  FROM [sCool-2019-10-24].[dbo].[PracticeTasks] ptask ' 
      
      + '  JOIN [sCool-2019-10-24].[dbo].[Skills] skill ON skill.SkillId = ptask.Skill_SkillId ' 
      + '  JOIN [sCool-2019-10-24].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
@@ -607,16 +586,45 @@ def getPracticeTaskDetailsExtra():
                     
     return dfPracticeTaskDetails
 
+
+
 def getSkillDetails():
     
     dfSkillDetails = pd.read_sql_query('SELECT  '
-                                   
+                               
      + ' skill.SkillId, skill.Title, skill.Description, skill.CreatedAt , skill.UpdatedAt '
-    
+ 
+     + ', course.CourseId, course.User_Id , course.isVisible '
+
      + '  FROM [sCool-2019-10-24].[dbo].[Skills] skill ' 
+ 
+     + '  JOIN [sCool-2019-10-24].[dbo].[Courses] course ON course.CourseId = skill.Course_CourseId ' 
+     , conn)
+                
+    return dfSkillDetails
+
+def getCourseDetails():
+    
+    dfCourseDetails = pd.read_sql_query('SELECT  '
+
+     + ' course.CourseId, course.Title, course.Description, course.User_Id , course.isVisible, course.CreatedAt , course.UpdatedAt  '
+    
+     + '  FROM [sCool-2019-10-24].[dbo].[Courses] course ' 
      , conn)
                     
-    return dfSkillDetails
+    return dfCourseDetails
+
+def getEnrolledDetails():
+    
+    dfCourseDetails = pd.read_sql_query('SELECT  '
+
+     + ' enrol.EnrolledId, enrol.Activated, enrol.Course_CourseId, enrol.Student_StudentId, enrol.Points, enrol.CreatedAt, enrol.UpdatedAt '
+    
+     + '  FROM [sCool-2019-10-24].[dbo].[Enrolleds] enrol ' 
+     , conn)
+                    
+    return dfCourseDetails
+
 
 def getStudentDetails():
     
@@ -860,7 +868,7 @@ class PythonParser:
 
     def hasVariable(self):    
         for node in [n for n in ast.walk(self.tree)]:
-                if isinstance(node, ( ast.NameConstant,   ast.Starred  )):
+                if isinstance(node, ( ast.Store, ast.NameConstant,   ast.Starred  )):
                     return True
         return False
     

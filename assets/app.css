@@ -126,23 +126,37 @@ html {
 	font-weight: bold;
     font-size: 1.3rem;
 } 
+.c-card.c-card-small .card_value_details {
+    font-size: 1rem;
+} 
 .c-card .card_value1, .c-card .card_value2 {
 	width: 50%;
     display: inline-block;
 	font-size: 1.5rem;
 	font-weight: bold;
 }
-.c-card .card-detail .card_value,  .c-card .card-detail-2 .card_value {
+.c-card .card-detail .card_value,  .c-card .card-detail-2 .card_value,
+.c-card .card_value_title {
     display: inline-block;	
 	font-size: 1.5rem;
 	font-weight: bold;
 }
-.c-card .card_value_label {
+.c-card .card_value_label,
+.c-card.c-card-small .card_value_title .card_value_label {
     font-size: 1rem;
 	margin-right: 1rem;
     display: inline-block;
     font-weight: normal;
 	color: black;
+}
+.c-card.c-card-small .card_value_label {
+    font-size: 0.7rem;
+    display: inline-block;
+    font-weight: normal;
+	color: black;
+}
+.c-card.c-card-small .c-details {
+	font-size: 0.7rem;
 }
 
 .c-container {
@@ -210,6 +224,10 @@ html {
   font-weight: bold;
 }
 
+.c-table .c-table-w-content-main {
+	width: 70%
+}
+
 
 .theme-app .navbar-main, 
 .theme-app .selector-main-row {
@@ -238,6 +256,8 @@ html {
 }
 .theme-app  .c-card .card_value,
 .theme-app .c-card .card_value1, .theme-app  .c-card .card_value2,
+.theme-app .c-card .card_value_details,
+.theme-app .c-card .card_value_title,
 .theme-app  i.fas {
 	color: var(--theme-background-color);
 }
@@ -342,6 +362,15 @@ html {
 .theme-app .c-pre span,
 .theme-app pre  span{
 	white-space: pre-wrap;
+}
+
+.theme-app .c-progress {
+	height: 1.2rem;
+}
+
+.theme-app .c-details {
+    display: inline-block;
+    padding: 0.2rem;
 }
 
 
@@ -535,7 +564,12 @@ html {
 
 
 
-
+.align-left {
+	text-align : left;
+}
+.align-right {
+	text-align : right;
+}
 .width-100 {
 	width: 100%;
 }

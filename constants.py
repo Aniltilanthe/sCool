@@ -197,6 +197,17 @@ featureCollectedCoins               = "CollectedCoins"
 
 TaskTypePractice                    = "Practice"
 TaskTypeTheory                      = "Theory"
+TypeCourse                          = "Course"
+featureCourse                       = "Course"
+TypeTask                            = "Task"
+featureTask                         = "Task"
+featureTaskId                       = "TaskId"
+TypeSkill                           = "Skill"
+featureSkill                        = "Skill"
+TypeStudent                         = "Student"
+featureStudent                      = "Student"
+TypeGroup                           = "Group"
+featureGroup                        = "Group"
 
 
 
@@ -336,6 +347,7 @@ feature2UserNamesDict[featureConceptsUsedDetailsStr] = "Concepts used details"
 ProgramConceptsUsefull2UserNames =  {
 		"Name" : "Variable",
 		"Starred" : "Variable",
+        "Store" : "Variable",
         
         "BinOp" : "Binary operation (Syntax: left operator right ; e.g. a + b ) ",
 		
@@ -436,6 +448,7 @@ iconNameCustom              = "fa-wrench"
 labelMedian                 = 'median'
 labelMean                   = 'mean'
 labelStd                    = 'std'
+labelDistAll                = 'All details'
 labelTotal                  = 'total'
 labelSuccess                = "Success"
 labelFail                   = "Fail"
@@ -457,6 +470,8 @@ MarginalPlotDefault         = 'box'
 PlotDistributionMedian      = "median"
 PlotDistributionMean        = "mean"
 PlotDistributionStd         = "std"
+PlotDistributionAll         = "all"
+
 
 FigureTypes                 = {
      FigureTypeBar      : { keyLabel        : FigureTypeBar, 
@@ -522,4 +537,18 @@ FeaturesCustomPractice  = ['NumberOfCoins', 'runsCount', 'runsErrorCount', 'runs
 FeaturesCustomTheory    = ['playerShootCount', 'playerShootEndCount', 'playerShootEndEnemyHitCount',
                                          'playerShootEndEnemyMissedHitCount', 'enemysShootEndPlayerHitCount']
 hoverData               = ["CollectedCoins", "Result", "SessionDuration", "Attempts", "robotCollisionsBoxCount", "Points", "lineOfCodeCount", 'StudentId']
+
+
+
+
+
+
+
+
+colors = ['skyblue', 'palegreen', 'mistyrose', 'cadetblue', 'pink', 'lightcoral'
+         ,'violet' , 'lime', 'tomato', 'lightgrey', 'darkslategray']
+markers = ['.', 'o', 'v', '^', '<', '>', '*', 's', '+', 'x', 'D', 'H', '|', '-']
+markerfacecolors = ['navy', 'seagreen', 'red', 'cyan', 'magenta', 'maroon'
+                   ,'darkviolet' , 'green', 'tomato', 'grey', 'mediumturqoise']
+
 

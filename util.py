@@ -321,16 +321,14 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                                       featureAxisDefault    = constants.AxisH,
                                       featureGroupByDefault = featureGroupByDefault,
                                       colorGroupIsDisabled  = False,
-                                      featureGroupByOptions = []
+                                      featureGroupByOptions = [],
+                                      featureGroupByFilterOptionsDefault  = [] ,
                                       ):
     """
     :return: A Div containing controls for feature selection for plotting graphs.
     """
-    return html.Div(
-        id = idApp + "-control-card-custom-plot-form",
-        children=[
-                
-                                    
+    
+    layout = [                   
             dbc.Row([
                     dbc.Col(
                       html.Div([
@@ -356,7 +354,7 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                                     placeholder     = "Select features",
                                     options         = BuildOptionsFeatures( featureGroupByOptions ), 
                                     multi           = True ,
-                                    className   =   "radio-items-inline " + ( ' disabled ' if colorGroupIsDisabled else ' ')
+                                    className   =   " " + ( ' disabled ' if colorGroupIsDisabled else ' ')
                                 ),
                             ],
                             className = "c-container"
@@ -364,29 +362,31 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                         , width=4
                     ),
             ])  ,
+        ]
+    
+    if featureGroupByFilterOptionsDefault and len(featureGroupByFilterOptionsDefault) > 0:
+        layout = layout + [
+                 dbc.Row([
+                        dbc.Col(
+                          html.Div([
+                                  
+                                    html.Span("Select Filter By ")  ,
+                                    dcc.Dropdown(
+                                        id          =   idApp + "-form-feature-color-group-filter",
+                                        placeholder     = "Select group by filter by",
+                                        options     =   BuildOptionsFeatures( featureGroupByFilterOptionsDefault ), 
+                                        multi       = True ,
+                                        className   =   " "
+                                    )
+                                ],
+                                className = "c-container"
+                           )
+                            , width=6
+                        ),
+                ])  ,  
+            ]
                     
-                                         
-#            dbc.Row([
-#                    dbc.Col(
-#                      html.Div([
-#                              
-#                                html.Span("Select Sub Group By ")  ,
-#                                dcc.Dropdown(
-#                                    id              = idApp + "-form-feature-color-group-sub",
-#                                    placeholder     = "Select features",
-#                                    options         = BuildOptionsFeatures( featureGroupByOptions ), 
-#                                    multi           = True ,
-#                                    className   =   "radio-items-inline " + ( ' disabled ' if colorGroupIsDisabled else ' ')
-#                                ),
-#                                
-#                            ],
-#                            className = "c-container"
-#                       )
-#                        , width=4
-#                    ),
-#            ])  ,
-            
-                 
+    layout = layout + [             
             html.P("Select Features")  ,   
             
             dbc.Row([
@@ -474,6 +474,7 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                                             {"label": constants.labelMean, "value": constants.PlotDistributionMean},
                                             {"label": constants.labelStd, "value": constants.PlotDistributionStd},
                                             {"label": constants.labelMedian, "value": constants.PlotDistributionMedian},
+                                            {"label": constants.labelDistAll, "value": constants.PlotDistributionAll},
                                         ],
                                         value   = [],
                                         id      = idApp + "-form-feature-distribution",
@@ -518,13 +519,18 @@ def generateControlCardCustomPlotForm(idApp                 = "",
             ], className = "m-top_small" )  ,
             
             html.Br()  ,
-        ],
+        ]
+    
+    
+    return html.Div(
+        id = idApp + "-control-card-custom-plot-form",
+        children =  layout,
         className = "form"
     )
                 
                 
 
-def getCustomPlot( df, 
+def getCustomPlot( df, dfOriginal, dfOriginalMean, dfOriginalMedian, dfOriginalStd,
                   featureX              = "", 
                   featureY              = "", 
                   feature3              = "", 
@@ -550,6 +556,7 @@ def getCustomPlot( df,
     
     if df is None  or df.empty :
         return rows
+    
     
     print(df.columns)
     
@@ -639,17 +646,18 @@ def getCustomPlot( df,
             if checkIsFeatureNumeric(df, featureY2Plot):
                  marginalY = constants.MarginalPlotDefault
 
+            print(featureX2Plot + '   featureX    featureY2Plot  '  + featureY2Plot)
 
-            if    selectedDistribution  and len(selectedDistribution) > 0:
+            print(selectedDistribution)
+            print(groupBy)
+        
+
+            if    selectedDistribution    and   len(selectedDistribution) > 0     and     featureY in numericFeatures :
                 
                 if   not  featureX in numericFeatures    and    not  featureY in numericFeatures:
                     rows.append(html.Div('Features must be Numerical for Distribution Mean, Std, Median Plot'))
                     return rows
     
-                if  not  featureY in numericFeatures :
-                    featureY2Plot   = constants.featureSessionDuration
-    
-                featureX2Plot = featureX
     
                 plotTitle = ' Details of ' 
                 plotTitle = plotTitle + str( constants.feature2UserNamesDict.get(featureX2Plot) if featureX2Plot in constants.feature2UserNamesDict.keys() else featureX2Plot )
@@ -823,7 +831,7 @@ def getCustomPlot( df,
                     , hover_name    =   hoverName
                     , hover_data    =   hoverData
                     , height        =   constants.graphHeight
-                    , template      =   constants.graphTemplete                              
+                    , template      =   constants.graphTemplete
                 )
                 
             else:
@@ -833,7 +841,7 @@ def getCustomPlot( df,
                     , color         =   groupBy
                     , hover_name    =   hoverName
                     , hover_data    =   hoverData
-                    , template      =   constants.graphTemplete                              
+                    , template      =   constants.graphTemplete
                 )
             figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
         
@@ -841,8 +849,9 @@ def getCustomPlot( df,
         
         
             
-        elif     selectedFigureType == constants.FigureTypeTable :            
+        elif     selectedFigureType == constants.FigureTypeTable :
             print('Inside Table Figure')
+            plotTitle = ' Details '             
             
             if    groupBy  and    groupBy  in selectedFeatures  :
                 selectedFeatures.remove(groupBy)
@@ -850,8 +859,6 @@ def getCustomPlot( df,
             if    groupBy  and    groupBy not in selectedFeatures :
                 selectedFeatures.insert(0, groupBy)
                 
-                
-            
             figStudents =  dash_table.DataTable(
                     columns=[
                         {"name": i, "id": i, "deletable": True, "selectable": True} for i in df[selectedFeatures].columns
@@ -874,7 +881,10 @@ def getCustomPlot( df,
         if (selectedFigureType in constants.FigureTypes  and 
             constants.keyIsDccGraph in constants.FigureTypes.get(selectedFigureType) and 
             not constants.FigureTypes.get(selectedFigureType).get(constants.keyIsDccGraph) ):
-                    
+             
+            rows.append(
+                    html.Span('Data ' + plotTitle), 
+                )
             rows.append(
                     html.Div([ figStudents ],
                              className = "c-table ")
@@ -887,31 +897,65 @@ def getCustomPlot( df,
         print('Before Mean and Std calculation ! ' )
         
         print('After Mean and Std calculation ! ' )
+
+
+        if 'dfOriginalMean' in locals()   and   dfOriginalMean is not None   and   not dfOriginalMean.empty :
+            rows.append(
+                    html.Span('Mean'),
+                )
+            rows.append(
+                    html.Div([ getTable(dfOriginalMean[selectedFeatures]) ],
+                             className = "c-table ")
+            )
+        if 'dfOriginalMedian' in locals()   and   dfOriginalMedian is not None   and   not dfOriginalMedian.empty :
+            rows.append(
+                    html.Span('Median'), 
+                )
+            rows.append(
+                    html.Div([ getTable(dfOriginalMedian[selectedFeatures]) ],
+                             className = "c-table ")
+            )
+        if 'dfOriginalStd' in locals()   and   dfOriginalStd is not None   and   not dfOriginalStd.empty :
+            try:
+                rows.append(
+                    html.Div('Std')
+                )
+                rows.append(
+                        html.Div([ getTable(dfOriginalStd[selectedFeatures]) ],
+                                 className = "c-table ")
+                )
+            except Exception as e: 
+                print('std error ' )
+                print(e)
         
-#        for multi features - No Mean and Std data is supported
-#        if not (constants.keyIsMultiFeatureEnabled in constants.FigureTypes.get(selectedFigureType) and 
-#            constants.FigureTypes.get(selectedFigureType).get(constants.keyIsMultiFeatureEnabled) ) :
-#            try :
-#                if  not featureX2Plot == ''   and   not 'Name' == featureX2Plot    and      featureX2Plot in studentDataDfSumMean:
-#                    rows.append( getDistributionForFeature(studentDataDfSumMedian, featureX2Plot)  )
-#            except Exception as e: 
-#                print('Exception Mean and Std calculation for feature1 ! ' )
-#                print(e)
-#            try :
-#                if  not featureY2Plot == ''  and    not 'Name' == featureY2Plot   and     featureY2Plot in studentDataDfSumMean:
-#                    rows.append( getDistributionForFeature(studentDataDfSumMedian, featureY2Plot)  )
-#            except Exception as e: 
-#                print('Exception Mean and Std calculation for feature2 ! ' )
-#                print(e)
-#        else :
-            
+        
+        rows.append(
+            html.Span('Distribution')
+        )
         for featureDist in selectedFeatures:
             try :
-                if  featureDist   in     numericFeatures :
-                    rows.append( getDistributionForFeature(dfMean = studentDataDfSumMean, 
-                                                           dfStd = studentDataDfSumStd,
-                                                           dfMedian = studentDataDfSumMedian,
-                                                           featureDist = featureDist)  )
+                if  (  selectedDistribution  and len(selectedDistribution) > 0 and constants.PlotDistributionAll in selectedDistribution 
+                     and  
+                     'dfOriginal' in locals()    and dfOriginal is not None and not dfOriginal.empty   and featureDist in dfOriginal.columns  ) :
+                    
+                    if  featureDist   in     numericFeatures :
+                        figQuantile = px.box(dfOriginal, x = groupBy, y = featureDist, points="all",
+                                             title="Distribution of " + str(featureDist),
+                                             hover_data=[groupBy, constants.featureStudent , featureDist, "SessionDuration", "Attempts", "Points"]
+                                )
+                        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)
+                        rows.append( html.Div(
+                                            dcc.Graph(
+                                                    figure = figQuantile
+                                )))
+                        rows.append( html.Br() )
+                
+                else:
+                    if  featureDist   in     numericFeatures :
+                        rows.append( getDistributionForFeature(dfMean = studentDataDfSumMean, 
+                                                               dfStd = studentDataDfSumStd,
+                                                               dfMedian = studentDataDfSumMedian,
+                                                               featureDist = featureDist)  )
             except Exception as e: 
                 print('Exception Mean and Std calculation for feature =  ' + featureDist )
                 print(e)
@@ -923,6 +967,25 @@ def getCustomPlot( df,
                 
     return rows         
                 
+
+def getTable(df):
+    return  dash_table.DataTable(
+                    columns=[
+                        {"name": i, "id": i, "deletable": True, "selectable": True} for i in df.columns
+                    ],
+                    data            =   df.to_dict('records'),
+                    row_deletable   =   True,
+                    filter_action   =   "native",
+                    sort_action     =   "native",
+                    sort_mode       =   "multi",
+                    style_data_conditional = ([
+                                {
+                                    'if': {'row_index': 'odd'},
+                                    'backgroundColor': constants.THEME_TABLE_ODDROW_COLOR_STYLE
+                                },
+                     ])
+            ) 
+
 
 def getMsgSelectFeature():
     return html.H4('Select Features' )
@@ -1180,7 +1243,10 @@ def getNumericFeatures(df):
 
 #---------------------------- App Specific ---------------------------------------------
     
-    
+def BuildOptions(options):  
+    return [{ constants.keyLabel : i , 
+             constants.keyValue : i} for i in options]
+
 def BuildOptionsFeatures(options):  
     return [{ constants.keyLabel : constants.feature2UserNamesDict.get(i) if i in constants.feature2UserNamesDict.keys() else i , 
              constants.keyValue : i} for i in options]

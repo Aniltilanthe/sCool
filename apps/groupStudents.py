@@ -72,10 +72,11 @@ hasFeatures                         =  studentGrouped.hasFeatures
 
 dfStudentDetails                        = studentGrouped.dfStudentDetails
 
-
+dfCourseDetails                         = studentGrouped.dfCourseDetails
+dfSkillDetails                          = studentGrouped.dfSkillDetails
 dfPracticeTaskDetails                   = studentGrouped.dfPracticeTaskDetails
 dfTheoryTaskDetails                     = studentGrouped.dfTheoryTaskDetails
-
+dfTaskDetails                           = studentGrouped.dfTaskDetails
 
 #dfGroupedPractice                       = studentGrouped.dfGroupedPractice
 dfGroupedOriginal                       = studentGrouped.dfGroupedOriginal
@@ -285,24 +286,15 @@ def plotStudentOverview(StudentId, groupId):
                                 ],
                                 className="col-sm-4",
                         ))   
-        plotRow.append( html.Div([  
-                                    util.generateCardBase([html.I(className="fas fa-cubes m-right-small"),   'Tasks completed'], 
-                                                           
-                                                           ', '.join(studentDataDfSuccess['Task'].unique()), 
-                                                           
-                                                           classes = "c-card-small"),
-#                                    util.generateCardDetail([html.I(className="fas fa-cubes m-right-small"),   'No. of Tasks completed'], 
-#                                        '' + util.millify(len(studentDataDfSuccess['Task'].unique())), 
-#                                        '' + str(  len(studentDataDfSuccess[studentDataDfSuccess[constants.featureTaskType] == constants.TaskTypePractice ]['Task'].unique()) ), 
-#                                        '' + str(  len(studentDataDfSuccess[studentDataDfSuccess[constants.featureTaskType] == constants.TaskTypeTheory ]['Task'].unique()) ), 
-#                                        constants.labelTotal  ,
-#                                        constants.TaskTypePractice,
-#                                        constants.TaskTypeTheory ,
-#                                        classes = "c-card-small" 
-#                                        )
-                                ],
-                                className="col-sm-8",
-                        ))
+#        plotRow.append( html.Div([  
+#                                    util.generateCardBase([html.I(className="fas fa-cubes m-right-small"),   'Tasks completed'], 
+#                                                           
+#                                                           ', '.join(studentDataDfSuccess['Task'].unique()), 
+#                                                           
+#                                                           classes = "c-card-small"),
+#                                ],
+#                                className="col-sm-8",
+#                        ))
         
     for feature2OKey in studentOverviewFeaturesDefault.keys():
         currentFeatureO = studentOverviewFeaturesDefault.get(feature2OKey)
@@ -368,19 +360,102 @@ def plotStudentOverview(StudentId, groupId):
                                     ],
                                     className="col-sm-6",
                             ))
+
     
+    if studentDataDfSuccess is not None and studentDataDfSuccess.empty is False  and 'Task' in studentDataDfSuccess.columns:        
+#        get tasks unique and courses
+        
+        print('skill studentdatadf')
+
+        tasksCompleted = studentDataDfSuccess['Task'].unique()
+        dfTasksCompleted = dfTaskDetails[dfTaskDetails['Task'].isin(tasksCompleted)]        
+        
+        for courseIdAttempt in dfTasksCompleted['CourseId'].unique():
+            plotRow.append( getCourseProgressCard(courseIdAttempt, dfTasksCompleted )  )
+
     
-        
-        
+
+
     graphs.append(
             html.Div(children  = plotRow,                
                      className = "row")
     )
 
-    
+
     return graphs
 
 
+def getCourseProgressCard(courseId, dfTasksCompleted ):
+    courseSkillIdAttempt = dfTasksCompleted[dfTasksCompleted['CourseId'] == courseId]['SkillId'].unique()
+            
+    skillsDiv = []
+    for skillIdAttempt in courseSkillIdAttempt:
+        skillTitle = dfTaskDetails[dfTaskDetails['SkillId'] == skillIdAttempt]['TitleSkill'].unique()
+        
+        dfSkillTaskCompleted = dfTasksCompleted[dfTasksCompleted['SkillId'] == skillIdAttempt]
+        skillTaskCount = len(dfTaskDetails[dfTaskDetails['SkillId'] == skillIdAttempt]['Task'].unique())
+        progressSkill = math.ceil(  len(dfSkillTaskCompleted['Task'].unique()) * 100 / skillTaskCount  )
+        
+        
+        tasksCompletedDetails =  []
+        
+        for taskId in dfSkillTaskCompleted['Task'].unique() :
+            tasksCompletedDetails.append(html.Details(
+                        children = [
+                                html.Summary(dfTaskDetails[dfTaskDetails['Task'] == taskId]['Title']),
+                                html.P('Task:' + str(taskId) + 
+                                       ';   Description: '  + dfTaskDetails[dfTaskDetails['Task'] == taskId]['Description']),
+                            ],
+                            className = " c-details "
+                    ))
+        
+        skillsDiv.append(html.Div(children= [
+            html.Div(
+                    children = [
+                                dbc.Progress(str(progressSkill) + "%", value = progressSkill, className= " c-progress ",
+                                             color = "success" if progressSkill == 100 else "primary", ), 
+                                html.Div( skillTitle + ' (Id:' +str(skillIdAttempt) + ')' ),
+                                html.Div(
+                                        children = [ 'Skill' ],
+                                        className="card_value_label"
+                                    ) ],
+                    className=" card_value_details  col-2  "
+                ),
+            html.Div(
+                    children =[ html.Div(
+                                        children = [ 'Tasks' ],
+                                        className="card_value_label"
+                                    ), 
+#                    ', '.join(dfSkillTaskCompleted['Task'].unique()),
+                                ] + tasksCompletedDetails,
+                    className=" card_value_details  col-10  align-left "
+                ),
+        ], className= "  row  "))
+    
+    courseTitle = dfTaskDetails[dfTaskDetails['CourseId'] == courseId]['TitleCourse'].unique()
+    courseTasksCount = len(dfTaskDetails[dfTaskDetails['CourseId'] == courseId]['Task'].unique())
+    courseTasksCompletedCount = len(dfTasksCompleted[dfTasksCompleted['CourseId'] == courseId]['Task'].unique())
+    progressCourse = math.ceil(  courseTasksCompletedCount * 100 / courseTasksCount  ) 
+
+    return html.Div( html.Div(
+        [
+            html.Div(
+                children = [
+                            dbc.Progress(str(progressCourse) + "%", value = progressCourse, className= " c-progress ",
+                                             color = "success" if progressCourse == 100 else "primary", ), 
+                            html.Div( courseTitle + ' (Id:' +str(courseId) + ')' ),
+                            html.Div(
+                                    children = [ 'Course' ],
+                                    className="card_value_label"
+                                ),  ],
+                className="card_value_title col-12"
+            ),
+            html.Div(children = skillsDiv,
+                     className = "  col-12  "),
+        ],
+        className="c-card  c-card-small   row",
+    ),
+    className = "col-sm-12" )
 
 
 def plotStudentOverviewFeatures( StudentId, groupId, features2Overview ):

@@ -80,14 +80,14 @@ featuresToInt = featuresToInt + hasFeatures
 
 
 
-dfPractice = main.getPracticeData()
+dfPractice              = main.getPracticeData()
 
-dfPracticeTaskDetails = main.getPracticeTaskDetails()
-dfPracticeTaskDetails = dfPracticeTaskDetails.drop_duplicates(subset=['PracticeTaskId'], keep='first')
+dfPracticeTaskDetails   = main.getPracticeTaskDetails()
+dfPracticeTaskDetails   = dfPracticeTaskDetails.drop_duplicates(subset=['PracticeTaskId'], keep='first')
 
 
-dfStudentDetails = main.getStudentDetails()
-dfStudentDetails = dfStudentDetails.drop_duplicates(subset=['StudentId'], keep='first')
+dfStudentDetails        = main.getStudentDetails()
+dfStudentDetails        = dfStudentDetails.drop_duplicates(subset=['StudentId'], keep='first')
 
 
 

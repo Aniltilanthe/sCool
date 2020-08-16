@@ -138,16 +138,19 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
     
     studentDataDf = studentGrouped.getStudentsOfSchoolDF(schoolKey, isOriginal = True)
     
-    studentDataDf['Student']     = studentDataDf['Name'].astype(str) + '-' + studentDataDf['StudentId'].astype(str)
-#    studentDataDf['Group']       = 'Group-' + studentDataDf['GroupId'].astype(str)
-    studentDataDf['Course']      = 'Course-' + studentDataDf['CourseId'].astype(str)
-    studentDataDf['Skill']       = 'Skill-' + studentDataDf['SkillId'].astype(str)
-    studentDataDf['Task']        =  studentDataDf['TaskId'].astype(str)
-    
-    studentDataDf = studentDataDf.drop_duplicates(subset=['Student', 'Task'], keep='last')
     
     
-    for hoverFeatureRemove in  featureGroupByOptions:
+    studentDataDf[constants.featureStudent]     =    studentDataDf['Name'].astype(str) + '-' + studentDataDf['StudentId'].astype(str)
+#    studentDataDf[constants.featureGroup]       =    constants.TypeGroup + '-' + studentDataDf['GroupId'].astype(str)
+    studentDataDf[constants.featureCourse]      =    constants.TypeCourse + '-' +  studentDataDf['CourseId'].astype(str)
+    studentDataDf[constants.featureSkill]       =    constants.TypeSkill + '-' +  studentDataDf['SkillId'].astype(str)
+    studentDataDf[constants.featureTask]        =    studentDataDf[constants.featureTaskId].astype(str)
+    
+    
+    studentDataDf = studentDataDf.drop_duplicates(subset=[constants.featureStudent, constants.featureTask], keep='last')
+    
+    
+    for hoverFeatureRemove in  featureGroupByOptions + [constants.featureTaskType]:
         if hoverFeatureRemove in hoverData:
             hoverData.remove( hoverFeatureRemove )
             
@@ -160,7 +163,7 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
         
 #        studentDataDf[constants.featureConceptsUsedDetailsStr]     = getPracticeConceptsUsedDetailsStr(studentDataDf)
                 
-        if    groupBy == 'Task'  :
+        if    groupBy == constants.featureTask  :
             groupByAll = [ groupBy, constants.featureTaskType ]
             
             studentDataDfSum, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(studentDataDf, 
@@ -175,7 +178,7 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
                 selectedFeatureMulti = groupByAll + groupBySub + selectedFeatureMulti
             print('hoverData 2   ' +  str(hoverData) + '   hoverName ' + str(hoverName) + '   groupBy ' + str(groupBy))
         
-        elif   groupBy  in  [ 'Skill' , 'Course' , 'Student' ]  :
+        elif   groupBy  in  [ constants.featureSkill , constants.featureCourse , constants.featureStudent , ]  :
             
             studentDataDfSum, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(studentDataDf, 
                                                                    groupBy = groupBy  , 
@@ -196,8 +199,12 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
             print('hoverData 4   ' +  str(hoverData) + '   hoverName ' + str(hoverName) + '   groupBy ' + str(groupBy))
                 
                 
-                
-                
+        
+        if not groupBy ==  constants.featureStudent :
+            gameDataStudent = studentDataDf.groupby([groupBy] + [ constants.featureStudent ], as_index=False).sum()
+        else :
+            gameDataStudent = studentDataDf.groupby([ constants.featureStudent ], as_index=False).sum()
+            
         
 #        if groupBy == 'Task':
 #            
@@ -236,6 +243,7 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
         
         rows = util.getCustomPlot(
                           df                    = studentDataDfSum, 
+                          dfOriginal            = gameDataStudent, 
                           featureX              = feature1, 
                           featureY              = feature2, 
                           feature3              = feature3, 

@@ -78,7 +78,8 @@ GroupSelector_options = studentGrouped.GroupSelector_options
 #--------------------------------- DataBase get data START ---------------------------
 dfStudentDetails                        = studentGrouped.dfStudentDetails
 
-
+dfSkillDetails                          = studentGrouped.dfSkillDetails
+dfCourseDetails                         = studentGrouped.dfCourseDetails
 dfPracticeTaskDetails                   = studentGrouped.dfPracticeTaskDetails
 dfTheoryTaskDetails                     = studentGrouped.dfTheoryTaskDetails
 
@@ -96,6 +97,11 @@ dfPracticeDB                            = studentGrouped.dfPracticeDB
 
 dfPlayerStrategyTheory                  = studentGrouped.dfPlayerStrategyTheory
 dfGroupedPlayerStrategyTheory           = studentGrouped.dfGroupedPlayerStrategyTheory
+
+
+
+
+
 
 #--------------------------------- DataBase get data END ---------------------------
 
@@ -179,8 +185,35 @@ def plotGameOverview():
     
     return plots
 
-featureGroupByOptions   = ['Student', 'Task', 'Group', 'Skill', 'Course']
+featureGroupByOptions   = [constants.featureStudent, constants.featureTask, constants.featureGroup, constants.featureSkill, constants.featureCourse]
 
+
+
+def getGroupByFilterOptions(selectedGroupBy = constants.featureGroup):
+    
+    if selectedGroupBy == constants.featureTask :
+        
+        print('getGroupByFilterOptions')
+        print(list(dfPracticeTaskDetails[constants.featureTask].unique()) +  list(dfTheoryTaskDetails[constants.featureTask].unique()))
+        
+        return list(dfPracticeTaskDetails[constants.featureTask].unique()) +  list(dfTheoryTaskDetails[constants.featureTask].unique())
+    
+    elif selectedGroupBy == constants.featureGroup :
+        return studentGrouped.getGroups()
+    
+    elif selectedGroupBy == constants.featureStudent:
+        return dfStudentDetails[constants.featureStudent].unique()
+    
+    elif selectedGroupBy ==   constants.featureSkill :
+        return dfSkillDetails[constants.featureSkill].unique()
+    
+    elif selectedGroupBy == constants.featureCourse :
+        return dfCourseDetails[constants.featureCourse].unique()
+    
+    else:
+        return []
+    
+    
 
 
 def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '', 
@@ -190,6 +223,7 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
                    selectedDistribution = [],
                    groupBy              = selectedColorGroupDefault  ,
                    groupBySub           = [],
+                   groupByFilter        = [],
                    selectedFeatureMulti = [],
                    hoverData            = hoverData.copy() ):
 
@@ -215,19 +249,23 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         
     gameData = pd.concat([dfPlayerStrategyPracticeOriginal, dfPlayerStrategyTheory], ignore_index=True)
     
-    gameData['Student']     = gameData['Name'].astype(str) + '-' + gameData['StudentId'].astype(str)
-    gameData['Group']       = 'Group-' + gameData['GroupId'].astype(str)
-    gameData['Course']      = 'Course-' + gameData['CourseId'].astype(str)
-    gameData['Skill']       = 'Skill-' + gameData['SkillId'].astype(str)
-    gameData['Task']        =  gameData['TaskId'].astype(str)
+    gameData[constants.featureStudent]     =    gameData['Name'].astype(str) + '-' + gameData['StudentId'].astype(str)
+    gameData[constants.featureGroup]       =    constants.TypeGroup + '-' + gameData['GroupId'].astype(str)
+    gameData[constants.featureCourse]      =    constants.TypeCourse + '-' +  gameData['CourseId'].astype(str)
+    gameData[constants.featureSkill]       =    constants.TypeSkill + '-' +  gameData['SkillId'].astype(str)
+    gameData[constants.featureTask]        =    gameData[constants.featureTaskId].astype(str)
             
     
-    gameData = gameData.drop_duplicates(subset=['Student', 'Task'], keep='last')
+    gameData = gameData.drop_duplicates(subset=[constants.featureStudent, constants.featureTask], keep='last')
     
     
-    for hoverFeatureRemove in  featureGroupByOptions:
+    for hoverFeatureRemove in  featureGroupByOptions + [constants.featureTaskType]:
         if hoverFeatureRemove in hoverData:
             hoverData.remove( hoverFeatureRemove )
+            
+    
+    if groupByFilter and len(groupByFilter) > 0:
+        gameData = gameData[gameData[groupBy].isin(groupByFilter)]
         
     
 #--------------------------------Total of each Features ----------------------------------     
@@ -237,9 +275,9 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         selectedFeatureMulti = [groupBy] + groupBySub + selectedFeatureMulti
         
     
-    if    groupBy == 'Task'  :
+    if    groupBy == constants.featureTask  :
         groupByAll = [ groupBy, constants.featureTaskType ]
-        gameDataDfGroupedStudent, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(gameData, 
+        gameDataDfGroupedSum, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(gameData, 
                                                                groupBy = groupBy  , 
                                                                groupBySub = groupBySub  , 
                                                                groupByAll = groupByAll  , 
@@ -250,9 +288,9 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         if selectedFeatureMulti is not None:
             selectedFeatureMulti = groupByAll + groupBySub + selectedFeatureMulti
     
-    elif   groupBy  in  [ 'Group', 'Skill' , 'Course' , 'Student'     ]  :
+    elif   groupBy  in  [ constants.featureGroup, constants.featureSkill , constants.featureCourse , constants.featureStudent     ]  :
         
-        gameDataDfGroupedStudent, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(gameData, 
+        gameDataDfGroupedSum, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(gameData, 
                                                                groupBy = groupBy  , 
                                                                groupBySub = groupBySub  , 
                                                                groupByAll = groupByAll  , 
@@ -262,25 +300,35 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         
         
     else  :
-        gameDataDfGroupedStudent = gameData.groupby([constants.GROUPBY_FEATURE, 'Group', 
-                                                 'Student' ], as_index=False).sum()
-
-        gameDataDfGroupedStudent = gameDataDfGroupedStudent.merge(
-                dfStudentDetails[['StudentId', 'Name']]
-                , how='inner', on=['StudentId'], left_index=False, right_index=False)
+        groupByAll = [constants.GROUPBY_FEATURE, constants.featureGroup, 
+                                                 constants.featureStudent ]
+        gameDataDfGroupedSum = gameData.groupby(groupByAll, as_index=False).sum()
         
         for hoverFeature in groupBySub:
             if hoverFeature in hoverData:
                 hoverData.remove(hoverFeature)
                 
-        if not 'Student' in hoverData:
-            hoverData.append('Student')
-        if not "Group" in hoverData:
-            hoverData.append("Group")
+        if not constants.featureStudent in hoverData:
+            hoverData.append(constants.featureStudent)
+        if not constants.featureGroup in hoverData:
+            hoverData.append(constants.featureGroup)
             
-        
     
-    if 'gameDataDfGroupedStudent' in locals()     and    ( gameDataDfGroupedStudent is not None  )    and   ( not  gameDataDfGroupedStudent.empty ) :
+    if not constants.featureStudent in groupByAll :
+        gameDataStudent = gameData.groupby(groupByAll + [constants.featureStudent], as_index=False).sum().round(decimals=2)
+    else:    
+        gameDataStudent = gameData.groupby(groupByAll, as_index=False).sum()
+
+    dfOriginalMean = gameDataStudent.groupby(groupByAll, as_index = False).mean().round(decimals=2)
+    dfOriginalMedian = gameDataStudent.groupby(groupByAll, as_index = False).median().round(decimals=2)
+    dfOriginalStd = gameDataStudent.groupby(groupByAll, as_index = False).agg([np.std])
+    dfOriginalStd.reset_index(level=0, inplace=True)
+    dfOriginalStd = dfOriginalStd.round(decimals=2)
+    dfOriginalStd.columns = dfOriginalStd.columns.droplevel(1)
+    
+    print('selectedFigureType   ' + str(selectedFigureType) + '   feature1   ' + str(feature1)  + '   feature2   ' + str(feature2) )
+        
+    if 'gameDataDfGroupedSum' in locals()     and    ( gameDataDfGroupedSum is not None  )    and   ( not  gameDataDfGroupedSum.empty )   :
         
             
         plotTitle   = ' Details of students ' 
@@ -292,7 +340,11 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         print('selectedFigureType   ' + str(selectedFigureType) + '   feature1   ' + str(feature1)  + '   feature2   ' + str(feature2) )
         
         rows = util.getCustomPlot(
-                          df                    = gameDataDfGroupedStudent, 
+                          df                    = gameDataDfGroupedSum, 
+                          dfOriginal            = gameDataStudent,
+                          dfOriginalMean        = dfOriginalMean, 
+                          dfOriginalMedian      = dfOriginalMedian,
+                          dfOriginalStd         = dfOriginalStd,                          
                           featureX              = feature1, 
                           featureY              = feature2, 
                           feature3              = feature3, 
@@ -332,8 +384,9 @@ def generateControlCardCustomPlot():
             feature3ValueDefault    = "",
             figureTypeDefault       = constants.FigureTypeScatter,
             featureMultiOptions     = featureGroupByOptions + FeaturesCustom + FeaturesCustomPractice + FeaturesCustomTheory,
-            featureGroupByDefault   = 'Group' ,
-            featureGroupByOptions   = featureGroupByOptions
+            featureGroupByDefault   = constants.featureGroup ,
+            featureGroupByOptions   = featureGroupByOptions, 
+            featureGroupByFilterOptionsDefault  = ['Group-1', 'Group-2', 'Group-3', 'Group-4','Group-5', 'Group-15',]
     )
 
 #----------------------------------Functions END --------------------------------------------
@@ -400,6 +453,7 @@ layout = [
                 State(component_id = idApp + "-form-feature-distribution", component_property='value'),
                 State(component_id = idApp + "-form-feature-color-group", component_property='value'),
                 State(component_id = idApp + "-form-feature-color-group-sub", component_property='value'),
+                State(component_id = idApp + "-form-feature-color-group-filter", component_property='value'),
                 State(component_id = idApp + "-form-feature-multi", component_property='value'),
                 State(component_id = idApp + "-custom-plot-container", component_property='children'),
                 ]
@@ -408,6 +462,7 @@ def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, s
                selectedDistribution, 
                selectedFeatureColorGroupBy,
                selectedFeatureColorGroupBySub,
+               selectedFeatureColorGroupByFilter,
                selectedFeatureMulti,
                containerChildren 
                ):    
@@ -427,6 +482,7 @@ def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, s
         
     print('   selectedFeature2   ' + str(selectedFeature2)  + '   selectedAxis   ' + str(selectedAxis) )
     print('selectedFigureType   ' + str(selectedFigureType) + '   selectedFeature1   ' + str(selectedFeature1)  + '     selectedFeature3   ' + str(selectedFeature3) )
+    print('selectedFeatureColorGroupByFilter   ' + str(selectedFeatureColorGroupByFilter) )
     
     
     graphs = plotGamePlots( feature1            = selectedFeature1, 
@@ -438,6 +494,7 @@ def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, s
                            selectedDistribution = selectedDistribution,
                            groupBy              = selectedFeatureColorGroupBy,
                            groupBySub           = selectedFeatureColorGroupBySub,
+                           groupByFilter        = selectedFeatureColorGroupByFilter, 
                            selectedFeatureMulti = selectedFeatureMulti   )
     
     if not(None is containerChildren):
@@ -499,3 +556,25 @@ def update_feature_distribution_disabled(selectedFigureType, initialClass):
 def update_feature_multi_disabled(selectedFigureType, initialClass):   
     return util.updateSelectorDisabled(selectedFigureType, initialClass, constants.keyIsMultiFeatureEnabled)
 
+
+
+
+
+ 
+@app.callback(
+    [Output(idApp + "-form-feature-color-group-filter", "value"),
+     Output(idApp + "-form-feature-color-group-filter", "options"),
+     ],
+    [
+        Input(idApp + "-form-feature-color-group", "value")
+    ],
+)
+def update_feature_groupby_filter_option_reset(selectedGroupBy):
+    
+    print('update_feature_groupby_filter_option_reset')
+    print(selectedGroupBy)
+    
+    return "", util.BuildOptions( getGroupByFilterOptions(selectedGroupBy) ) 
+
+
+              

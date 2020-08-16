@@ -426,15 +426,15 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         studentDataDfStd = studentDataDfStd.round(decimals=2)
         
         studentDataDfMeanTaskWise = studentDataDfStudentTaskWiseSum.groupby([constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE], 
-                                        as_index=False).agg([np.std])      
-        studentDataDfMeanTaskWise.fillna(0, inplace=True)  
+                                        as_index=False).agg([np.std])
+        studentDataDfMeanTaskWise.fillna(0, inplace=True)
         studentDataDfMeanTaskWise.reset_index(level=[0,1], inplace=True)
         studentDataDfMeanTaskWise = studentDataDfMeanTaskWise[[constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE,
-                                        'SessionDuration']].round(decimals=2) 
+                                        'SessionDuration']].round(decimals=2)
         studentDataDfMeanTaskWise.columns = studentDataDfMeanTaskWise.columns.droplevel(1)
         
         
-        studentDataDfFeaturesInterpreted = pd.DataFrame(columns = [constants.GROUPBY_FEATURE, 'PracticeSessionDuration', 'TheorySessionDuration']) 
+        studentDataDfFeaturesInterpreted = pd.DataFrame(columns = [constants.GROUPBY_FEATURE, 'PracticeSessionDuration', 'TheorySessionDuration'])
         for groupKey, group in studentDataDfGrouped :     
             practiceSessionDuration = studentDataDfMeanTaskWise[ (studentDataDfMeanTaskWise[constants.GROUPBY_FEATURE ] == groupKey )   &
                         (studentDataDfMeanTaskWise[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice )  ]['SessionDuration'].sum()
@@ -471,7 +471,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         
 #        -------------------
 #        the Quantile Plots - distribution for each feature
-        rows.append(html.Div(id='Group-Distribution-Information', children = []))   
+        rows.append(html.Div(id='Group-Distribution-Information', children = []))
         rows.append( dbc.Row( html.Div([
                     html.H3('Distributions', id='group-distribution-title'), 
                 ]) ) )
@@ -487,15 +487,15 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
                              title="Distribution of Session Duration",
                              hover_data=[constants.STUDENT_ID_FEATURE, "Name", "SessionDuration", "Attempts", "Points"]
 #                             , marker_color = 'rgb(214,12,140)'
-                             )   
-        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)         
+                             )
+        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)
         columns3 = []
         columns3.append(dbc.Col(
                 dcc.Graph(
                         figure= figQuantile
-                    ) , align="center"))    
-        rows.append( dbc.Row( columns3 ) ) 
-        rows.append( html.Br() )       
+                    ) , align="center"))
+        rows.append( dbc.Row( columns3 ) )
+        rows.append( html.Br() )
 
 #Attempts
         figQuantile = px.box(studentDataDfStudentSum, x="GroupId", y="Attempts", points="all",

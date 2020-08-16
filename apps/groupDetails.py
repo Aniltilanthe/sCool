@@ -86,8 +86,11 @@ featurePairsToPlotTheory = [
 dfStudentDetails                        = studentGrouped.dfStudentDetails
 
 
+dfCourseDetails                         = studentGrouped.dfCourseDetails
+dfSkillDetails                          = studentGrouped.dfSkillDetails
 dfPracticeTaskDetails                   = studentGrouped.dfPracticeTaskDetails
 dfTheoryTaskDetails                     = studentGrouped.dfTheoryTaskDetails
+dfTaskDetails                           = studentGrouped.dfTaskDetails
 
 
 dfGroupedPractice                       = studentGrouped.dfGroupedPractice
@@ -163,7 +166,7 @@ def plotSingleClass( titleTextAdd, school ):
                     ))
 
 #---------------------------        Datatable task wise success fail    ---------------------------
-        dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', constants.featureDescription, labelSuccess, labelFail, 'SessionDuration', 'Type', 'TaskId'])
+        dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', constants.featureDescription, labelSuccess, labelFail, 'SessionDuration', 'Type', constants.featureTask])
         
         
         pieDataTaskWisePractice = groupOriginal.groupby(['PracticeTaskId', 'StudentId'], as_index=False).sum()
@@ -300,9 +303,10 @@ def plotSingleClass( titleTextAdd, school ):
         try: 
             studentWiseDataOriginalTaskPerformed = groupOriginal
             studentWiseDataOriginalTaskPerformed[featureTaskDesc] = studentWiseDataOriginalTaskPerformed['Title'] + ' (Id: ' + studentWiseDataOriginalTaskPerformed['PracticeTaskId'].astype(str) + ')' 
+            studentWiseDataOriginalTaskPerformed[constants.featureTask] = constants.TaskTypePractice + '-' + studentWiseDataOriginalTaskPerformed['PracticeTaskId'].astype(str) 
             studentWiseDataOriginalTaskPerformed = studentWiseDataOriginalTaskPerformed [ studentWiseDataOriginalTaskPerformed['Result'] == 1][['StudentId', 'PracticeTaskId'
-                          , 'Result', 'Name', featureTaskDesc]].groupby(
-                          ['StudentId', 'Name']).agg({'PracticeTaskId': ['nunique'], featureTaskDesc: ['unique']})
+                          , 'Result', 'Name', featureTaskDesc, constants.featureTask]].groupby(
+                          ['StudentId', 'Name']).agg({'PracticeTaskId': ['nunique'], featureTaskDesc: ['unique'], constants.featureTask : ['unique']})
             studentWiseDataOriginalTaskPerformed = studentWiseDataOriginalTaskPerformed.reset_index()
             studentWiseDataOriginalTaskPerformed.rename(columns={'PracticeTaskId': countTaskCompletedByStudentFeature}, inplace=True)
             studentWiseDataOriginalTaskPerformed.columns = studentWiseDataOriginalTaskPerformed.columns.droplevel(1)
@@ -310,18 +314,49 @@ def plotSingleClass( titleTextAdd, school ):
             studentWiseDataOriginalTaskPerformed[featureTaskDesc] = studentWiseDataOriginalTaskPerformed[featureTaskDesc].apply(convert_list_column_tostr_NL)
             studentWiseDataOriginalTaskPerformed[featureTaskType] = TaskTypePractice
             
+            table_header = [
+                html.Thead(html.Tr([html.Th("Student"), html.Th("No of Tasks completed"), html.Th("Tasks", className="c-table-w-content-main")
+                                    ]))
+            ]
+            rows = []
+            for index, row in studentWiseDataOriginalTaskPerformed.iterrows():
+    
+                tds = []
+                for feature in studentWiseDataOriginalTaskPerformed[['Name',countTaskCompletedByStudentFeature, constants.featureTask, ]].columns:
+                    if feature == constants.featureTask:
+                        print(list(row[feature]))
+                        print(  [ taskId  for taskId in  list(row[feature]) ] )
+                        tds.append( html.Td( html.Div(children = [ 
+                                html.Details(
+                                        children = [
+                                                html.Summary(dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['Title']),
+                                                html.P('Task:' + str(taskId) + 
+                                                       ';   Description: '  + dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['Description']),
+                                                html.P('Skill: '  + dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['TitleSkill']),
+                                                html.P('Course: '  + dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['TitleCourse']),
+                                            ],
+                                            className = " c-details "
+                                    )
+                                  for taskId in 
+                                                                  list(row[feature]) ] ), 
+                                        className="c-table-w-content-main"  ) )
+                    else:
+                        tds.append( html.Td(  str(  row[feature]  )  ) )
+                        
+    
+                rows.append(  html.Tr(  tds ,
+#                                      className =  (   "type-practice"  if row[featureTaskType] == constants.TaskTypePractice else "type-theory"  )
+                                      ) )
             
-            figStudents, graphQuantile = getFeaturePlot(studentWiseDataOriginalTaskPerformed, 
-                           countTaskCompletedByStudentFeature, 
-                           'Name', graphTitle, [featureTaskDesc], isColored = False, hasMeanStd = False)
-                       
+            table_body = [html.Tbody(  rows   )]
             
-            graphs.append(
-                    html.Div(
-                        children = figStudents
-                ))
-
-            graphIndex = graphIndex + 1
+            table = dbc.Table(table_header + table_body, bordered=True)
+            
+            graphs.append(html.Div( graphTitle
+                        )) 
+            graphs.append(html.Div(table ,
+                             className = "c-table c-table-oddeven font-size_small"
+                        ))
         except Exception as e:             
             print( 'ERROR - ' + graphTitle )
             print(e)
@@ -334,26 +369,57 @@ def plotSingleClass( titleTextAdd, school ):
                                                 , left_index=False, right_index=False
                                                 , how='inner')
             studentWiseDataOriginalTaskPerformedTheory[featureTaskDesc] = studentWiseDataOriginalTaskPerformedTheory['Title'] + ' (Id: ' + studentWiseDataOriginalTaskPerformedTheory['TheoryTaskId'].astype(str) + ')' 
+            studentWiseDataOriginalTaskPerformedTheory[constants.featureTask] = constants.TaskTypeTheory + '-' + studentWiseDataOriginalTaskPerformedTheory['TheoryTaskId'].astype(str) 
             studentWiseDataOriginalTaskPerformedTheory = studentWiseDataOriginalTaskPerformedTheory [ studentWiseDataOriginalTaskPerformedTheory['Result'] == 1][['StudentId', 'TheoryTaskId'
-                          , 'Result', 'Name', featureTaskDesc]].groupby(
-                          ['StudentId', 'Name']).agg({'TheoryTaskId': ['nunique'], featureTaskDesc: ['unique']})
+                          , 'Result', 'Name', featureTaskDesc, constants.featureTask]].groupby(
+                          ['StudentId', 'Name']).agg({'TheoryTaskId': ['nunique'], featureTaskDesc: ['unique'], constants.featureTask : ['unique'], })
             studentWiseDataOriginalTaskPerformedTheory = studentWiseDataOriginalTaskPerformedTheory.reset_index()
             studentWiseDataOriginalTaskPerformedTheory.rename(columns={'TheoryTaskId': countTaskCompletedByStudentFeature}, inplace=True)
             studentWiseDataOriginalTaskPerformedTheory.columns = studentWiseDataOriginalTaskPerformedTheory.columns.droplevel(1)
             studentWiseDataOriginalTaskPerformedTheory[featureTaskDesc] = studentWiseDataOriginalTaskPerformedTheory[featureTaskDesc].apply(convert_list_column_tostr_NL)
             studentWiseDataOriginalTaskPerformedTheory[featureTaskType] = TaskTypeTheory
             
-            figStudents, graphQuantile = getFeaturePlot(studentWiseDataOriginalTaskPerformedTheory, 
-                           countTaskCompletedByStudentFeature, 
-                           'Name', graphTitle, [featureTaskDesc], isColored = True, hasMeanStd = False)
+            
+            table_header = [
+                html.Thead(html.Tr([html.Th("Student"), html.Th("No of Tasks completed"), html.Th("Tasks", className="c-table-w-content-main")
+                                    ]))
+            ]
+            rows = []
+            for index, row in studentWiseDataOriginalTaskPerformedTheory.iterrows():
+    
+                tds = []
+                for feature in studentWiseDataOriginalTaskPerformedTheory[['Name',countTaskCompletedByStudentFeature, constants.featureTask, ]].columns:
+                    if feature == constants.featureTask:                        
+                        tds.append( html.Td( html.Div(children = [ 
+                                        html.Details(
+                                                children = [
+                                                        html.Summary(dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['Title']),
+                                                        html.P('Task:' + str(taskId) + 
+                                                               ';   Description: '  + dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['Description']),
+                                                        html.P('Skill: '  + dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['TitleSkill']),
+                                                    ],
+                                                    className = " c-details "
+                                            )
+                                          for taskId in 
+                                                                  list(row[feature]) ] ), 
+                                        className="c-table-w-content-main"  ) )
+                    else:
+                        tds.append( html.Td(  str(  row[feature]  )  ) )
                         
+    
+                rows.append(  html.Tr(  tds ,
+#                                      className =  (   "type-practice"  if row[featureTaskType] == constants.TaskTypePractice else "type-theory"  )
+                                      ) )
             
-            graphs.append(
-                    html.Div(
-                        children = figStudents
-                ))
-            graphIndex = graphIndex + 1
+            table_body = [html.Tbody(  rows   )]
             
+            table = dbc.Table(table_header + table_body, bordered=True)
+            
+            graphs.append(html.Div( graphTitle
+                        )) 
+            graphs.append(html.Div(table ,
+                             className = "c-table c-table-oddeven font-size_small"
+                        ))            
             
         except Exception as e: 
             print( 'ERROR - ' + graphTitle )  

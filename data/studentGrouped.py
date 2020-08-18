@@ -35,6 +35,7 @@ dfCourseDetails[constants.featureCourse]                = constants.TypeCourse +
 dfSkillDetails                                          = main.getSkillDetails()
 dfSkillDetails[constants.featureSkill]                  = constants.TypeSkill + '-' + dfSkillDetails['SkillId'].astype(str) 
 dfPracticeTaskDetails                                   = main.getPracticeTaskDetails()
+dfPracticeTaskDetails[constants.featureTaskType]        = constants.TaskTypePractice
 dfPracticeTaskDetails[constants.featureTask]            = constants.TaskTypePractice + '-' + dfPracticeTaskDetails['PracticeTaskId'].astype(str) 
 dfPracticeTaskDetails[constants.featureSkill]           = constants.TypeSkill + '-' + dfPracticeTaskDetails['SkillId'].astype(str) 
 dfPracticeTaskDetails[constants.featureCourse]          = constants.TypeCourse + '-' + dfPracticeTaskDetails['CourseId'].astype(str) 
@@ -45,6 +46,7 @@ dfPracticeTaskDetails                                   = dfPracticeTaskDetails.
                dfCourseDetails
                , how='inner', on=['CourseId'], left_index=False, right_index=False, suffixes = ['', 'Course'])
 dfTheoryTaskDetails                                     = main.getTheoryTaskDetails()
+dfTheoryTaskDetails[constants.featureTaskType]          = constants.TaskTypeTheory
 dfTheoryTaskDetails[constants.featureTask]              = constants.TaskTypeTheory + '-' + dfTheoryTaskDetails['TheoryTaskId'].astype(str)
 dfTheoryTaskDetails[constants.featureSkill]             = constants.TypeSkill + '-' + dfTheoryTaskDetails['SkillId'].astype(str) 
 dfTheoryTaskDetails[constants.featureCourse]            = constants.TypeCourse + '-' + dfTheoryTaskDetails['CourseId'].astype(str) 

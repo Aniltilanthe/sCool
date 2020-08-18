@@ -530,7 +530,7 @@ def generateControlCardCustomPlotForm(idApp                 = "",
                 
                 
 
-def getCustomPlot( df, dfOriginal, dfOriginalMean, dfOriginalMedian, dfOriginalStd,
+def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = None, dfOriginalStd = None,
                   featureX              = "", 
                   featureY              = "", 
                   feature3              = "", 
@@ -932,11 +932,16 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean, dfOriginalMedian, dfOriginalS
         rows.append(
             html.Span('Distribution')
         )
+        print('Before Distribution')
+        print(dfOriginal.columns)
+        print(df.columns)
+        print(dfOriginal)
         for featureDist in selectedFeatures:
             try :
                 if  (  selectedDistribution  and len(selectedDistribution) > 0 and constants.PlotDistributionAll in selectedDistribution 
                      and  
-                     'dfOriginal' in locals()    and dfOriginal is not None and not dfOriginal.empty   and featureDist in dfOriginal.columns  ) :
+                     'dfOriginal' in locals()    and dfOriginal is not None and not dfOriginal.empty   
+                     and featureDist in dfOriginal.columns  and groupBy in  dfOriginal.columns ) :
                     
                     if  featureDist   in     numericFeatures :
                         figQuantile = px.box(dfOriginal, x = groupBy, y = featureDist, points="all",

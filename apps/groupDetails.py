@@ -315,7 +315,7 @@ def plotSingleClass( titleTextAdd, school ):
             studentWiseDataOriginalTaskPerformed[featureTaskType] = TaskTypePractice
             
             table_header = [
-                html.Thead(html.Tr([html.Th("Student"), html.Th("No of Tasks completed"), html.Th("Tasks", className="c-table-w-content-main")
+                html.Thead(html.Tr([html.Th("Student"), html.Th("No of Tasks completed"), html.Th("Practice Tasks", className="c-table-w-content-main")
                                     ]))
             ]
             rows = []
@@ -381,7 +381,7 @@ def plotSingleClass( titleTextAdd, school ):
             
             
             table_header = [
-                html.Thead(html.Tr([html.Th("Student"), html.Th("No of Tasks completed"), html.Th("Tasks", className="c-table-w-content-main")
+                html.Thead(html.Tr([html.Th("Student"), html.Th("No of Tasks completed"), html.Th("Theory Tasks", className="c-table-w-content-main")
                                     ]))
             ]
             rows = []

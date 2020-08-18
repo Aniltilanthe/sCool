@@ -98,7 +98,8 @@ Feature3Size        = "SessionDuration"
 
 
 
-featureGroupByOptions   = ['Student', 'Task', 'Skill', 'Course']
+featureGroupByOptions   = [constants.featureStudent, constants.featureTask, constants.featureSkill, constants.featureCourse, constants.featureTaskType]
+#featureGroupBySubOptions   = featureGroupByOptions + [constants.featureTaskType]
 featureGroupByDefault   = 'Student'
 
 
@@ -150,7 +151,7 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
     studentDataDf = studentDataDf.drop_duplicates(subset=[constants.featureStudent, constants.featureTask], keep='last')
     
     
-    for hoverFeatureRemove in  featureGroupByOptions + [constants.featureTaskType]:
+    for hoverFeatureRemove in  featureGroupByOptions :
         if hoverFeatureRemove in hoverData:
             hoverData.remove( hoverFeatureRemove )
             
@@ -163,22 +164,26 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
         
 #        studentDataDf[constants.featureConceptsUsedDetailsStr]     = getPracticeConceptsUsedDetailsStr(studentDataDf)
                 
-        if    groupBy == constants.featureTask  :
-            groupByAll = [ groupBy, constants.featureTaskType ]
-            
-            studentDataDfSum, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(studentDataDf, 
-                                                                   groupBy = groupBy  , 
-                                                                   groupBySub = groupBySub  , 
-                                                                   groupByAll = groupByAll  , 
-                                                                   hoverData = hoverData.copy()   )
-            hoverName   = groupBy
-            groupBy     = constants.featureTaskType
-            
-            if selectedFeatureMulti is not None:
-                selectedFeatureMulti = groupByAll + groupBySub + selectedFeatureMulti
-            print('hoverData 2   ' +  str(hoverData) + '   hoverName ' + str(hoverName) + '   groupBy ' + str(groupBy))
+#        if    groupBy == constants.featureTask  :
+##            groupByAll = [ groupBy, constants.featureTaskType ]
+##            groupByAll = [ groupBy ]
+#            
+#            studentDataDfSum, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(studentDataDf, 
+#                                                                   groupBy = groupBy  , 
+#                                                                   groupBySub = groupBySub  , 
+#                                                                   groupByAll = groupByAll  , 
+#                                                                   hoverData = hoverData.copy()   )
+#            hoverName   = groupBy
+##            groupBy     = constants.featureTaskType
+#            
+#            if selectedFeatureMulti is not None:
+#                selectedFeatureMulti = groupByAll + groupBySub + selectedFeatureMulti
+#            print('hoverData 2   ' +  str(hoverData) + '   hoverName ' + str(hoverName) + '   groupBy ' + str(groupBy))
+#        
         
-        elif   groupBy  in  [ constants.featureSkill , constants.featureCourse , constants.featureStudent , ]  :
+        
+        if   groupBy  in  featureGroupByOptions  :
+#        elif   groupBy  in  [ constants.featureSkill , constants.featureCourse , constants.featureStudent , ]  :
             
             studentDataDfSum, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(studentDataDf, 
                                                                    groupBy = groupBy  , 
@@ -191,51 +196,28 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
             print('hoverData 3   ' +  str(hoverData) + '   hoverName ' + str(hoverName) + '   groupBy ' + str(groupBy))
             
         else  :
-            studentDataDfSum = studentDataDf.groupby([ featureGroupByDefault ], as_index=False).sum()
+            groupByAll = [ featureGroupByDefault ]
+            studentDataDfSum = studentDataDf.groupby(groupByAll, as_index=False).sum()
             
             hoverName   = featureGroupByDefault
             groupBy     = featureGroupByDefault
             
-            print('hoverData 4   ' +  str(hoverData) + '   hoverName ' + str(hoverName) + '   groupBy ' + str(groupBy))
+            print('hoverData 4   ' +  str(hoverData) + '   hoverName ' + str(hoverName) + '   groupByAll ' + str(groupByAll))
                 
                 
         
-        if not groupBy ==  constants.featureStudent :
-            gameDataStudent = studentDataDf.groupby([groupBy] + [ constants.featureStudent ], as_index=False).sum()
+#        TODO :- CHECK THIS   18.08.2020
+        if not constants.featureStudent in  groupByAll:
+            gameDataStudent = studentDataDf.groupby(groupByAll + [ constants.featureStudent ], as_index=False).sum().round(decimals=2)
         else :
-            gameDataStudent = studentDataDf.groupby([ constants.featureStudent ], as_index=False).sum()
+            gameDataStudent = studentDataDf
             
-        
-#        if groupBy == 'Task':
-#            
-##            studentDataDfGrouped = studentDataDf.groupby(['TaskId',
-##                                                          constants.STUDENT_ID_FEATURE, 'Name'
-##                                                          ], as_index = False)
-#            studentDataDfSum = studentDataDf.groupby(['TaskId',
-#                                                      constants.STUDENT_ID_FEATURE, 'Name'
-#                                                      ], as_index=False).sum()
-#            
-#            hoverName   = "TaskId"
-#            groupBy     = "TaskId"
-#            
-#        else:
-##            studentDataDfGrouped = studentDataDf.groupby([constants.STUDENT_ID_FEATURE, 'Name'], as_index = False)
-#        
-#    #--------------------------------Total of each Features ----------------------------------     
-#            
-#            studentDataDfSum = studentDataDf.groupby([constants.STUDENT_ID_FEATURE, 'Name'], as_index=False).sum()
-#
-#            hoverName   = "Name"
-#            groupBy     = "Name"
-        
+
         plotTitle   = ' Details of students ' 
         plotTitle   = plotTitle + str( constants.feature2UserNamesDict.get(feature1) if feature1 in constants.feature2UserNamesDict.keys() else feature1 )
         plotTitle   = plotTitle + ' vs ' + str( constants.feature2UserNamesDict.get(feature2) if feature2 in constants.feature2UserNamesDict.keys() else feature2 )
         
-        
-#        hoverName   = "Name"
-#        groupBy     = "Name"
-        
+
         marginalX   = ''
         marginalY   = ''
         
@@ -257,7 +239,7 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
                           groupBy               = groupBy,
                           selectedDistribution  = selectedDistribution,
                           selectedFeatureMulti  = selectedFeatureMulti,
-                          isThemeSizePlot       = True,
+                          isThemeSizePlot       = False,
             )
         
         

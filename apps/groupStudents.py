@@ -393,20 +393,21 @@ def getCourseProgressCard(courseId, dfTasksCompleted ):
         skillTitle = dfTaskDetails[dfTaskDetails['SkillId'] == skillIdAttempt]['TitleSkill'].unique()
         
         dfSkillTaskCompleted = dfTasksCompleted[dfTasksCompleted['SkillId'] == skillIdAttempt]
-        skillTaskCount = len(dfTaskDetails[dfTaskDetails['SkillId'] == skillIdAttempt]['Task'].unique())
-        progressSkill = math.ceil(  len(dfSkillTaskCompleted['Task'].unique()) * 100 / skillTaskCount  )
+        skillTaskCount = len(dfTaskDetails[dfTaskDetails['SkillId'] == skillIdAttempt][constants.featureTask].unique())
+        progressSkill = math.ceil(  len(dfSkillTaskCompleted[constants.featureTask].unique()) * 100 / skillTaskCount  )
         
         
         tasksCompletedDetails =  []
         
-        for taskId in dfSkillTaskCompleted['Task'].unique() :
+        for taskId in dfSkillTaskCompleted[constants.featureTask].unique() :
+            currentTask = dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]
             tasksCompletedDetails.append(html.Details(
                         children = [
-                                html.Summary(dfTaskDetails[dfTaskDetails['Task'] == taskId]['Title']),
+                                html.Summary(currentTask['Title']),
                                 html.P('Task:' + str(taskId) + 
-                                       ';   Description: '  + dfTaskDetails[dfTaskDetails['Task'] == taskId]['Description']),
+                                       ';   Description: '  + currentTask['Description']),
                             ],
-                            className = " c-details "
+                            className = " c-details " + (   "type-practice"  if currentTask[constants.featureTaskType].iloc[0] == constants.TaskTypePractice else "type-theory"  )
                     ))
         
         skillsDiv.append(html.Div(children= [

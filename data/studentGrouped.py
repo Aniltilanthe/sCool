@@ -26,6 +26,7 @@ np.random.seed(19680801)
 #------------------------------------------------------------------------------
 
 #------------------ Database interactions START --------------------------------------------
+getUserDetails                                          = main.getUserDetails
 
 dfStudentDetails                                        = main.getStudentDetails()
 dfStudentDetails[constants.featureStudent]              = constants.TypeStudent + '-' + dfStudentDetails['StudentId'].astype(str) 

@@ -641,7 +641,6 @@ def getStudentDetails():
 
 
 
-
 def getUserDetails(username):
     
     dfUserDetails = pd.read_sql_query('SELECT  '
@@ -654,6 +653,7 @@ def getUserDetails(username):
      , conn)
                     
     return dfUserDetails
+
 
 #------------------------------------ General Dataframe functions ----------------------------
 

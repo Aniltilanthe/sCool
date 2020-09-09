@@ -33,6 +33,7 @@ GroupSelector_options = studentGrouped.GroupSelector_options
 
 
 
+print(GroupSelector_options )
 
 
 def generateControlCard():

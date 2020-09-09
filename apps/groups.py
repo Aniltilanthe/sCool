@@ -217,7 +217,7 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
              ( [
                 {
                     'if': {
-                        'filter_query': '{{GroupId}} = {}'.format(i),
+                        'filter_query': '{{LearningActivityId}} = {}'.format(i),
                     },
                     'color': constants.THEME_BACKGROUND_COLOR,
                     'backgroundColor': constants.THEME_COLOR_LIGHT,
@@ -483,7 +483,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         
 
 #Session duration
-        figQuantile = px.box(studentDataDfStudentSum, x="GroupId", y="SessionDuration", points="all",
+        figQuantile = px.box(studentDataDfStudentSum, x=constants.GROUPBY_FEATURE, y="SessionDuration", points="all",
                              title="Distribution of Session Duration",
                              hover_data=[constants.STUDENT_ID_FEATURE, "Name", "SessionDuration", "Attempts", "Points"]
 #                             , marker_color = 'rgb(214,12,140)'
@@ -498,7 +498,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         rows.append( html.Br() )
 
 #Attempts
-        figQuantile = px.box(studentDataDfStudentSum, x="GroupId", y="Attempts", points="all",
+        figQuantile = px.box(studentDataDfStudentSum, x=constants.GROUPBY_FEATURE, y="Attempts", points="all",
                              title="Distribution of Attempts",
                              hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
                              )       
@@ -512,7 +512,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         rows.append( html.Br() )         
         
 #Points
-        figQuantile = px.box(studentDataDfStudentSum, x="GroupId", y="Points", points="all",
+        figQuantile = px.box(studentDataDfStudentSum, x=constants.GROUPBY_FEATURE, y="Points", points="all",
                              title="Distribution of Points",
                              hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
                              )     
@@ -526,7 +526,7 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         rows.append( html.Br() )           
 
 #Items Collected
-        figQuantile = px.box(studentDataDfStudentSum, x="GroupId", y="itemsCollectedCount", points="all",
+        figQuantile = px.box(studentDataDfStudentSum, x=constants.GROUPBY_FEATURE, y="itemsCollectedCount", points="all",
                              title="Distribution of Items Collected",
                              hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
                              )    
@@ -688,7 +688,7 @@ def on_reset(reset_click):
 def update_bar(groupMain, groupComparision ):    
     graphs = []
 
-    if groupMain is None or not int(groupMain) >= 0:
+    if groupMain is None :
         return html.Div(graphs)
  
     graphs = plotClassOverview( int(groupMain), groupComparision )    
@@ -707,7 +707,7 @@ def update_bar(groupMain, groupComparision ):
 def update_main_overview(groupMain):    
     graphs = []
 
-    if groupMain is None or not int(groupMain) >= 0:
+    if groupMain is None :
         return html.Div(graphs)
  
     graphs = plotGroupOverview(groupMain)  
@@ -722,7 +722,7 @@ def update_main_overview(groupMain):
     [ Input("group-selector-main", "value"),
         Input("group-selector-comparision-overview", "value"), ])
 def update_download_link(groupMain, groupComparision):
-    if groupMain is None or not int(groupMain) >= 0:
+    if groupMain is None:
         return ""
     
     csv_string = util.get_download_link_data_uri(getGroupData( int(groupMain), groupComparision))

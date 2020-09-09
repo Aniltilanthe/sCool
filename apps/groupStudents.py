@@ -893,7 +893,7 @@ def setStudentOptions(schoolSelected):
 def setStudentDateOptions(studentSelected, groupSelected):
     defaultValue = []
     
-    if groupSelected is None or not int(groupSelected) >= 0  or studentSelected is None or not int(studentSelected) >= 0:
+    if groupSelected is None   or studentSelected is None or not int(studentSelected) >= 0:
         return defaultValue
     
     if not isStudentInGroup(studentSelected, groupSelected) :
@@ -917,7 +917,7 @@ def setStudentDateOptions(studentSelected, groupSelected):
         state = [ State(component_id='group-selector-main', component_property='value') ] 
 )
 def setStudentDateOptionsClear(studentSelected, groupSelected):        
-    if groupSelected is None or not int(groupSelected) >= 0  or studentSelected is None or not int(studentSelected) >= 0:
+    if groupSelected is None   or studentSelected is None or not int(studentSelected) >= 0:
         return ''   
     
     if not isStudentInGroup(studentSelected, groupSelected) :
@@ -958,7 +958,7 @@ def display_graphs_student(studentSelected, studentSelectedDate, studentGraphDir
 def display_graphs_student_overview(studentSelected, groupSelected):        
     graphs = []
     
-    if groupSelected is None or not int(groupSelected) >= 0 or studentSelected is None or not int(studentSelected) >= 0:
+    if groupSelected is None  or studentSelected is None or not int(studentSelected) >= 0:
         return html.Div(graphs)
     
     if not isStudentInGroup(studentSelected, groupSelected) :
@@ -985,7 +985,7 @@ def display_graphs_student_overview(studentSelected, groupSelected):
 def onSelectFeatureOverview(selectedFeatures, studentSelected, groupSelected ):
     graphs = []
 
-    if groupSelected is None or not int(groupSelected) >= 0    or   studentSelected is None   or not int(studentSelected) >= 0:
+    if groupSelected is None     or   studentSelected is None   or not int(studentSelected) >= 0:
         return html.Div(graphs)
  
     graphs = plotStudentOverviewFeatures( int( studentSelected ) , int(groupSelected), selectedFeatures )    
@@ -1049,7 +1049,7 @@ def update_no_student_selectors_class_disabled(studentSelected, initialClassDate
 def update_download_link__details_student( studentSelected, studentSelectedDate, groupMain ):
     defaultValues = ["", "disabled"]
     
-    if (groupMain is None or not int(groupMain) >= 0 or groupMain == "" ) or ( 
+    if (groupMain is None or groupMain == "" ) or ( 
             studentSelected is None or not int(studentSelected) >= 0 or studentSelected == "" ):
         return defaultValues
     

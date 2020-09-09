@@ -28,6 +28,14 @@ np.random.seed(19680801)
 #------------------ Database interactions START --------------------------------------------
 getUserDetails                                          = main.getUserDetails
 
+
+dfLearningActivityDetails                               = main.getLearningActivityDetails()
+dfLearningActivityDetails[constants.featureGroup]       = constants.TypeGroup + '-' + dfLearningActivityDetails[constants.GROUPBY_FEATURE].astype(str) 
+
+dfEnrolledDetails                                       = main.getEnrolledDetails()
+dfEnrolledDetails[constants.featureGroup]               = constants.TypeGroup + '-' + dfEnrolledDetails[constants.GROUPBY_FEATURE].astype(str) 
+dfEnrolledDetails[constants.featureStudent]             = constants.TypeStudent + '-' + dfEnrolledDetails['StudentId'].astype(str) 
+
 dfStudentDetails                                        = main.getStudentDetails()
 dfStudentDetails[constants.featureStudent]              = constants.TypeStudent + '-' + dfStudentDetails['StudentId'].astype(str) 
 
@@ -223,17 +231,19 @@ def getStudentWiseData(df):
 
 #---------------------------------
 # school selection
+        
+def getGroups():
+    return [constants.TypeGroup + '-' + str(0)] + [constants.TypeGroup + '-' + str(learningActivityId) for learningActivityId in dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique()]
+ 
+
+
 def BuildOptions(options):  
     return [{'label': i, 'value': i} for i in options]
 
 
-GroupSelector_options = BuildOptions(dfStudentDetails[constants.GROUPBY_FEATURE].unique())
+GroupSelector_options = BuildOptions( [ int(groupId) for groupId in dfStudentDetails[constants.GROUPBY_FEATURE].unique() ]  )
 
 
-
-def getGroups():
-    return [constants.TypeGroup + '-' + str(groupId) for groupId in dfStudentDetails[constants.GROUPBY_FEATURE].unique()]
- 
 
 
 #--------------------------------------------------------------------------------------------
@@ -245,7 +255,7 @@ def get_merge_list(values):
 #get List of Students for a group
 def getStudentsOfSchool(groupSelected):
         
-    students = list(dfStudentDetails[dfStudentDetails['GroupId'] == groupSelected]['StudentId'].unique())
+    students = list(dfStudentDetails[dfStudentDetails[constants.GROUPBY_FEATURE] == groupSelected][constants.STUDENT_ID_FEATURE].unique())
     
     return students
 

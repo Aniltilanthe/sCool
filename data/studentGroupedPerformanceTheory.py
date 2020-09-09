@@ -18,6 +18,7 @@ import plotly.express as px
 
 #main library
 from data import main
+import constants
 #from main import PythonParser
 
 
@@ -290,7 +291,7 @@ def getGroupedData(df):
     #return df.groupby(  [df['CreatedAt'].dt.year, df['CreatedAt'].dt.month]  )
     #other option - grouped by date
 #    return df.groupby(  [df['CreatedAt'].dt.date] )
-    return df.groupby(  [df['GroupId']] )
+    return df.groupby(  [df[ constants.GROUPBY_FEATURE ]] )
      
 
 

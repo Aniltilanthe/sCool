@@ -151,7 +151,7 @@ THEME_TABLE_ODDROW_COLOR_STYLE = 'rgb(248, 248, 248)'
 
 #------------------- feature related START -----------------------------------------------
 
-GROUPBY_FEATURE         =  'GroupId'
+GROUPBY_FEATURE         =  'LearningActivityId'
 COUNT_STUDENT_FEATURE   =  'CountOfStudents'
 STUDENT_ID_FEATURE      =  'StudentId'
 TASK_TYPE_FEATURE       =  'TaskType'

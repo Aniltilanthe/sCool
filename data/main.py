@@ -38,9 +38,11 @@ import constants
 imputer = impu.SimpleImputer(missing_values = "NaN", strategy = "mean")
 
 
+DatabaseName = 'sCool-2020-05-28'
+
 conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=localhost\SQLEXPRESS;'
-                      'Database=sCool-2019-10-24;'
+                      'Database='+ DatabaseName +';'
                       'Trusted_Connection=yes;')
 
 
@@ -291,7 +293,11 @@ def getDfFromJsonFeature(jsonFeature, df, idFeatures):
 
 
 def toFormatDatetime(df, feature):
-    df[feature] = pd.to_datetime(df[feature])
+    try :
+         df[feature] = pd.to_datetime(df[feature])
+    except Exception as e: 
+            print('toFormatDatetime 1 ')
+            print(e)
 
 
 def toFormatNumeric(df, feature):
@@ -429,7 +435,7 @@ def getTheoryData():
 
     dfDB = pd.read_sql_query('SELECT  '
     
-     + ' s.StudentId, s.Name, s.Email, s.IsConsentGiven, s.GroupId '
+     + ' s.StudentId, s.Name, s.Email, s.IsConsentGiven '
      
      
      + ' , tstat.TheoryStatisticsId , tstat.CreatedAt , tstat.UpdatedAt, tstat.Result '
@@ -440,21 +446,27 @@ def getTheoryData():
      + ' , ttask.TheoryTaskId, ttask.Title, ttask.Description, ttask.Difficulty, ttask.Solution, ttask.Hint '
      + ' , ttask.Answer1, ttask.Answer2, ttask.ShortDescription '
 
-     
      + ' , skill.SkillId '
      + ' , c.CourseId, c.User_Id, c.isVisible '
+     
+     + ' , en.EnrolledId, en.LearningActivity_LearningActivityId '
+
     
-     + '  FROM [sCool-2019-10-24].[dbo].[Students] s ' 
+     + '  FROM [' + DatabaseName +'].[dbo].[Students] s ' 
      
      
-     + '  JOIN [sCool-2019-10-24].[dbo].[TheoryStatistics] tstat ON tstat.Student_StudentId = s.studentId ' 
-     + '  JOIN [sCool-2019-10-24].[dbo].[TheoryTasks] ttask ON ttask.TheoryTaskId = tstat.TheoryTask_TheoryTaskId ' 
-     + '  JOIN [sCool-2019-10-24].[dbo].[Skills] skill ON skill.SkillId = ttask.Skill_SkillId ' 
-     + '  JOIN [sCool-2019-10-24].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
-    # + '  INNER JOIN [sCool-2019-10-24].[dbo].[Enrolleds] en ON en.Course_CourseId = c.CourseId AND en.Student_StudentId = s.StudentId'   
+     + '  JOIN [' + DatabaseName +'].[dbo].[TheoryStatistics] tstat ON tstat.Student_StudentId = s.studentId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[TheoryTasks] ttask ON ttask.TheoryTaskId = tstat.TheoryTask_TheoryTaskId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[Skills] skill ON skill.SkillId = ttask.Skill_SkillId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[Enrolleds] en ON en.Course_CourseId = c.CourseId AND en.Student_StudentId = s.StudentId'  
     
      + '  WHERE s.IsConsentGiven = 1 '
      , conn)
+    
+    
+    dfDB[constants.GROUPBY_FEATURE]                     = dfDB['LearningActivity_LearningActivityId']
+    dfDB[constants.GROUPBY_FEATURE].fillna(0, inplace=True)
     
     dfDB.sort_values(['Difficulty','StudentId', 'SkillId', 'TheoryStatisticsId'], 
                    axis=0, 
@@ -495,10 +507,10 @@ def getTheoryTaskDetails():
      + ' , skill.SkillId '
      + ' , c.CourseId , c.isVisible '
     
-     + '  FROM [sCool-2019-10-24].[dbo].[TheoryTasks] ttask  ' 
+     + '  FROM [' + DatabaseName +'].[dbo].[TheoryTasks] ttask  ' 
      
-     + '  JOIN [sCool-2019-10-24].[dbo].[Skills] skill ON skill.SkillId = ttask.Skill_SkillId ' 
-     + '  JOIN [sCool-2019-10-24].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[Skills] skill ON skill.SkillId = ttask.Skill_SkillId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
      , conn)
                     
     return dfTheoryTaskDetails
@@ -512,7 +524,7 @@ def getPracticeData():
     
     dfPractice = pd.read_sql_query('SELECT  '
     
-     + ' s.StudentId, s.Name, s.Email, s.IsConsentGiven, s.GroupId  '
+     + ' s.StudentId, s.Name, s.Email, s.IsConsentGiven  '
      + ' , pstat.PracticeStatisticsId , pstat.Result , pstat.Points, pstat.SessionDuration '
      + ' , pstat.Answer, pstat.Attempts, pstat.TaskType, pstat.CreatedAt, pstat.UpdatedAt '
      + ' , pstat.PracticeTask_PracticeTaskId, pstat.Student_StudentId, pstat.Code '
@@ -530,19 +542,24 @@ def getPracticeData():
      + ' , skill.SkillId '
      + ' , skill.Course_CourseId '
      + ' , c.CourseId, c.User_Id, c.isVisible '
+     
+     + ' , en.EnrolledId, en.LearningActivity_LearningActivityId '
     
-     + '  FROM [sCool-2019-10-24].[dbo].[Students] s ' 
+     + '  FROM [' + DatabaseName +'].[dbo].[Students] s ' 
      
      
-     + '  JOIN [sCool-2019-10-24].[dbo].[PracticeStatistics] pstat ON pstat.Student_StudentId = s.studentId ' 
-     + '  JOIN [sCool-2019-10-24].[dbo].[PracticeTasks] ptask ON ptask.PracticeTaskId = pstat.PracticeTask_PracticeTaskId ' 
-     + '  JOIN [sCool-2019-10-24].[dbo].[Skills] skill ON skill.SkillId = ptask.Skill_SkillId ' 
-     + '  JOIN [sCool-2019-10-24].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
-    # + '  INNER JOIN [sCool-2019-10-24].[dbo].[Enrolleds] en ON en.Course_CourseId = c.CourseId AND en.Student_StudentId = s.StudentId'   
+     + '  JOIN [' + DatabaseName +'].[dbo].[PracticeStatistics] pstat ON pstat.Student_StudentId = s.studentId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[PracticeTasks] ptask ON ptask.PracticeTaskId = pstat.PracticeTask_PracticeTaskId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[Skills] skill ON skill.SkillId = ptask.Skill_SkillId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[Enrolleds] en ON en.Course_CourseId = c.CourseId AND en.Student_StudentId = s.StudentId'  
     
      + '  WHERE s.IsConsentGiven = 1 '
      , conn)
-        
+    
+    dfPractice[constants.GROUPBY_FEATURE]                     = dfPractice['LearningActivity_LearningActivityId']
+    dfPractice[constants.GROUPBY_FEATURE].fillna(0, inplace=True)
+    
     dfPractice.sort_values(['Difficulty','StudentId', 'PracticeStatisticsId', 'SkillId'], 
                    axis=0, 
                    ascending=True, 
@@ -577,10 +594,10 @@ def getPracticeTaskDetails():
      + ' , skill.SkillId '
      + ' , c.CourseId, c.isVisible '
      
-     + '  FROM [sCool-2019-10-24].[dbo].[PracticeTasks] ptask ' 
+     + '  FROM [' + DatabaseName +'].[dbo].[PracticeTasks] ptask ' 
      
-     + '  JOIN [sCool-2019-10-24].[dbo].[Skills] skill ON skill.SkillId = ptask.Skill_SkillId ' 
-     + '  JOIN [sCool-2019-10-24].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[Skills] skill ON skill.SkillId = ptask.Skill_SkillId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
 
      , conn)
                     
@@ -596,9 +613,9 @@ def getSkillDetails():
  
      + ', course.CourseId, course.User_Id , course.isVisible '
 
-     + '  FROM [sCool-2019-10-24].[dbo].[Skills] skill ' 
+     + '  FROM [' + DatabaseName +'].[dbo].[Skills] skill ' 
  
-     + '  JOIN [sCool-2019-10-24].[dbo].[Courses] course ON course.CourseId = skill.Course_CourseId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[Courses] course ON course.CourseId = skill.Course_CourseId ' 
      , conn)
                 
     return dfSkillDetails
@@ -609,33 +626,54 @@ def getCourseDetails():
 
      + ' course.CourseId, course.Title, course.Description, course.User_Id , course.isVisible, course.CreatedAt , course.UpdatedAt  '
     
-     + '  FROM [sCool-2019-10-24].[dbo].[Courses] course ' 
+     + '  FROM [' + DatabaseName +'].[dbo].[Courses] course ' 
      , conn)
                     
     return dfCourseDetails
 
 def getEnrolledDetails():
     
-    dfCourseDetails = pd.read_sql_query('SELECT  '
+    dfEnrolledDetails = pd.read_sql_query('SELECT  '
 
-     + ' enrol.EnrolledId, enrol.Activated, enrol.Course_CourseId, enrol.Student_StudentId, enrol.Points, enrol.CreatedAt, enrol.UpdatedAt '
+     + ' enrol.EnrolledId, enrol.Activated, enrol.Points, enrol.CreatedAt, enrol.UpdatedAt '
+ 
+     + ', course.CourseId, course.User_Id , course.isVisible '
+ 
+     + ', s.StudentId, s.Name '
+     
+     + ', la.LearningActivityId, la.Title, la.Description, la.BeginDate, la.EndDate, la.GroupType, la.SchoolName  '
+     + ', la.Grade, la.NrOfParticipants, la.JoinCode, la.Notes, la.User_Id  '
     
-     + '  FROM [sCool-2019-10-24].[dbo].[Enrolleds] enrol ' 
+     + '  FROM [' + DatabaseName +'].[dbo].[Enrolleds] enrol ' 
+ 
+     + '  JOIN [' + DatabaseName +'].[dbo].[Courses] course  ON course.CourseId = enrol.Course_CourseId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[Students] s   ON s.StudentId = enrol.Student_StudentId ' 
+     + '  JOIN [' + DatabaseName +'].[dbo].[LearningActivity] la  ON la.LearningActivityId = enrol.LearningActivity_LearningActivityId ' 
+     
+     + '  WHERE s.IsConsentGiven = 1 '
      , conn)
                     
-    return dfCourseDetails
+    return dfEnrolledDetails
 
 
 def getStudentDetails():
     
     dfStudentDetails = pd.read_sql_query('SELECT  '
                                    
-     + ' s.StudentId, s.Name, s.Email, s.IsConsentGiven, s.CreatedAt, s.UpdatedAt, s.GroupId  ' 
+     + ' s.StudentId, s.Name, s.Email, s.IsConsentGiven, s.CreatedAt, s.UpdatedAt  ' 
     
-     + '  FROM [sCool-2019-10-24].[dbo].[Students] s ' 
+     + ' , en.EnrolledId, en.LearningActivity_LearningActivityId, en.Course_CourseId '
+     
+     
+     + '  FROM [' + DatabaseName +'].[dbo].[Students] s ' 
+     
+     + '  JOIN [' + DatabaseName +'].[dbo].[Enrolleds] en ON  en.Student_StudentId = s.StudentId'  
      
      + '  WHERE s.IsConsentGiven = 1 '
      , conn)
+    
+    dfStudentDetails[constants.GROUPBY_FEATURE]                     = dfStudentDetails['LearningActivity_LearningActivityId']
+    dfStudentDetails[constants.GROUPBY_FEATURE].fillna(0, inplace=True)
                     
     return dfStudentDetails
 
@@ -648,12 +686,30 @@ def getUserDetails(username):
                                    
      + ' u.Id, u.IsAdmin, u.Email, u.PasswordHash, u.UserName ' 
     
-     + '  FROM [sCool-2019-10-24].[dbo].[AspNetUsers] u ' 
+     + '  FROM [' + DatabaseName +'].[dbo].[AspNetUsers] u ' 
      
      + '  WHERE u.Email = \'' + username + '\''
      , conn)
                     
     return dfUserDetails
+
+
+def getLearningActivityDetails():
+    
+    dfLearningActivityDetails = pd.read_sql_query('SELECT  '
+                                   
+     + ' la.LearningActivityId, la.Title, la.Description, la.BeginDate, la.EndDate, la.GroupType, la.SchoolName  '
+     + ', la.Grade, la.NrOfParticipants, la.JoinCode, la.Notes, la.User_Id  '
+ 
+     + ', u.Id, u.IsAdmin , u.Email '
+     + ', u.UserName , u.PasswordHash '
+    
+     + '  FROM [' + DatabaseName +'].[dbo].[LearningActivity] la ' 
+ 
+     + '  JOIN [' + DatabaseName +'].[dbo].[AspNetUsers] u ON u.Id = la.User_Id ' 
+     , conn)
+                    
+    return dfLearningActivityDetails
 
 #------------------------------------ General Dataframe functions ----------------------------
 

@@ -16,7 +16,7 @@ from plotly.offline import plot
 import plotly.express as px
 
 #main library
-from data import main
+import main
 import constants
 #from main import PythonParser
 
@@ -77,13 +77,12 @@ featuresToInt = featuresToInt + hasFeatures
 
 
 
-
 dfLearningActivityDetails              = main.getLearningActivityDetails()
 
 
 
 dfPractice              = main.getPracticeData()
-#dfPractice[constants.GROUPBY_FEATURE]            = dfPractice['LearningActivity_LearningActivityId']
+dfPractice[constants.GROUPBY_FEATURE]            = dfPractice['LearningActivity_LearningActivityId']
 
 dfPracticeTaskDetails   = main.getPracticeTaskDetails()
 dfPracticeTaskDetails   = dfPracticeTaskDetails.drop_duplicates(subset=['PracticeTaskId'], keep='first')
@@ -93,6 +92,9 @@ dfStudentDetails        = main.getStudentDetails()
 #dfStudentDetails        = dfStudentDetails.drop_duplicates(subset=['StudentId'], keep='first')
 
 
+#dfPractice = dfPractice.merge(
+#        dfLearningActivityDetails[['LearningActivityId', 'User_Id', 'SchoolName', 'GroupType']]
+#        , how='inner', on=['LearningActivityId'], left_index=False, right_index=False)
 
 
 #----------------

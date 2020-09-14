@@ -158,7 +158,7 @@ TASK_TYPE_FEATURE       =  'TaskType'
 
 
 
-featureAdderGroup = "GroupId-"
+featureAdderGroup = "LAId-"
 featureAdderAvg = ' Avg.'
 
 featuresCombined = [GROUPBY_FEATURE,'SessionDuration', 'Points', 'Attempts' ]
@@ -206,8 +206,8 @@ TypeSkill                           = "Skill"
 featureSkill                        = "Skill"
 TypeStudent                         = "Student"
 featureStudent                      = "Student"
-TypeGroup                           = "Group"
-featureGroup                        = "Group"
+TypeGroup                           = "LA"
+featureGroup                        = "LA"
 
 
 

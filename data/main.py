@@ -467,6 +467,8 @@ def getTheoryData():
     
     dfDB[constants.GROUPBY_FEATURE]                     = dfDB['LearningActivity_LearningActivityId']
     dfDB[constants.GROUPBY_FEATURE].fillna(0, inplace=True)
+    dfDB[constants.GROUPBY_FEATURE]    = dfDB[constants.GROUPBY_FEATURE].astype(int)
+    dfDB[constants.featureGroup]       = constants.TypeGroup + '-' + dfDB[constants.GROUPBY_FEATURE].astype(str) 
     
     dfDB.sort_values(['Difficulty','StudentId', 'SkillId', 'TheoryStatisticsId'], 
                    axis=0, 
@@ -559,6 +561,9 @@ def getPracticeData():
     
     dfPractice[constants.GROUPBY_FEATURE]                     = dfPractice['LearningActivity_LearningActivityId']
     dfPractice[constants.GROUPBY_FEATURE].fillna(0, inplace=True)
+    dfPractice[constants.GROUPBY_FEATURE]    = dfPractice[constants.GROUPBY_FEATURE].astype(int)
+    dfPractice[constants.featureGroup]       = constants.TypeGroup + '-' + dfPractice[constants.GROUPBY_FEATURE].astype(str) 
+
     
     dfPractice.sort_values(['Difficulty','StudentId', 'PracticeStatisticsId', 'SkillId'], 
                    axis=0, 

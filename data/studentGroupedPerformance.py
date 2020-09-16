@@ -83,6 +83,7 @@ dfLearningActivityDetails              = main.getLearningActivityDetails()
 
 
 dfPractice              = main.getPracticeData()
+dfPractice[constants.featureGroup]            = constants.TypeGroup + '-' + dfPractice[constants.GROUPBY_FEATURE].astype(str) 
 #dfPractice[constants.GROUPBY_FEATURE]            = dfPractice['LearningActivity_LearningActivityId']
 
 dfPracticeTaskDetails   = main.getPracticeTaskDetails()

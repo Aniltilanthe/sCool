@@ -31,6 +31,10 @@ keyIsDefault                = 'isDefault'
 
 
 
+
+loginRedirect               = "/Home"
+
+
 #--------------------------------------------------------------------------------
 #-------------------------------- STYLES START -----------------------------------
 # the styles for the main content position it to the right of the sidebar and

@@ -213,8 +213,8 @@ sidebar = html.Div(
         ) 
         , 
     ],
-    className = " page-sidebar p-bottom_x-large ",
-    id="sidebar",
+    className = " page-sidebar p-bottom_x-large hidden",
+    id="page-sidebar",
 )
 
 

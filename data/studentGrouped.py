@@ -15,8 +15,6 @@ from data import studentGroupedPerformanceTheory
 
 import constants
 
-
-
 # Fixing random state for reproducibility
 np.random.seed(19680801)
 
@@ -27,6 +25,9 @@ np.random.seed(19680801)
 
 #------------------ Database interactions START --------------------------------------------
 getUserDetails                                          = main.getUserDetails
+
+
+dfUser                                                  = main.getUsers()
 
 
 dfLearningActivityDetails                               = main.getLearningActivityDetails()
@@ -241,9 +242,31 @@ def BuildOptions(options):
     return [{'label': i, 'value': i} for i in options]
 
 
-GroupSelector_options = BuildOptions( [ int(groupId) for groupId in dfStudentDetails[constants.GROUPBY_FEATURE].unique() ]  )
+def getUserLA():
+
+    return dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique()
 
 
+def getUserLAOptions():
+    userLA = [0] + getUserLA()
+    
+    print(getUserLA())
+    print(userLA)
+    
+    return BuildOptions( [ int(groupId) for groupId in [0] + userLA ]  )
+
+GroupSelector_options = getUserLAOptions()
+
+
+
+def getUserFromUserId(usernameOrId):
+    
+    userDB = dfUser[ (dfUser['Id'] == usernameOrId ) |  (dfUser['UserName'] == usernameOrId) ]
+        
+    if len(userDB) > 0:            
+        return userDB.iloc[0]   
+    else:
+        return None
 
 
 #--------------------------------------------------------------------------------------------
@@ -255,7 +278,9 @@ def get_merge_list(values):
 #get List of Students for a group
 def getStudentsOfSchool(groupSelected):
         
-    students = list(dfStudentDetails[dfStudentDetails[constants.GROUPBY_FEATURE] == groupSelected][constants.STUDENT_ID_FEATURE].unique())
+#    students = list(dfStudentDetails[dfStudentDetails[constants.GROUPBY_FEATURE] == groupSelected][constants.STUDENT_ID_FEATURE].unique())
+    
+    students = list(dfEnrolledDetails[dfEnrolledDetails[constants.GROUPBY_FEATURE] == groupSelected][constants.STUDENT_ID_FEATURE].unique())
     
     return students
 
@@ -315,7 +340,18 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
             studentDF = schoolTheory
     
     
+    print('first isOriginal')
+    print(isOriginal)
+    
     groupStudents = getStudentsOfSchool(groupSelected)
+    print('first groupStudents')
+    print(groupStudents)
+    print(len(groupStudents))
+    
+    groupStudents = studentDF['StudentId'].unique()
+    print('second groupStudents')
+    print(groupStudents)
+    print(len(groupStudents))
     
     
     if 'studentDF' in locals()     and    studentDF is not None :

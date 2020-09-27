@@ -882,7 +882,10 @@ def setStudentOptions(schoolSelected):
     
     students = getStudentsOfSchool(int(schoolSelected))
     
-    return [{'label': row['Name'], 'value': row['StudentId'] } for index, row  in dfStudentDetails[dfStudentDetails['StudentId'].isin( students)][['StudentId', 'Name']].iterrows() ]
+    
+    return [{'label': row['Name'], 'value': row['StudentId'] } for index, row  in 
+             dfStudentDetails[dfStudentDetails[constants.STUDENT_ID_FEATURE].isin( students)][['StudentId', 'Name']]
+             .drop_duplicates(subset=['StudentId'], keep='first').iterrows() ]
     
 
 @app.callback(

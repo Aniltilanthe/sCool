@@ -11,3 +11,4 @@ pip install sklearn
 pip install seaborn
 pip install scipy
 pip install statsmodels
+pip install dash-auth

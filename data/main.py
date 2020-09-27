@@ -679,13 +679,26 @@ def getStudentDetails():
     
     dfStudentDetails[constants.GROUPBY_FEATURE]                     = dfStudentDetails['LearningActivity_LearningActivityId']
     dfStudentDetails[constants.GROUPBY_FEATURE].fillna(0, inplace=True)
+    dfStudentDetails[constants.GROUPBY_FEATURE]    = dfStudentDetails[constants.GROUPBY_FEATURE].astype(int)
+    dfStudentDetails[constants.featureGroup]       = constants.TypeGroup + '-' + dfStudentDetails[constants.GROUPBY_FEATURE].astype(str) 
                     
     return dfStudentDetails
 
 
 
 
-def getUserDetails(username):
+def getUsers():
+    
+    dfUserDetails = pd.read_sql_query('SELECT  '
+                                   
+     + ' u.Id, u.IsAdmin, u.Email, u.PasswordHash, u.UserName ' 
+    
+     + '  FROM [' + DatabaseName +'].[dbo].[AspNetUsers] u ' 
+     , conn)
+                    
+    return dfUserDetails
+
+def getUserDetails(usernameOrId):
     
     dfUserDetails = pd.read_sql_query('SELECT  '
                                    
@@ -693,7 +706,7 @@ def getUserDetails(username):
     
      + '  FROM [' + DatabaseName +'].[dbo].[AspNetUsers] u ' 
      
-     + '  WHERE u.Email = \'' + username + '\''
+     + '  WHERE u.Email = \'' + usernameOrId + '\'   OR   u.UserName = \'' + usernameOrId + '\'  OR   u.Id = \'' + usernameOrId + '\''
      , conn)
                     
     return dfUserDetails

@@ -235,11 +235,17 @@ def getStudentWiseData(df):
         
 def getGroups():
     return [constants.TypeGroup + '-' + str(0)] + [constants.TypeGroup + '-' + str(learningActivityId) for learningActivityId in dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique()]
- 
 
 
-def BuildOptions(options):  
+
+def BuildOptions(options):
     return [{'label': i, 'value': i} for i in options]
+
+
+def BuildOptionsLA(options):
+    return [{'label': dfLearningActivityDetails[dfLearningActivityDetails['LearningActivityId'] == i]['Title'].iloc[0] if int(i) > 0 else 'General Ungrouped', 
+             'value': int(i) } for i in options]
+
 
 
 def getUserLA():
@@ -253,7 +259,7 @@ def getUserLAOptions():
     print(getUserLA())
     print(userLA)
     
-    return BuildOptions( [ int(groupId) for groupId in [0] + userLA ]  )
+    return BuildOptionsLA( [ int(groupId) for groupId in [0] + userLA ]  )
 
 GroupSelector_options = getUserLAOptions()
 

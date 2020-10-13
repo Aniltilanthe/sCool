@@ -10,13 +10,15 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input,Output,State
 from dash import no_update
 
+from flask import  Flask, request, redirect
 from flask_login import login_user, current_user
 from werkzeug.security import check_password_hash
 import time
+import base64
 
 from data import studentGrouped
 
-from app import app, User
+from app import app, User, server
 
 import constants
 
@@ -90,7 +92,7 @@ def login_success(n_clicks, usernameId):
         print('login success user')
         userDB = studentGrouped.getUserFromUserId(usernameId)
         
-        if  userDB is not None:            
+        if  userDB is not None: 
             user = User(userDB['UserName'], userDB['Id'], True)
             print('login success user')
             print(userDB)
@@ -98,13 +100,40 @@ def login_success(n_clicks, usernameId):
             if user:
                 login_user(user)
 
-                return '/home', success_alert
+                return constants.loginRedirect, success_alert
             else:
                 return no_update, failure_alert
         else:
             return no_update, failure_alert
     else:
         return no_update, ''
+
+
+
+# Adding this route allows us to use the POST method on our login app.
+# It also allows us to implement HTTP Redirect when the login form is submitted.
+@server.route('/login', methods=['POST'])
+def login():
+    print('in server route login')
+    if request.method == 'POST':
+        print('in server route login POST')
+        if request.args.get('usernameId'):
+            userDB = studentGrouped.getUserFromUserId(request.args.get('usernameId'))
+            if  userDB is not None:            
+                user = User(userDB['UserName'], userDB['Id'], True)
+                if user:
+                    login_user(user)
+                    return redirect(constants.loginRedirect)
+                else:
+                    return redirect('/login')
+            else:
+                return redirect('/login')
+        else:
+            return redirect('/login')
+    else:
+        return redirect('/login')
+
+
 
 
 #import dash_html_components as html

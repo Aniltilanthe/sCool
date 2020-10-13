@@ -32,7 +32,7 @@ keyIsDefault                = 'isDefault'
 
 
 
-loginRedirect               = "/Home"
+loginRedirect               = "/Details"
 
 
 #--------------------------------------------------------------------------------
@@ -554,5 +554,19 @@ colors = ['skyblue', 'palegreen', 'mistyrose', 'cadetblue', 'pink', 'lightcoral'
 markers = ['.', 'o', 'v', '^', '<', '>', '*', 's', '+', 'x', 'D', 'H', '|', '-']
 markerfacecolors = ['navy', 'seagreen', 'red', 'cyan', 'magenta', 'maroon'
                    ,'darkviolet' , 'green', 'tomato', 'grey', 'mediumturqoise']
+
+
+
+
+
+
+
+
+
+#------------------------------------
+#-- Label
+#------------------------------------
+labelSelectLA = 'Select Learning Activity'
+
 
 

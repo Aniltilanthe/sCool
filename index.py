@@ -7,6 +7,7 @@ Created on Thu Jun 11 18:04:10 2020
 
 # -*- coding: utf-8 -*-
 import pandas as pd
+import numpy as np
 
 import dash
 from dash.dependencies import Input, Output, State
@@ -36,8 +37,56 @@ dfUser                  =  studentGrouped.dfUser
 #--------------------- school selection END ----------------------
 
 
+    
+@login_manager.user_loader
+def load_user(usernameOrId):
+     # 1. Fetch against the database a user by `id` 
+     # 2. Create a new object of `User` class and return it.
+ 
+    userDB = studentGrouped.getUserFromUserId(usernameOrId)
+    print(userDB['UserName'])
+    
+    if  userDB is not None:        
+        return User(userDB['UserName'], userDB['Id'], True)
 
-print(GroupSelector_options )
+
+
+print( GroupSelector_options )
+
+
+def getUserLA():
+    print('index getUserLA current user')
+    print(current_user)
+    if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
+        currentUserId = current_user.id
+        print('getUserLA isAdmin or not userDB')
+        print(currentUserId)
+        
+        userDB = studentGrouped.getUserFromUserId(currentUserId)
+        
+        print(userDB)
+        
+        if  userDB is not None:        
+            if userDB['IsAdmin']:
+                print('In IsAdmin part')
+                return studentGrouped.dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique().astype(str)
+            else:
+                print('In Not Admin Else Part')
+                return studentGrouped.dfLearningActivityDetails[studentGrouped.dfLearningActivityDetails['User_Id'] == 
+                                                                currentUserId][constants.GROUPBY_FEATURE].unique().astype(str)
+
+
+    return studentGrouped.dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique()
+
+
+
+
+def getUserLAOptions():
+    print('index  getUserLAOptions')
+    userLA = getUserLA()
+    print(userLA)
+    
+    return studentGrouped.BuildOptionsLA( [ groupId for groupId in  np.append(userLA, [0])  ]  )
 
 
 def generateControlCard():
@@ -47,10 +96,10 @@ def generateControlCard():
     return html.Div(
         id="control-card-index",
         children=[
-            html.P("Select Group"),
+            html.P(constants.labelSelectLA),
             dcc.Dropdown(
                 id = "group-selector-main",
-                options = GroupSelector_options,
+                options = getUserLAOptions(),
                 className = "dropdown-main",
             ),
         ]
@@ -104,6 +153,8 @@ userInfoLayout = html.Div(
     className = " hidden "
 )
 
+
+
 app.layout = html.Div([dcc.Location(id="url"), sidebar.sidebar, content,
                        userInfoLayout ],
                        className = constants.THEME
@@ -114,8 +165,6 @@ app.layout = html.Div([dcc.Location(id="url"), sidebar.sidebar, content,
 
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
-    
-    
     
     if pathname == '/login':
         if not current_user.is_authenticated:
@@ -154,6 +203,8 @@ def render_page_content(pathname):
 #        return studentGrouped.getUserLAOptions()
 
 
+
+
 # Update bar plot
 @app.callback(
     Output("page-topbar", "className"),
@@ -174,7 +225,9 @@ def show_hide_topbar(pathname, currentClasses):
     if pathname in  ["/", "/Home", "/login"] :
         currentClassesS.add('hidden')
         
-    return  ' '.join(currentClassesS) 
+    return  ' '.join(currentClassesS)
+
+
 
 
 
@@ -203,6 +256,7 @@ def show_hide_sidebar(pathname, currentClasses):
 
 
 
+
 @app.callback(
     Output("group-selector-main", "options"),
     [
@@ -214,48 +268,6 @@ def on_login_update_group_selector_options(usernameOrId):
     return studentGrouped.getUserLAOptions()
 
 
-    
-@login_manager.user_loader
-def load_user(usernameOrId):
-     # 1. Fetch against the database a user by `id` 
-     # 2. Create a new object of `User` class and return it.
- 
-    userDB = studentGrouped.getUserFromUserId(usernameOrId)
-    
-    if  userDB is not None:        
-        return User(userDB['UserName'], userDB['Id'], True)
-
-
-
-def getUserLA():
-    if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
-        currentUserId = current_user.id
-        print('getUserLA isAdmin or not userDB')
-        print(currentUserId)
-        
-        userDB = studentGrouped.getUserFromUserId(currentUserId)
-            
-        print(userDB)
-        
-        if  userDB is not None:        
-            if userDB['IsAdmin']:
-                print('In IsAdmin part')
-                return studentGrouped.dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique()
-            else:
-                print('In Not Admin Else Part')
-                return studentGrouped.dfLearningActivityDetails[studentGrouped.dfLearningActivityDetails['User_Id'] == 
-                                                                currentUserId][constants.GROUPBY_FEATURE].unique()
-
-
-    return studentGrouped.dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique()
-
-
-def getUserLAOptions():
-    userLA = [0] + getUserLA()
-    
-    return studentGrouped.BuildOptions( [ int(groupId) for groupId in [0] + userLA ]  )
-
-#GroupSelector_options = getUserLAOptions()
 
 
 

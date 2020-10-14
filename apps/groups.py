@@ -233,7 +233,7 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
 def plotGroupOverview(groupSelected):
     
     groupStudents     =  getStudentsOfSchool(groupSelected)
-    studentDataDf     =  studentGrouped.getStudentsOfSchoolDF(groupSelected)
+#    studentDataDf     =  studentGrouped.getStudentsOfSchoolDF(groupSelected)
     studentDataDf       = getGroupData(groupSelected, [])
     
     plots = util.plotGroupOverview(groupSelected, groupStudents, studentDataDf)

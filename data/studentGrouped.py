@@ -243,8 +243,13 @@ def BuildOptions(options):
 
 
 def BuildOptionsLA(options):
-    return [{'label': dfLearningActivityDetails[dfLearningActivityDetails['LearningActivityId'] == i]['Title'].iloc[0] if int(i) > 0 else 'General Ungrouped', 
-             'value': int(i) } for i in options]
+    
+    print(' BuildOptionsLA ')    
+    print(options)
+    
+    return [{'label': dfLearningActivityDetails[dfLearningActivityDetails['LearningActivityId'] == int(i)]['Title'].iloc[0] if int(i) > 0 else 'General Ungrouped', 
+             'value': int(i) } for i in options]     +      [{'label': 'General Ungrouped', 
+             'value': 0 }]
 
 
 
@@ -254,12 +259,12 @@ def getUserLA():
 
 
 def getUserLAOptions():
-    userLA = [0] + getUserLA()
+    userLA =  getUserLA()
     
     print(getUserLA())
     print(userLA)
     
-    return BuildOptionsLA( [ int(groupId) for groupId in [0] + userLA ]  )
+    return BuildOptionsLA( [ int(groupId) for groupId in      userLA ]  )
 
 GroupSelector_options = getUserLAOptions()
 
@@ -293,12 +298,15 @@ def getStudentsOfSchool(groupSelected):
 #get students DataFrame a group
 def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
     
+    print('Students school DF getStudentsOfSchoolDF ')
+    print(dfGroupedPractice.groups.keys())
+    
     if not(isOriginal) and groupSelected in dfGroupedPractice.groups.keys():
         schoolPractice = dfGroupedPractice.get_group(groupSelected)
         schoolPractice[constants.featureTaskId]        = constants.TaskTypePractice + '-' + schoolPractice['PracticeTaskId'].astype(str)
         schoolPractice[constants.TASK_TYPE_FEATURE]      = constants.TaskTypePractice
     
-        schoolPractice = schoolPractice.loc[:,~schoolPractice.columns.duplicated()]     
+        schoolPractice = schoolPractice.loc[:,~schoolPractice.columns.duplicated()]
 
         studentDF = schoolPractice
         
@@ -306,14 +314,14 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
         studentDF['ConceptsUsedDetailsGroup'] = [  studentDF.ConceptsUsedDetails.agg(get_merge_list) ] * studentDF.shape[0]
         studentDF[constants.featureConceptsUsedDetailsStr]     = studentDF['ConceptsUsedDetailsGroup']
         
-        studentDF[featureDescription] = getPracticeDescription(studentDF)  
+        studentDF[featureDescription] = getPracticeDescription(studentDF)
     
     elif isOriginal and groupSelected in dfGroupedOriginal.groups.keys():
         schoolPractice = dfGroupedOriginal.get_group(groupSelected)
         schoolPractice[constants.featureTaskId]        = constants.TaskTypePractice + '-' + schoolPractice['PracticeTaskId'].astype(str)
         schoolPractice[constants.TASK_TYPE_FEATURE]      = constants.TaskTypePractice
     
-        schoolPractice = schoolPractice.loc[:,~schoolPractice.columns.duplicated()]     
+        schoolPractice = schoolPractice.loc[:,~schoolPractice.columns.duplicated()]
 
         studentDF = schoolPractice
         
@@ -325,7 +333,7 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
         studentDF['ConceptsUsedDetailsGroup'] = [  studentDF.ConceptsUsedDetails.agg(get_merge_list) ] * studentDF.shape[0]
         studentDF[constants.featureConceptsUsedDetailsStr]     = studentDF['ConceptsUsedDetailsGroup']
         
-        studentDF[featureDescription] = getPracticeDescription(studentDF)  
+        studentDF[featureDescription] = getPracticeDescription(studentDF)
         
 
     
@@ -334,8 +342,8 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
         schoolTheory[constants.featureTaskId]      =  constants.TaskTypeTheory + schoolTheory['TheoryTaskId'].astype(str)
         schoolTheory[constants.TASK_TYPE_FEATURE]    =  constants.TaskTypeTheory 
         
-        schoolTheory = schoolTheory.loc[:,~schoolTheory.columns.duplicated()]          
-        schoolTheory[featureDescription] = getTheoryDescription(schoolTheory)    
+        schoolTheory = schoolTheory.loc[:,~schoolTheory.columns.duplicated()]
+        schoolTheory[featureDescription] = getTheoryDescription(schoolTheory)
         
 #        if defined, else
         try:

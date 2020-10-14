@@ -42,6 +42,8 @@ dfUser                  =  studentGrouped.dfUser
 def load_user(usernameOrId):
      # 1. Fetch against the database a user by `id` 
      # 2. Create a new object of `User` class and return it.
+
+    print('inside load_user')
  
     userDB = studentGrouped.getUserFromUserId(usernameOrId)
     print(userDB['UserName'])
@@ -86,7 +88,7 @@ def getUserLAOptions():
     userLA = getUserLA()
     print(userLA)
     
-    return studentGrouped.BuildOptionsLA( [ groupId for groupId in  np.append(userLA, [0])  ]  )
+    return studentGrouped.BuildOptionsLA( [ groupId for groupId in  userLA  ]  )
 
 
 def generateControlCard():
@@ -99,7 +101,6 @@ def generateControlCard():
             html.P(constants.labelSelectLA),
             dcc.Dropdown(
                 id = "group-selector-main",
-                options = getUserLAOptions(),
                 className = "dropdown-main",
             ),
         ]
@@ -163,8 +164,13 @@ app.layout = html.Div([dcc.Location(id="url"), sidebar.sidebar, content,
 
 
 
+
+
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
+    
+    print('inside index render page content')
+    print(current_user)
     
     if pathname == '/login':
         if not current_user.is_authenticated:
@@ -192,6 +198,40 @@ def render_page_content(pathname):
     # DEFAULT NOT LOGGED IN: /login
     return login.layout
 
+
+
+
+@app.callback(Output("group-selector-main", "options"), [Input("url", "pathname")],
+    state=[ State(component_id = "group-selector-main", component_property='options') ]
+    )
+def render_main_selector_content(pathname,
+               selectorOptions ):
+    
+    print('inside index render_main_selector_content')
+    print(current_user)
+    print(selectorOptions)
+
+    if current_user.is_authenticated  :
+        return getUserLAOptions()
+    
+    
+    
+#    if not(None is containerChildren):
+#        if isinstance(containerChildren, list):
+#            print(' isinstance(containerChildren, list) ')
+#            graphs = graphs + containerChildren 
+#        else :
+#            if isinstance(containerChildren, dict) and 'props' in containerChildren.keys():
+#                print(' isinstance(containerChildren, dict) and props in containerChildren.keys() ')
+#                graphs = graphs + containerChildren.get('props').get('children')
+#
+#    print(' graphs to plot ! ')
+#
+#    return   graphs 
+    
+    
+#    return html.Div(graphs)
+    
 
 
 #@app.callback(Output('group-selector-main', 'options'), 
@@ -257,15 +297,15 @@ def show_hide_sidebar(pathname, currentClasses):
 
 
 
-@app.callback(
-    Output("group-selector-main", "options"),
-    [
-        Input("user-info-id", "value")
-    ],
-)
-def on_login_update_group_selector_options(usernameOrId):
-    
-    return studentGrouped.getUserLAOptions()
+#@app.callback(
+#    Output("group-selector-main", "options"),
+#    [
+#        Input("user-info-id", "value")
+#    ],
+#)
+#def on_login_update_group_selector_options(usernameOrId):
+#    
+#    return studentGrouped.getUserLAOptions()
 
 
 

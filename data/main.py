@@ -640,24 +640,32 @@ def getEnrolledDetails():
     
     dfEnrolledDetails = pd.read_sql_query('SELECT  '
 
-     + ' enrol.EnrolledId, enrol.Activated, enrol.Points, enrol.CreatedAt, enrol.UpdatedAt '
+     + ' enrol.EnrolledId, enrol.Activated, enrol.Points, enrol.CreatedAt, enrol.UpdatedAt, enrol.LearningActivity_LearningActivityId '
  
      + ', course.CourseId, course.User_Id , course.isVisible '
  
      + ', s.StudentId, s.Name '
      
-     + ', la.LearningActivityId, la.Title, la.Description, la.BeginDate, la.EndDate, la.GroupType, la.SchoolName  '
-     + ', la.Grade, la.NrOfParticipants, la.JoinCode, la.Notes, la.User_Id  '
+#     + ', la.LearningActivityId, la.Title, la.Description, la.BeginDate, la.EndDate, la.GroupType, la.SchoolName  '
+#     + ', la.Grade, la.NrOfParticipants, la.JoinCode, la.Notes, la.User_Id  '
     
      + '  FROM [' + DatabaseName +'].[dbo].[Enrolleds] enrol ' 
  
      + '  JOIN [' + DatabaseName +'].[dbo].[Courses] course  ON course.CourseId = enrol.Course_CourseId ' 
      + '  JOIN [' + DatabaseName +'].[dbo].[Students] s   ON s.StudentId = enrol.Student_StudentId ' 
-     + '  JOIN [' + DatabaseName +'].[dbo].[LearningActivity] la  ON la.LearningActivityId = enrol.LearningActivity_LearningActivityId ' 
+#     + '  JOIN [' + DatabaseName +'].[dbo].[LearningActivity] la  ON la.LearningActivityId = enrol.LearningActivity_LearningActivityId ' 
      
      + '  WHERE s.IsConsentGiven = 1 '
      , conn)
+    
+    
+    dfEnrolledDetails[constants.GROUPBY_FEATURE]                     = dfEnrolledDetails['LearningActivity_LearningActivityId']
+    dfEnrolledDetails[constants.GROUPBY_FEATURE].fillna(0, inplace=True)
+    dfEnrolledDetails[constants.GROUPBY_FEATURE]                     = dfEnrolledDetails[constants.GROUPBY_FEATURE].astype(int)
                     
+    print('getEnrolledDetails')
+    print(    dfEnrolledDetails[constants.GROUPBY_FEATURE].unique()   )
+    
     return dfEnrolledDetails
 
 
@@ -679,7 +687,12 @@ def getStudentDetails():
     
     dfStudentDetails[constants.GROUPBY_FEATURE]                     = dfStudentDetails['LearningActivity_LearningActivityId']
     dfStudentDetails[constants.GROUPBY_FEATURE].fillna(0, inplace=True)
-    dfStudentDetails[constants.GROUPBY_FEATURE]    = dfStudentDetails[constants.GROUPBY_FEATURE].astype(int)
+    dfStudentDetails[constants.GROUPBY_FEATURE]                     = dfStudentDetails[constants.GROUPBY_FEATURE].astype(int)
+    
+    
+    print('getStudentDetails')
+    print(    dfStudentDetails[constants.GROUPBY_FEATURE].unique()   )
+    
     dfStudentDetails[constants.featureGroup]       = constants.TypeGroup + '-' + dfStudentDetails[constants.GROUPBY_FEATURE].astype(str) 
                     
     return dfStudentDetails

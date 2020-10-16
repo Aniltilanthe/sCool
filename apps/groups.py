@@ -492,9 +492,20 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)
         columns3 = []
         columns3.append(dbc.Col(
+                
                 dcc.Graph(
-                        figure= figQuantile
-                    ) , align="center"))
+                    figure= figQuantile
+                )
+            
+                if  constants.languageLocal  != 'en' else
+            
+                dcc.Graph(
+                    figure= figQuantile
+                     
+                    , config  =  dict (locale   =  constants.languageLocal   ) 
+                )
+                
+                , align="center"))
         rows.append( dbc.Row( columns3 ) )
         rows.append( html.Br() )
 
@@ -506,9 +517,25 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)            
         columns3 = []
         columns3.append(dbc.Col(
+                
+                
                 dcc.Graph(
-                        figure= figQuantile
-                    ) , align="center"))    
+                    figure= figQuantile
+                )
+            
+                if  constants.languageLocal  != 'en' else
+            
+                dcc.Graph(
+                    figure= figQuantile
+                     
+                    , config  =  dict (locale   =  constants.languageLocal   ) 
+                )
+                
+                
+                
+                
+                
+                , align="center"))    
         rows.append( dbc.Row( columns3 ) )      
         rows.append( html.Br() )         
         
@@ -520,9 +547,25 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)                      
         columns3 = []
         columns3.append(dbc.Col(
+                
+                
+                
+            
                 dcc.Graph(
-                        figure= figQuantile
-                    ) , align="center"))    
+                    figure= figQuantile
+                )
+            
+                if  constants.languageLocal  != 'en' else
+            
+                dcc.Graph(
+                    figure= figQuantile
+                     
+                    , config  =  dict (locale   =  constants.languageLocal   ) 
+                )
+                
+                
+                
+                , align="center"))    
         rows.append( dbc.Row( columns3 ) )       
         rows.append( html.Br() )           
 
@@ -534,9 +577,27 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
         figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)                           
         columns3 = []
         columns3.append(dbc.Col(
+                
+                
+                
+            
                 dcc.Graph(
-                        figure= figQuantile
-                    ) , align="center"))    
+                    figure= figQuantile
+                )
+            
+                if  constants.languageLocal  != 'en' else
+            
+                dcc.Graph(
+                    figure= figQuantile
+                     
+                    , config  =  dict (locale   =  constants.languageLocal   ) 
+                )
+                
+                
+                
+                
+                
+                , align="center"))    
         rows.append( dbc.Row( columns3 ) )      
         rows.append( html.Br() )             
 

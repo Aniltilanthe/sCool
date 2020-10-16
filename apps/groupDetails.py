@@ -567,9 +567,20 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 ) :
                 )
             
             graphs.append(
-                    dcc.Graph(
-                        figure= figBar
-                )) 
+            
+                dcc.Graph(
+                    figure= figBar
+                )
+            
+                if  constants.languageLocal  != 'en' else
+            
+                dcc.Graph(
+                    figure= figBar
+                     
+                    , config  =  dict (locale   =  constants.languageLocal   ) 
+                )
+                    
+            ) 
             
             return graphs
 
@@ -690,17 +701,40 @@ def plotGroupConceptDetails(groupId):
                             , labels        =   feature2UserNamesDict # customize axis label
             )
         graphs.append(
+            
                 dcc.Graph(
                     figure= figBar
-            ))
+                )
+            
+                if  constants.languageLocal  != 'en' else
+            
+                dcc.Graph(
+                    figure= figBar
+                     
+                    , config  =  dict (locale   =  constants.languageLocal   ) 
+                )
+        )
         
 #        Task wise concepts used - grouped together
         try :
             figBar = plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 )
             graphs.append(
-                    dcc.Graph(
-                        figure= figBar
-                ))
+                    
+            
+                dcc.Graph(
+                    figure= figBar
+                )
+            
+                if  constants.languageLocal  != 'en' else
+            
+                dcc.Graph(
+                    figure= figBar
+                     
+                    , config  =  dict (locale   =  constants.languageLocal   ) 
+                )
+                    
+                
+                )
         except Exception as e: 
                 print('Task Concepts used')
                 print(e)                
@@ -732,9 +766,20 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                     constants.TaskTypePractice  : constants.colorPractice, },
             )
             graphs.append(
-                    dcc.Graph(
-                        figure = fig
-                ))
+            
+                dcc.Graph(
+                    figure= fig
+                )
+            
+                if  constants.languageLocal  != 'en' else
+            
+                dcc.Graph(
+                    figure= fig
+                     
+                    , config  =  dict (locale   =  constants.languageLocal   ) 
+                )
+                
+            )
         except Exception as e: 
             print('getFeaturePlot  1st  ')
             print('title  ' + title)
@@ -753,9 +798,18 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                 , hover_data    =  hoverData
             )
             graphs.append(
-                    dcc.Graph(
-                        figure = fig
-                ))
+                dcc.Graph(
+                    figure= fig
+                )
+            
+                if  constants.languageLocal  != 'en' else
+            
+                dcc.Graph(
+                    figure= fig
+                     
+                    , config  =  dict (locale   =  constants.languageLocal   ) 
+                )
+                )
         except Exception as e: 
             print('getFeaturePlot  2nd  ')
             print('title  ' + title)
@@ -795,9 +849,22 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                 )
                 
             figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)
-            graphDistributions.append( html.Div( dcc.Graph(
-                    figure =  figQuantile
-            )))
+            graphDistributions.append( html.Div( 
+                    
+                    
+                dcc.Graph(
+                    figure= figQuantile
+                )
+            
+                if  constants.languageLocal  != 'en' else
+            
+                dcc.Graph(
+                    figure= figQuantile
+                     
+                    , config  =  dict (locale   =  constants.languageLocal   ) 
+                )
+                
+            ))
     except Exception as e: 
         print('getFeaturePlot  hasDistribution ')
         print('title  ' + title)

@@ -145,19 +145,20 @@ content = html.Div(
     className = "  page-main "
 )
                                         
-                                        
-userInfoLayout = html.Div(
-        children=[
-        dcc.Input(id="user-info-username", type="text", placeholder=""),
-        dcc.Input(id="user-info-id", type="text", placeholder=""),
-    ],
-    className = " hidden "
-)
+#                                        
+#userInfoLayout = html.Div(
+#        children=[
+#        dcc.Input(id="user-info-username", type="text", placeholder=""),
+#        dcc.Input(id="user-info-id", type="text", placeholder=""),
+#    ],
+#    className = " hidden "
+#)
 
 
 
 app.layout = html.Div([dcc.Location(id="url"), sidebar.sidebar, content,
-                       userInfoLayout ],
+#                       userInfoLayout 
+                       ],
                        className = constants.THEME
                        )
 
@@ -181,11 +182,11 @@ def render_page_content(pathname):
         
 
     if current_user.is_authenticated:
-        if pathname in ["/", "/Home"]:
+        if pathname in ["/Home"]:
             return home.layout
         if pathname in ["/Overview", "/Groups"]:
             return groups.layout
-        elif pathname == "/Details":
+        elif pathname  in ["/", "/Details"]:
             return groupDetails.layout
         elif pathname == "/Custom":
             return custom.layout
@@ -214,34 +215,6 @@ def render_main_selector_content(pathname,
     if current_user.is_authenticated  :
         return getUserLAOptions()
     
-    
-    
-#    if not(None is containerChildren):
-#        if isinstance(containerChildren, list):
-#            print(' isinstance(containerChildren, list) ')
-#            graphs = graphs + containerChildren 
-#        else :
-#            if isinstance(containerChildren, dict) and 'props' in containerChildren.keys():
-#                print(' isinstance(containerChildren, dict) and props in containerChildren.keys() ')
-#                graphs = graphs + containerChildren.get('props').get('children')
-#
-#    print(' graphs to plot ! ')
-#
-#    return   graphs 
-    
-    
-#    return html.Div(graphs)
-    
-
-
-#@app.callback(Output('group-selector-main', 'options'), 
-#              [Input("url", "pathname")])
-#def update_group_select_options(pathname):    
-#    if pathname in  ["/login"] :
-#        return []
-#    else:
-#        return studentGrouped.getUserLAOptions()
-
 
 
 

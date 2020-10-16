@@ -592,7 +592,8 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
                                             studentData['Description'] 
                             ), axis=-1) ,
                     hovertemplate   = "<br>" +
-                                  "%{customdata[1]}<br>"                         
+                                  "%{customdata[1]}<br>"     
+                                  
                                 )
                     )
     fig.update_layout(
@@ -606,11 +607,22 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
                                                 title = 'Duration (s)',
                                                 titlefont_size = 16,
                                                 tickfont_size = 14,
-                            ))
+                            )                   
+                                )
     graphs.append(
-            dcc.Graph(
-                figure= fig
-        ))
+            
+                dcc.Graph(
+                    figure= fig
+                )
+            
+            if  constants.languageLocal  != 'en' else
+            
+                dcc.Graph(
+                    figure= fig
+                     
+                    , config  =  dict (locale   =  constants.languageLocal   ) 
+                )
+        )
     
     
     
@@ -635,9 +647,19 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
                           )
     
     graphs.append(
-            dcc.Graph(
-                figure= fig
-        ))
+            
+                dcc.Graph(
+                    figure= fig
+                )
+            
+            if  constants.languageLocal  != 'en' else
+            
+                dcc.Graph(
+                    figure= fig
+                     
+                    , config  =  dict (locale   =  constants.languageLocal   ) 
+                )
+    )
 
 # **** IMPORTANT - ff.create_gantt is deprecated -> moved to px.timeline 
 #    studentData['StartStr'] = studentData['Start'].dt.strftime('%Y-%m-%d %H:%M:%S')

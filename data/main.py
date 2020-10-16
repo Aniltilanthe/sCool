@@ -178,13 +178,13 @@ def getConceptFeaturesFromCodeLines(df, featureCode):
             dFeature.append(newFeaturesArrForThisRow)
             
         except SyntaxError:
-            dFeature.append( (len(conceptFeaturesMap) + 1) * [0]    ) 
-                
-                
+            dFeature.append( (len(conceptFeaturesMap) + 1) * [0]    )
+
+
     dFeature = np.array(dFeature)
-    dfFeature = pd.DataFrame(dFeature, columns=columnsFeatures)    
+    dfFeature = pd.DataFrame(dFeature, columns=columnsFeatures)
     
-    return dfFeature    
+    return dfFeature
 
 
 
@@ -662,9 +662,6 @@ def getEnrolledDetails():
     dfEnrolledDetails[constants.GROUPBY_FEATURE]                     = dfEnrolledDetails['LearningActivity_LearningActivityId']
     dfEnrolledDetails[constants.GROUPBY_FEATURE].fillna(0, inplace=True)
     dfEnrolledDetails[constants.GROUPBY_FEATURE]                     = dfEnrolledDetails[constants.GROUPBY_FEATURE].astype(int)
-                    
-    print('getEnrolledDetails')
-    print(    dfEnrolledDetails[constants.GROUPBY_FEATURE].unique()   )
     
     return dfEnrolledDetails
 
@@ -689,11 +686,7 @@ def getStudentDetails():
     dfStudentDetails[constants.GROUPBY_FEATURE].fillna(0, inplace=True)
     dfStudentDetails[constants.GROUPBY_FEATURE]                     = dfStudentDetails[constants.GROUPBY_FEATURE].astype(int)
     
-    
-    print('getStudentDetails')
-    print(    dfStudentDetails[constants.GROUPBY_FEATURE].unique()   )
-    
-    dfStudentDetails[constants.featureGroup]       = constants.TypeGroup + '-' + dfStudentDetails[constants.GROUPBY_FEATURE].astype(str) 
+    dfStudentDetails[constants.featureGroup]       = constants.TypeGroup + '-' + dfStudentDetails[constants.GROUPBY_FEATURE].astype(str)
                     
     return dfStudentDetails
 

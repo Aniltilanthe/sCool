@@ -10,9 +10,12 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State, ClientsideFunction
 
+from flask_login import current_user
 
 from app import app
+from data import studentGrouped
 import constants
+
 
 THEME_COLOR_MAP     = constants.THEME_COLOR_MAP
 
@@ -32,6 +35,48 @@ iconNameDetails     = constants.iconNameDetails
 iconNameStudents    = constants.iconNameStudents
 iconNameCustom      = constants.iconNameCustom
 
+
+
+
+
+dfUser                                                  =  studentGrouped.dfUser
+
+dfLearningActivityDetails                               = studentGrouped.dfLearningActivityDetails
+
+dfEnrolledDetails                                       = studentGrouped.dfEnrolledDetails
+
+dfStudentDetails                                        = studentGrouped.dfStudentDetails
+
+dfCourseDetails                                         = studentGrouped.dfCourseDetails
+dfSkillDetails                                          = studentGrouped.dfSkillDetails
+dfPracticeTaskDetails                                   = studentGrouped.dfPracticeTaskDetails
+dfTheoryTaskDetails                                     = studentGrouped.dfTheoryTaskDetails
+dfTaskDetails                                           = studentGrouped.dfTaskDetails
+
+
+dfPracticeTasks = dfPracticeTaskDetails.merge(
+        dfSkillDetails[['SkillId', 'Title', 'Description']]
+        , how='inner', on=['SkillId'], left_index=False, right_index=False,
+        suffixes = ('', ' Skill')  )
+
+
+dfPracticeTasks = dfPracticeTaskDetails.merge(
+        dfCourseDetails[['CourseId', 'Title', 'Description']]
+        , how='inner', on=['CourseId'], left_index=False, right_index=False,
+        suffixes = ('', ' Course')  )
+
+
+
+dfTheoryTasks = dfTheoryTaskDetails.merge(
+        dfSkillDetails[['SkillId', 'Title', 'Description']]
+        , how='inner', on=['SkillId'], left_index=False, right_index=False,
+        suffixes = ('', ' Skill')  )
+
+
+dfTheoryTasks = dfTheoryTaskDetails.merge(
+        dfCourseDetails[['CourseId', 'Title', 'Description']]
+        , how='inner', on=['CourseId'], left_index=False, right_index=False,
+        suffixes = ('', ' Course')  )
 
 
 
@@ -65,7 +110,7 @@ layoutModalBodyCustomize = layoutModalBodyCustomize + [ html.Button(children=[
 
 
 layoutModalBodyHelp = [
-    html.H5( children = [ html.I(className="fas " + iconNameHome + " p-right_xx-small"),   "Home"  ] ),
+    html.H5( children = [ html.I(className="fas " + iconNameHome + " p-right_xx-small"),   "Game Details"  ] ),
     html.P("Information about the game data"),
     
     html.Br(),
@@ -128,6 +173,66 @@ layoutModalBodyHelp = [
 ]
 
 
+print(dfPracticeTaskDetails.info())
+print(dfTheoryTaskDetails.info())
+
+#[['PracticeTaskId','Title','Description','Difficulty','Title Skill','Title Course']]
+
+
+
+
+def getCourseTask():
+    
+    layoutModalBodyCourseTask = []
+    
+    if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
+        currentUserId = current_user.id        
+        userDB = studentGrouped.getUserFromUserId(currentUserId)        
+        
+        if  userDB is not None:        
+            if userDB['IsAdmin']:
+                
+                layoutModalBodyCourseTask.append(                        
+                        html.Div(                        
+                            dbc.Table.from_dataframe(dfPracticeTaskDetails[[
+                                    'PracticeTaskId','Title','Description','Difficulty','TitleSkill','TitleCourse']], 
+                                                     striped=True, bordered=True, hover=True)
+                            )
+                )
+                
+                layoutModalBodyCourseTask.append(                        
+                        html.Div(                        
+                            dbc.Table.from_dataframe(dfTheoryTaskDetails[[
+                                    'TheoryTaskId','Title','Description','Difficulty','TitleSkill','TitleCourse']], 
+                                                     striped=True, bordered=True, hover=True)
+                            )
+                )
+            else:
+                layoutModalBodyCourseTask.append(
+                        
+                        html.Div(
+                        
+                        dbc.Table.from_dataframe(dfPracticeTaskDetails[  dfPracticeTaskDetails['User_Id'] ==  currentUserId][[
+                                'PracticeTaskId','Title','Description','Difficulty','TitleSkill','TitleCourse']], 
+                                                 striped=True, bordered=True, hover=True)
+                        
+                        )
+                )
+                
+                layoutModalBodyCourseTask.append(
+                        
+                        html.Div(
+                        
+                        dbc.Table.from_dataframe(dfTheoryTaskDetails[  dfTheoryTaskDetails['User_Id'] ==  currentUserId][[
+                                'TheoryTaskId','Title','Description','Difficulty','TitleSkill','TitleCourse']], 
+                                                 striped=True, bordered=True, hover=True)
+                        
+                        )
+                )
+
+
+    return layoutModalBodyCourseTask
+
 
 
 
@@ -138,6 +243,7 @@ settingsLayout = [
         [
             dbc.Tab( layoutModalBodyCustomize , label="Customize"),
             dbc.Tab( layoutModalBodyHelp , label="Help"),
+            dbc.Tab( getCourseTask() , label="Course & Tasks" , id = "tabCourseSkillTask"),
         ]
     )
         
@@ -178,6 +284,19 @@ def onChangeCustomizeAppTheme(*args):
         
     return newValue  
 
+
+
+
+
+@app.callback(Output("tabCourseSkillTask", "children"), [Input("url", "pathname")],
+    )
+def render_tab_task_content(pathname ):
+    
+    print('inside settings render_tab_task_content')
+    print(current_user)
+
+    if current_user.is_authenticated  :
+        return getCourseTask()
 
 
 

@@ -12,8 +12,11 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State, ClientsideFunction
 
 
+from flask_login import current_user
+
 from app import app
 import constants
+from data import studentGrouped
 
 from apps import settings
 
@@ -29,6 +32,7 @@ keySubmenu          = constants.keySubmenu
 keyValue            = constants.keyValue
 keyScrollTo         = constants.keyScrollTo
 keyClassName        = constants.keyClassName
+keyOnlyForAdmin     = constants.keyOnlyForAdmin
 
 iconNameHome        = constants.iconNameHome
 iconNameGroups      = constants.iconNameGroups
@@ -41,22 +45,27 @@ iconNameCustom      = constants.iconNameCustom
 menuLink = {
      "menu-link-0" : { keyLabel : 'Game Data', keyHref : '/Home',
                   keySubmenu : [ 
-                          ],  keyClassName : 'fas ' + iconNameHome + ' m-right-small' }
+                          ],  keyClassName : 'fas ' + iconNameHome + ' m-right-small',
+                          keyOnlyForAdmin : True }
     ,   "menu-link-1" : { keyLabel : 'Groups', keyHref : '/Groups',
                   keySubmenu : [
                           "menu-sub-link-0", "menu-sub-link-1", "menu-sub-link-2"
-                          ],  keyClassName : 'fas ' + iconNameGroups + ' m-right-small'   }
+                          ],  keyClassName : 'fas ' + iconNameGroups + ' m-right-small',
+                          keyOnlyForAdmin : True    }
     ,   "menu-link-2" : { keyLabel : 'Details', keyHref : '/Details' ,
                   keySubmenu : [
                           "menu-sub-link-3", "menu-sub-link-7", "menu-sub-link-4"
-                          ],  keyClassName : 'fas ' + iconNameDetails + ' m-right-small'   }
+                          ],  keyClassName : 'fas ' + iconNameDetails + ' m-right-small',
+                          keyOnlyForAdmin : False    }
     ,   "menu-link-3" : { keyLabel : 'Students', keyHref : '/Students' ,
                   keySubmenu : [ "menu-sub-link-5"  
-                          ],  keyClassName : 'fas ' + iconNameStudents + ' m-right-small'   }
-    ,   "menu-link-4" : { keyLabel : 'Custom', 'href' : '/Custom' ,
+                          ],  keyClassName : 'fas ' + iconNameStudents + ' m-right-small',
+                          keyOnlyForAdmin : False    }
+    ,   "menu-link-4" : { keyLabel : 'Custom', keyHref : '/Custom' ,
                   keySubmenu : [
                           "menu-sub-link-6"
-                          ],  keyClassName : 'fas ' + iconNameCustom + ' m-right-small'   }
+                          ],  keyClassName : 'fas ' + iconNameCustom + ' m-right-small',
+                          keyOnlyForAdmin : False    }
 }
 menuSubLink2Scroll = {
 		"menu-sub-link-0"  :  {keyLabel : "Overview", keyScrollTo: ''}
@@ -92,6 +101,19 @@ def getMenu():
     countMenuLink = 0
     countMenuSubLink = 0
     
+    isUserAdmin = False    
+    
+    if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
+        userDB = studentGrouped.getUserFromUserId(current_user.id)
+        
+        if  userDB is not None:        
+            if userDB['IsAdmin']:
+                isUserAdmin = True
+            else:
+                isUserAdmin = False
+
+
+
     for menuKey in menuLink.keys():
         currentMenu = menuLink.get(menuKey)
         
@@ -100,7 +122,7 @@ def getMenu():
         if len(currentMenu.get(keySubmenu)) > 0  :
             contentClass = " c-button-nav-content-hover-items "
         
-        menus.append( 
+        menus.append(
             html.Li(
                 # use Row and Col components to position the chevrons
                         dbc.Button(html.Span([
@@ -110,17 +132,15 @@ def getMenu():
                                                     ], 
                                                     className = contentClass)
                                                 ]
-#                                                +
-#                                                menuOpener
                                         ,
                                         className = " c-button-nav-content " ), 
                                     href= currentMenu.get(keyHref) , 
                                     size="lg", 
-                                    className="c-button-nav", 
+                                    className=" c-button-nav ", 
                                     outline=True, color="primary", 
                                     id= menuKey, 
                                     block=True),
-                className = "m-top_x-small"
+                className = "hidden-v "  if    not isUserAdmin   and   currentMenu.get(keyOnlyForAdmin)   else   "m-top_x-small"
             )
         )
         # we use the Collapse component to hide and reveal the navigation links
@@ -158,7 +178,8 @@ def getModalHelpBody():
 sidebar = html.Div(
     [
 
-        html.H2("sCool", className="display-4"),
+        html.H2(
+                html.Img(src=app.get_asset_url('sCool-Logo.png'), className="img-fit" ), className="display-4"),
 
         html.P(
             "Student perfomance in sCool", className="lead"
@@ -166,7 +187,9 @@ sidebar = html.Div(
 
         html.Hr(),
 
-        dbc.Nav( getMenu(), vertical=True),
+        dbc.Nav( children = getMenu(), 
+                id = "menu-main-nav",
+                vertical=True),
                 
 #        for menu link click output
         html.Div(id='menu-link-output-hidden', style={'display':'none'}),
@@ -227,30 +250,52 @@ menuLinksCount      =   len(menuLink.keys())
 def toggle_accordion(*args):
     ctx = dash.callback_context
 
+    print('sidebar  toggle_accordion ')
+    
     newToggle = [False] * (menuLinksCount)
+    print(newToggle)
+    print(ctx.triggered)
+    print(args)
+    print(args[ menuLinksCount ])
     
     if not ctx.triggered:
+        
+        for index, menuLinkKey in enumerate(list(menuLink.keys())):
+                if  (   ( args[ menuLinksCount ] is not None  ) 
+                        and   args[ menuLinksCount ].lower()   in  menuLink.get(menuLinkKey).get(keyHref).lower()):
+                    newToggle[index] = True
+                    
         return newToggle
 
     triggered_id = [p['prop_id'] for p in ctx.triggered][0]
-    clickedButton_id = triggered_id.split('.')[0]     
+    clickedButton_id = triggered_id.split('.')[0]
             
+    print('sidebar  clickedButton_id ')
+    print(clickedButton_id)
+    
 #    on INIT url changes is the clickedButton_id
     if len(clickedButton_id.split('-')) == 1 :
         if args[menuLinksCount ] in ["/"]:
             newToggle[0] = True 
         else :
             for index, menuLinkKey in enumerate(list(menuLink.keys())):
-                if args[ menuLinksCount ].lower()   in  menuLink.get(menuLinkKey).get(keyHref).lower():
+                if (  ( args[ menuLinksCount ] is not None  ) 
+                        and  args[ menuLinksCount ].lower()   in  menuLink.get(menuLinkKey).get(keyHref).lower()  ) :
                     newToggle[index] = True   
         
+        print('on init url')
+        print(args[menuLinksCount ])
+        print(newToggle)
         return newToggle
 
     clickedButton_index = int(clickedButton_id.split('-')[2])
+    print(clickedButton_index)
     
     if clickedButton_index >= 0  and  args[clickedButton_index] :
         newToggle[clickedButton_index] = not args[menuLinksCount + 1 + clickedButton_index ]   # add 1 for URL pathname param
         
+    
+    print(newToggle)
     
     return newToggle
 
@@ -307,4 +352,3 @@ app.clientside_callback(
          Output('menu-sub-link-output-hidden', 'children'),
         [Input("menu-sub-link-input", "value")]
     )
-

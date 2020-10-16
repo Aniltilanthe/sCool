@@ -25,6 +25,7 @@ keyBackgroundColor          = 'backgroundColor'
 keyExpress                  = 'express'
 keyLight                    = 'light'
 keyIsDefault                = 'isDefault'
+keyOnlyForAdmin             = 'onlyForAdmin'
 
 
 
@@ -33,6 +34,10 @@ keyIsDefault                = 'isDefault'
 
 
 loginRedirect               = "/Details"
+
+
+
+languageLocal               = "en"
 
 
 #--------------------------------------------------------------------------------

@@ -28,23 +28,24 @@ import pandas as pd
 
 
 FA = "https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-MATERIAL_CSS = "https://fonts.googleapis.com/icon?family=Material+Icons"
 
 external_stylesheets = [
                         dbc.themes.BOOTSTRAP,
                         dbc.themes.MATERIA,
-                        FA,
-#                        MATERIAL_CSS
+                        FA
                         ]
 
+external_scripts = ["https://cdn.plot.ly/plotly-locale-fr-latest.js"]
 
-
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets, external_scripts=external_scripts)
 app.config.suppress_callback_exceptions = True
 
 server = app.server
 app.title = 'sCool Data Analysis App'
 
+
+#<script src="plotly-locale-de-ch.js"></script>
+#<script>Plotly.setPlotConfig({locale: 'de-CH'})</script>
 
 
 # Setup the LoginManager for the server

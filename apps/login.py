@@ -117,12 +117,17 @@ def login():
     print('in server route login')
     if request.method == 'POST':
         print('in server route login POST')
-        if request.args.get('usernameId'):
-            userDB = studentGrouped.getUserFromUserId(request.args.get('usernameId'))
+        if request.args.get('usernameId')   :
+            userDB = studentGrouped.getUserFromUserId( str(request.args.get('usernameId'))  )            
+            
+            print(userDB)
+        
             if  userDB is not None:            
                 user = User(userDB['UserName'], userDB['Id'], True)
                 if user:
                     login_user(user)
+                    print(user)
+                    print('login user')
                     return redirect(constants.loginRedirect)
                 else:
                     return redirect('/login')
@@ -132,6 +137,40 @@ def login():
             return redirect('/login')
     else:
         return redirect('/login')
+#
+## Adding this route allows us to use the POST method on our login app.
+## It also allows us to implement HTTP Redirect when the login form is submitted.
+#@server.route('/login', methods=['POST'])
+#def login():
+#    print('in server route login')
+#    if request.method == 'POST':
+#        print('in server route login POST')
+#        if request.args.get('usernameId')  and request.args.get('password') :
+#            userDB = studentGrouped.getUserFromUserId( str(request.args.get('usernameId')), password = str(request.args.get('password')))            
+#            
+#            print(userDB)
+#        
+#            if  userDB is not None:            
+#                user = User(userDB['UserName'], userDB['Id'], True)
+#                if user:
+#                    login_user(user)
+#                    print(user)
+#                    print('login user')
+#                    return redirect(constants.loginRedirect)
+#                else:
+#                    return redirect('/login')
+#            else:
+#                return redirect('/login')
+#        else:
+#            return redirect('/login')
+#    else:
+#        return redirect('/login')
+
+
+
+
+
+
 
 
 

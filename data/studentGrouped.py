@@ -270,15 +270,26 @@ GroupSelector_options = getUserLAOptions()
 
 
 
-def getUserFromUserId(usernameOrId):
+def getUserFromUserId(usernameOrId, password = ''):
     
-    userDB = dfUser[ (dfUser['Id'] == usernameOrId ) |  (dfUser['UserName'] == usernameOrId) ]
+    userDB = []
+    
+    if password:
+        print('inside if password ')
+        print(dfUser.info())
+        print(dfUser[ (dfUser['PasswordHash'] == password) ])
+        userDB = dfUser[ ( (dfUser['Id'] == usernameOrId) | (dfUser['UserName'] == usernameOrId) )  & (dfUser['PasswordHash'] == password) ]
+        print(userDB)
+        print(usernameOrId)
+        print(password)
+    
+    else:
+        userDB = dfUser[ (dfUser['Id'] == usernameOrId ) |  (dfUser['UserName'] == usernameOrId) ]
         
     if len(userDB) > 0:            
         return userDB.iloc[0]   
     else:
         return None
-
 
 #--------------------------------------------------------------------------------------------
 #--------------------- get students of School  START ---------------------------------------

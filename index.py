@@ -235,7 +235,7 @@ def show_hide_topbar(pathname, currentClasses):
 
     currentClassesS.discard('hidden')
     
-    if pathname in  ["/", "/Home", "/login"] :
+    if pathname in  ["/Home", "/login"] :
         currentClassesS.add('hidden')
         
     return  ' '.join(currentClassesS)

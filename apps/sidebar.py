@@ -98,21 +98,26 @@ def getSubmenuButtons(menuKey):
 def getMenu():
     menus = []
     
+    print('getMenu ')
+    
     countMenuLink = 0
     countMenuSubLink = 0
     
     isUserAdmin = False    
     
+    print(current_user)
+    
     if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
         userDB = studentGrouped.getUserFromUserId(current_user.id)
         
+        print(userDB)
         if  userDB is not None:        
             if userDB['IsAdmin']:
                 isUserAdmin = True
-            else:
-                isUserAdmin = False
 
-
+    
+    print('getMenu check isUserAdmin')
+    print(isUserAdmin)
 
     for menuKey in menuLink.keys():
         currentMenu = menuLink.get(menuKey)
@@ -140,7 +145,8 @@ def getMenu():
                                     outline=True, color="primary", 
                                     id= menuKey, 
                                     block=True),
-                className = "hidden-v "  if    not isUserAdmin   and   currentMenu.get(keyOnlyForAdmin)   else   "m-top_x-small"
+                className = "hidden-v "  if    not isUserAdmin   and   currentMenu.get(keyOnlyForAdmin)   else   "m-top_x-small",
+                id = menuKey + '-li-container' 
             )
         )
         # we use the Collapse component to hide and reveal the navigation links
@@ -299,6 +305,39 @@ def toggle_accordion(*args):
     
     return newToggle
 
+
+
+
+
+@app.callback(  [  Output(f"{i}-li-container", "className") for i in menuLink   ], 
+                [  Input("url", "pathname")   ],
+)
+def setMenuClassOnLogin(pathname):   
+    
+    newClasses =  ['m-top_x-small'] * menuLinksCount
+    
+    if   current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated  :
+
+        isUserAdmin = False    
+        
+        userDB = studentGrouped.getUserFromUserId(current_user.id)
+        
+        if  userDB is not None:        
+            if userDB['IsAdmin']:
+                isUserAdmin = True
+        
+        print('setMenuClassOnLogin   isUserAdmin')
+        print(isUserAdmin)
+        print(newClasses)
+        
+        for index, menuKey in enumerate(menuLink):
+            currentMenu = menuLink.get(menuKey)
+            newClasses[index] = "hidden-v "  if    not isUserAdmin   and   currentMenu.get(keyOnlyForAdmin)   else   "m-top_x-small"
+            
+        print(newClasses)
+        
+    
+    return  newClasses
 
 
 

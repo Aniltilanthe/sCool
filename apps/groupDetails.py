@@ -150,8 +150,6 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
         groupOriginal['CreatedAtDate'] = groupOriginal['CreatedAt'].dt.date
         
         if filterByDate:
-            print('plotSingleClass filterByDates')
-            print(filterByDate)
             dateGroup = groupOriginal.groupby(  [ groupOriginal['CreatedAt'].dt.date ] )
             groupOriginal = dateGroup.get_group(filterByDate)
         
@@ -162,7 +160,6 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             if filterByDate :
                 dateGroup = groupOriginalTheory.groupby(  [ groupOriginalTheory['CreatedAt'].dt.date ] )
                 groupOriginalTheory = dateGroup.get_group(filterByDate)
-#                groupOriginalTheory = groupOriginalTheory[groupOriginalTheory['CreatedAtDate'].isin(filterByDates) ]
             
         except Exception as e: 
             print('plotSingleClass 1 ')
@@ -686,7 +683,6 @@ def getGroupPTaskDoneOptions(groupId , filterByDate = '' ) :
         
         taskWiseConceptPracticeGrouped = currentGroupDataNoDup.groupby(['PracticeTaskId']) 
         
-#        taskWiseConceptPracticeGrouped = dfGroupedOriginal.get_group(groupId).groupby(['PracticeTaskId'])
         
         for groupKeyTaskId, groupTask in taskWiseConceptPracticeGrouped:            
             options.append({
@@ -793,7 +789,7 @@ def plotGroupConceptDetails(groupId, filterByDate = '' ):
     return graphs        
 
 
-def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, hasMeanStd = True, hoverName = "Name", hasDistribution = False):
+def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, hasMeanStd = True, hoverName = "Name", hasDistribution = False, isThemeSizePlot = False):
     graphs = []
     
     if isColored:
@@ -801,20 +797,40 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
             
             df = df.sort_values(by=[ featureX ])
             
-            fig = px.bar( df
-                , x             =  featureX
-                , y             =  featureY
-                , title         = title
-                , labels        = feature2UserNamesDict # customize axis label
-                , template      = constants.graphTemplete                              
-                , orientation   = 'h'
-                , hover_name    =  hoverName
-                , hover_data    =  hoverData
-                , color         = constants.featureTaskType
-                , color_discrete_map     =   {
-                    constants.TaskTypeTheory    : constants.colorTheory,
-                    constants.TaskTypePractice  : constants.colorPractice, },
-            )
+            
+            if isThemeSizePlot : 
+                 fig = px.bar( df
+                    , x             =  featureX
+                    , y             =  featureY
+                    , title         = title
+                    , labels        = feature2UserNamesDict # customize axis label
+                    , template      = constants.graphTemplete                              
+                    , orientation   = 'h'
+                    , hover_name    =  hoverName
+                    , hover_data    =  hoverData
+                    , color         = constants.featureTaskType
+                    , height        =   constants.graphHeight
+                    , color_discrete_map     =   {
+                        constants.TaskTypeTheory    : constants.colorTheory,
+                        constants.TaskTypePractice  : constants.colorPractice, },
+                )
+                    
+            else:
+                fig = px.bar( df
+                    , x             =  featureX
+                    , y             =  featureY
+                    , title         = title
+                    , labels        = feature2UserNamesDict # customize axis label
+                    , template      = constants.graphTemplete                              
+                    , orientation   = 'h'
+                    , hover_name    =  hoverName
+                    , hover_data    =  hoverData
+                    , color         = constants.featureTaskType
+                    , color_discrete_map     =   {
+                        constants.TaskTypeTheory    : constants.colorTheory,
+                        constants.TaskTypePractice  : constants.colorPractice, },
+                )
+            
             graphs.append(
             
                 dcc.Graph(
@@ -828,7 +844,6 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                      
                     , config  =  dict (locale   =  constants.languageLocal   ) 
                 )
-                
             )
         except Exception as e: 
             print('getFeaturePlot  1st  ')
@@ -841,16 +856,31 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
             df = df.sort_values(by=[ featureX ])
             
             
-            fig = px.bar( df
-                , x             =  featureX
-                , y             =  featureY
-                , title         = title
-                , labels        = feature2UserNamesDict # customize axis label
-                , template      = constants.graphTemplete                              
-                , orientation   = 'h'
-                , hover_name    =  hoverName
-                , hover_data    =  hoverData
-            )
+            if isThemeSizePlot : 
+                fig = px.bar( df
+                    , x             =  featureX
+                    , y             =  featureY
+                    , title         = title
+                    , labels        = feature2UserNamesDict # customize axis label
+                    , template      = constants.graphTemplete                              
+                    , orientation   = 'h'
+                    , hover_name    =  hoverName
+                    , hover_data    =  hoverData
+                    , height        =   constants.graphHeight
+                )
+                    
+            else:
+                fig = px.bar( df
+                    , x             =  featureX
+                    , y             =  featureY
+                    , title         = title
+                    , labels        = feature2UserNamesDict # customize axis label
+                    , template      = constants.graphTemplete                              
+                    , orientation   = 'h'
+                    , hover_name    =  hoverName
+                    , hover_data    =  hoverData
+                )
+                
             graphs.append(
                 dcc.Graph(
                     figure= fig
@@ -863,7 +893,7 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
                      
                     , config  =  dict (locale   =  constants.languageLocal   ) 
                 )
-                )
+            )
         except Exception as e: 
             print('getFeaturePlot  2nd  ')
             print('title  ' + title)
@@ -1021,9 +1051,6 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
             #Drop duplicates keeping only the first row for Student and Task
             studentWiseDataTheory = studentWiseDataTheory.drop_duplicates(subset=['StudentId'], keep='first')
             
-            print(' plotSingleClassGeneral  studentWiseDataTheory for plots ++++++++++++++++++++++++++++++++++++++++++++++++++++ ')
-            print(studentWiseDataTheory[['Name', 'Points', 'SessionDuration','StudentId', "Result"]])
-            
             
         except Exception as e: 
             print(' plotSingleClassGeneral  studentWiseDataTheory value set error !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ')
@@ -1056,13 +1083,14 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                             featurePlot, graphDistributions = getFeaturePlot(studentWiseData, featuresPractice[first], featuresPractice[second], 
                                                                    '(Practice) Details of students ' + titleFirst,
                                                                    hoverDataPractice,
-                                                                   hasDistribution = True)
+                                                                   hasDistribution = True,
+                                                                   isThemeSizePlot = True )
                             
                             graphs.append(
                                     html.Div(
                                             children = featurePlot
                                     )
-                            )               
+                            )
                             graphs.append(  html.Div( getPlotDistributionPlotChildrens(graphDistributions, quantileIndex) ,
                                 className = "c-container"
                             ))
@@ -1075,12 +1103,13 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                                                                    '(Theory) Details of students ' + titleFirst,
                                                                    hoverDataTheory, 
                                                                    isColored = True,
-                                                                   hasDistribution = True)
+                                                                   hasDistribution = True,
+                                                                   isThemeSizePlot = True )
                             graphs.append(
                                     html.Div(
                                             children = featurePlot
                                     )
-                            )               
+                            )
                             graphs.append(  html.Div( getPlotDistributionPlotChildrens(graphDistributions, quantileIndex) ,
                                 className = "c-container"
                             ))
@@ -1091,7 +1120,8 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                             featurePlot, graphDistributions = getFeaturePlot(studentWiseData, featuresPractice[first], featuresPractice[second], 
                                                                    '(Practice) Details of students ' + titleFirst,
                                                                    hoverDataPractice,
-                                                                   hasDistribution = True)
+                                                                   hasDistribution = True,
+                                                                   isThemeSizePlot = True )
                             graphs.append(
                                     html.Div(
                                             children = featurePlot
@@ -1116,7 +1146,8 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                     featurePlot, graphDistributions = getFeaturePlot(dfTheory2Plot, rowTheory[0], rowTheory[1] , 
                                                                    '(Theory) Details of students ' + titleFirst,
                                                                    hoverDataTheory, isColored = True,
-                                                                   hasDistribution = True)
+                                                                   hasDistribution = True,
+                                                                   isThemeSizePlot = True )
                     
                     graphs.append(
                                     html.Div(

@@ -46,7 +46,8 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = "")
                     ))
     plotRow.append( html.Div([
                                 generateCardBase([html.I(className="fas fa-users m-right-small"),   'No of Students'], len(studentDataDf[constants.STUDENT_ID_FEATURE].unique()),
-                                        classes = classes)
+                                        classes = classes
+                                        )
                             ],
                             className="col-sm-6",
                     ))
@@ -58,15 +59,20 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = "")
     plotRow = []    
     plotRow.append(
             html.Div([
-                   generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
+                    
+                    generateCardBase([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
                                         '' + seconds_2_dhms(studentDataDf[constants.featureSessionDuration].sum().round(decimals=2)), 
-                                        '' + str(studentDataDf[constants.featureSessionDuration].mean().round(decimals=2)) + 's', 
-                                        '' + str(studentDataDf[constants.featureSessionDuration].std().round(decimals=2)) + 's', 
-                                        'total',
-                                        'mean',
-                                        'std',
-                                        classes = classes
-                                        )
+                                        classes = classes)
+                    
+#                   generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
+#                                        '' + seconds_2_dhms(studentDataDf[constants.featureSessionDuration].sum().round(decimals=2)), 
+#                                        '' + str(studentDataDf[constants.featureSessionDuration].mean().round(decimals=2)) + 's', 
+#                                        '' + str(studentDataDf[constants.featureSessionDuration].std().round(decimals=2)) + 's', 
+#                                        'total',
+#                                        'mean',
+#                                        'std',
+#                                        classes = classes
+#                                        )
                 ],
                 className="col-sm-4",
             ))
@@ -86,15 +92,18 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = "")
             ))
     plotRow.append(
             html.Div([
-                   generateCardDetail('Points', 
+                    generateCardBase('Points', 
                                         '' + millify(studentDataDf['Points'].sum().round(decimals=2)), 
-                                        '' + str(studentDataDf['Points'].mean().round(decimals=2)), 
-                                        '' + str(studentDataDf['Points'].std().round(decimals=2)), 
-                                        'total',
-                                        'mean',
-                                        'std',
-                                        classes = classes
-                                        )
+                                        classes = classes)
+#                   generateCardDetail('Points', 
+#                                        '' + millify(studentDataDf['Points'].sum().round(decimals=2)), 
+#                                        '' + str(studentDataDf['Points'].mean().round(decimals=2)), 
+#                                        '' + str(studentDataDf['Points'].std().round(decimals=2)), 
+#                                        'total',
+#                                        'mean',
+#                                        'std',
+#                                        classes = classes
+#                                        )
                 ],            
                 className="col-sm-4",
             ))
@@ -115,14 +124,6 @@ studentOverviewFeaturesDefault = [ constants.featureSessionDuration, constants.f
 def plotStudentOverview(studentDataDf, classes = ""):
     plots = []
     
-    print(studentDataDf)
-    print(studentDataDf[constants.featureSessionDuration])
-    print(studentDataDf['Points'])
-    print(studentDataDf.std())
-    print(studentDataDf.std()[constants.featureSessionDuration])
-    print(studentDataDf.std().round(decimals=2)[constants.featureSessionDuration])
-    print(studentDataDf[constants.featureSessionDuration].std())
-    
     if studentDataDf is None or studentDataDf.empty :
         return plots
     
@@ -142,15 +143,21 @@ def plotStudentOverview(studentDataDf, classes = ""):
     try:
         plotRow.append(
                 html.Div([
-                       generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
-                                            '' + seconds_2_dhms(studentDataDf[constants.featureSessionDuration].sum().round(decimals=2)), 
-                                            '' + str(studentDataDfMean[constants.featureSessionDuration]) + 's', 
-                                            '' + str( studentDataDfStd[constants.featureSessionDuration] ) + 's', 
-                                            'total',
-                                            'mean',
-                                            'std',
+                        
+                        generateCardBase([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
+                                            '' + seconds_2_dhms(studentDataDf[constants.featureSessionDuration].sum().round(decimals=2)),
                                             classes = classes
                                             )
+                        
+#                       generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
+#                                            '' + seconds_2_dhms(studentDataDf[constants.featureSessionDuration].sum().round(decimals=2)), 
+#                                            '' + str(studentDataDfMean[constants.featureSessionDuration]) + 's', 
+#                                            '' + str( studentDataDfStd[constants.featureSessionDuration] ) + 's', 
+#                                            'total',
+#                                            'mean',
+#                                            'std',
+#                                            classes = classes
+#                                            )
                     ],
                     className="col-sm-4",
                 ))
@@ -176,17 +183,24 @@ def plotStudentOverview(studentDataDf, classes = ""):
     try:
         plotRow.append(
                 html.Div([
-                       generateCardDetail(
-                               ((constants.feature2UserNamesDict.get(constants.featurePoints)) if constants.featurePoints in constants.feature2UserNamesDict.keys() else constants.featurePoints ) 
+                        
+                        generateCardBase(((constants.feature2UserNamesDict.get(constants.featurePoints)) if constants.featurePoints in constants.feature2UserNamesDict.keys() else constants.featurePoints ) 
                                 , 
                                             '' + millify(studentDataDf[ constants.featurePoints ].sum().round(decimals=2)), 
-                                            '' + str(studentDataDfMean[ constants.featurePoints ]), 
-                                            '' + str( studentDataDfStd[ constants.featurePoints ] ), 
-                                            'total',
-                                            'mean',
-                                            'std',
                                             classes = classes
                                             )
+                        
+#                       generateCardDetail(
+#                               ((constants.feature2UserNamesDict.get(constants.featurePoints)) if constants.featurePoints in constants.feature2UserNamesDict.keys() else constants.featurePoints ) 
+#                                , 
+#                                            '' + millify(studentDataDf[ constants.featurePoints ].sum().round(decimals=2)), 
+#                                            '' + str(studentDataDfMean[ constants.featurePoints ]), 
+#                                            '' + str( studentDataDfStd[ constants.featurePoints ] ), 
+#                                            'total',
+#                                            'mean',
+#                                            'std',
+#                                            classes = classes
+#                                            )
                     ],            
                     className="col-sm-4",
                 ))
@@ -740,6 +754,8 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
             
             
         elif selectedFigureType == constants.FigureTypeBar :
+            
+            df = df.sort_values(by=[ featureX2Plot ])
             
             if isThemeSizePlot : 
                 figStudents = px.bar( df

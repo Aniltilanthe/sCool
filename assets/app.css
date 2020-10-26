@@ -232,6 +232,17 @@ html {
 	width: 70%
 }
 
+.theory {
+	color : var(--theme-type-theory);
+}
+.practice  {
+	color : var(--theme-type-practice);
+}
+
+.heading-sub {
+	font-size: 20px;
+}
+
 
 .img-fit {
 	max-width: 100%;

@@ -38,7 +38,7 @@ import constants
 imputer = impu.SimpleImputer(missing_values = "NaN", strategy = "mean")
 
 
-DatabaseName = 'sCool-2020-05-28'
+DatabaseName = constants.DatabaseName
 
 conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=localhost\SQLEXPRESS;'
@@ -697,7 +697,7 @@ def getUsers():
     
     dfUserDetails = pd.read_sql_query('SELECT  '
                                    
-     + ' u.Id, u.IsAdmin, u.Email, u.PasswordHash, u.UserName ' 
+     + ' u.Id, u.IsAdmin, u.Email, u.PasswordHash, u.UserName, u.SecurityStamp  ' 
     
      + '  FROM [' + DatabaseName +'].[dbo].[AspNetUsers] u ' 
      , conn)
@@ -708,7 +708,7 @@ def getUserDetails(usernameOrId):
     
     dfUserDetails = pd.read_sql_query('SELECT  '
                                    
-     + ' u.Id, u.IsAdmin, u.Email, u.PasswordHash, u.UserName ' 
+     + ' u.Id, u.IsAdmin, u.Email, u.PasswordHash, u.UserName, u.SecurityStamp  ' 
     
      + '  FROM [' + DatabaseName +'].[dbo].[AspNetUsers] u ' 
      
@@ -1178,17 +1178,3 @@ class PythonParser:
                                      , ast.Del  ,   ast.Starred  )):
                     return True
         return False
-    
-    
-#e.g.
-#expr="""
-#for i in 3:
-#   print (i)
-#   for j in i:
-#        print(j)
-#        for k in i:
-#            print(k)
-#"""
-#stf = PythonParser(dfRuns[dfRuns['RunsCode'].str.contains("for") & (dfRuns.RunsError == False ) ]['RunsCode'].iloc[1])
-#
-#print(stf.hasRecursion())

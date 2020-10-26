@@ -242,14 +242,16 @@ def BuildOptions(options):
     return [{'label': i, 'value': i} for i in options]
 
 
-def BuildOptionsLA(options):
+def BuildOptionsLA(options, isAdmin = False):    
     
-    print(' BuildOptionsLA ')    
-    print(options)
-    
-    return [{'label': dfLearningActivityDetails[dfLearningActivityDetails['LearningActivityId'] == int(i)]['Title'].iloc[0] if int(i) > 0 else 'General Ungrouped', 
+    if isAdmin:
+        return [{'label': dfLearningActivityDetails[dfLearningActivityDetails['LearningActivityId'] == int(i)]['Title'].iloc[0] if int(i) > 0 else 'Learning Activity ' + str(i), 
              'value': int(i) } for i in options]     +      [{'label': 'General Ungrouped', 
              'value': 0 }]
+    
+    
+    return [{'label': dfLearningActivityDetails[dfLearningActivityDetails['LearningActivityId'] == int(i)]['Title'].iloc[0] if int(i) > 0 else 'Learning Activity ' + str(i), 
+             'value': int(i) } for i in options]
 
 
 
@@ -261,36 +263,34 @@ def getUserLA():
 def getUserLAOptions():
     userLA =  getUserLA()
     
-    print(getUserLA())
-    print(userLA)
-    
     return BuildOptionsLA( [ int(groupId) for groupId in      userLA ]  )
 
 GroupSelector_options = getUserLAOptions()
 
 
 
-def getUserFromUserId(usernameOrId, password = ''):
+def getUserFromUserId(usernameOrId):
     
-    userDB = []
-    
-    if password:
-        print('inside if password ')
-        print(dfUser.info())
-        print(dfUser[ (dfUser['PasswordHash'] == password) ])
-        userDB = dfUser[ ( (dfUser['Id'] == usernameOrId) | (dfUser['UserName'] == usernameOrId) )  & (dfUser['PasswordHash'] == password) ]
-        print(userDB)
-        print(usernameOrId)
-        print(password)
-    
-    else:
-        userDB = dfUser[ (dfUser['Id'] == usernameOrId ) |  (dfUser['UserName'] == usernameOrId) ]
+    userDB = dfUser[ (dfUser['Id'] == usernameOrId ) |  (dfUser['UserName'] == usernameOrId) ]
         
     if len(userDB) > 0:            
         return userDB.iloc[0]   
     else:
         return None
 
+
+
+def getUserFromSecurityStamp(securityStamp = ''):
+    
+    userDB = []
+    
+    if securityStamp:
+        userDB = dfUser[ dfUser['SecurityStamp'] == securityStamp ]
+        
+    if len(userDB) > 0:            
+        return userDB.iloc[0]   
+    else:
+        return None
 #--------------------------------------------------------------------------------------------
 #--------------------- get students of School  START ---------------------------------------
 
@@ -309,8 +309,6 @@ def getStudentsOfSchool(groupSelected):
 #get students DataFrame a group
 def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
     
-    print('Students school DF getStudentsOfSchoolDF ')
-    print(dfGroupedPractice.groups.keys())
     
     if not(isOriginal) and groupSelected in dfGroupedPractice.groups.keys():
         schoolPractice = dfGroupedPractice.get_group(groupSelected)
@@ -359,24 +357,14 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
 #        if defined, else
         try:
             studentDF = pd.concat([studentDF, schoolTheory], ignore_index=True, sort=False)
-            print('in try part concated both')
         except NameError:
             print("studentDF WASN'T defined after all!")
             studentDF = schoolTheory
     
     
-    print('first isOriginal')
-    print(isOriginal)
-    
     groupStudents = getStudentsOfSchool(groupSelected)
-    print('first groupStudents')
-    print(groupStudents)
-    print(len(groupStudents))
     
     groupStudents = studentDF['StudentId'].unique()
-    print('second groupStudents')
-    print(groupStudents)
-    print(len(groupStudents))
     
     
     if 'studentDF' in locals()     and    studentDF is not None :
@@ -393,3 +381,31 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
 #--------------------- get students of School  END ---------------------------------------
 #--------------------------------------------------------------------------------------------
     
+
+
+
+
+
+
+def getGroupDateOptions(groupId) :
+    options = []
+    
+    try :
+        currentGroupData = dfGroupedOriginal.get_group(groupId)
+        
+        taskWiseConceptPracticeGrouped = currentGroupData.groupby(  [ currentGroupData['CreatedAt'].dt.date ] )
+        
+        for groupKeyDate, groupTask in taskWiseConceptPracticeGrouped:            
+            options.append({
+                    'label' : groupKeyDate,
+                    'value' : groupKeyDate
+                    
+            })
+                    
+        return options
+    except Exception as e: 
+        print('getGroupDateOptions')
+        print(e)    
+    
+    
+    return options

@@ -61,10 +61,12 @@ server.config.update(
 
 
 class User(UserMixin):
-    def __init__(self, name, Id, active=True):
+    def __init__(self, name, Id, active=True, isAdmin = False, securityStamp = ''):
         self.name = name
         self.id = Id
         self.active = active
+        self.isAdmin = isAdmin
+        self.securityStamp = securityStamp
 
     def is_active(self):
         # Here you should write whatever the code is
@@ -76,6 +78,9 @@ class User(UserMixin):
 
     def is_authenticated(self):
         return True
+
+    def is_admin(self):
+        return self.isAdmin
 
 
 

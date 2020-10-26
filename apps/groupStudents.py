@@ -116,7 +116,7 @@ def convert_list_column_tostr_NL(val) :
 
 
 
-def getStudentData(StudentId, schoolKey, selectedDate = ''):
+def getStudentData(StudentId, schoolKey, selectedDate = '' ):
     
     print('getStudentData')
     
@@ -489,27 +489,37 @@ def plotStudentOverviewFeatures( StudentId, groupId, features2Overview ):
     studentDataDf.fillna(0, inplace=True)
     
     try:
-        studentDataDfMean           = studentDataDf.mean().round(decimals=2)
-        studentDataDfStd            = studentDataDf.std().round(decimals=2)
-        
-        studentDataDfMean.fillna(0, inplace=True)
-        studentDataDfStd.fillna(0, inplace=True)
+#        For Mean and STD cards !!!
+#        studentDataDfMean           = studentDataDf.mean().round(decimals=2)
+#        studentDataDfStd            = studentDataDf.std().round(decimals=2)
+#        
+#        studentDataDfMean.fillna(0, inplace=True)
+#        studentDataDfStd.fillna(0, inplace=True)
     
         for feature2O in features2Overview :
             
             plotRow.append(
                 html.Div([
-                       util.generateCardDetail( 
+                        
+                        util.generateCardBase( 
                                ((constants.feature2UserNamesDict.get(feature2O)) if feature2O in constants.feature2UserNamesDict.keys() else feature2O ) 
                                 , 
                                             '' + util.millify( studentDataDf[ feature2O ].sum().round(decimals=2) ), 
-                                            '' + str( studentDataDfMean[ feature2O ] ), 
-                                            '' + str( studentDataDfStd[ feature2O ] ), 
-                                            'total',
-                                            'mean',
-                                            'std',
                                             classes = "c-card-small"
                                             )
+                        
+#        For Mean and STD cards !!!
+#                       util.generateCardDetail( 
+#                               ((constants.feature2UserNamesDict.get(feature2O)) if feature2O in constants.feature2UserNamesDict.keys() else feature2O ) 
+#                                , 
+#                                            '' + util.millify( studentDataDf[ feature2O ].sum().round(decimals=2) ), 
+#                                            '' + str( studentDataDfMean[ feature2O ] ), 
+#                                            '' + str( studentDataDfStd[ feature2O ] ), 
+#                                            'total',
+#                                            'mean',
+#                                            'std',
+#                                            classes = "c-card-small"
+#                                            )
                     ],            
                     className="col-sm-4",
                 ))
@@ -681,102 +691,118 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
 
 
 
-featureOptionsOverview = [
-     'Result',
-     'Points',
-     'SessionDuration',
-     'Attempts',
-     'CollectedCoins',
-     
-     'Difficulty',
-     
-     'NumberOfCoins',
-     'NumberOfHidden',
-     'lineOfCodeCount',
-     'runsCount',
-     'runsErrorCount',
-     'runsSuccessCount',
-     'runsErrorSyntaxCount',
-     'runsErrorNameCount',
-     'runsErrorTypeCount',
-     'runsErrorAttribiteCount',
-     
-     'hasLoop',
-     'hasNestedLoop',
-     'hasCondition',
-     'hasVariable',
-     'hasExpressions',
-     'hasAsyncOrAwait',
-     'hasFunctionClass',
-     'hasControlFlow',
-     'hasImports',
-     'hasStatements',
-     'hasComprehensions',
-     'hasSubscripting',
-     'hasExpressionsArithematic',
-     'hasExpressionsBool',
-     'hasExpressionsLogical',
-     'hasExpressionsBitwise',
-     'hasExpressionsDict',
-     'hasExpressionsDataStructure',
-     'hasExpressionsFunctionCall',
-     'hasControlFlowConditional',
-     'hasControlFlowTryException',
-     'hasExpressionsDict',
-     'hasVariablesNamed',
-     'hasConstantsUseful',
-     'hasExpressionsKeyword',
-     'hasConstants',
-     'hasVariables',
-     
-     'runsHasLoopCount',
-     'runsHasNestedLoopCount',
-     'runsHasConditionCount',
-     'runsHasVariableCount',
-     'runsHasExpressionsCount',
-     'runsHasAsyncOrAwaitCount',
-     'runsHasFunctionClassCount',
-     'runsHasControlFlowCount',
-     'runsHasImportsCount',
-     'runsHasStatementsCount',
-     'runsHasComprehensionsCount',
-     'runsHasSubscriptingCount',
-     'runsLineOfCodeCountAvg',
-     
-     
-     'draggedCount',
-     'tabsSwitchedCount',
-     'tabsSwitchedDescriptionCount',
-     'tabsSwitchedCodeCount',
-     'tabsSwitchedOutputCount',
-     'deletedCodesCount',
-     'robotCollisionsBoxCount',
-     'coinCollectedCount',
-     'keyboardKeyPressedCount',
-     'studentAttemptsTotal',
-     'enemiesCount',
-     'playerShootCount',
-     'playerShootEndCount',
-     'playerShootEndEnemyHitCount',
-     'playerShootEndEnemyMissedHitCount',
-     'enemysShootEndPlayerHitCount',
-     'enemysShootEndPlayerNotHitCount',
-     'itemsCollectedCount'
- ]
+#featureOptionsOverview = [
+#     'Result',
+#     'Points',
+#     'SessionDuration',
+#     'Attempts',
+#     'CollectedCoins',
+#     
+#     'Difficulty',
+#     
+#     'NumberOfCoins',
+#     'NumberOfHidden',
+#     'lineOfCodeCount',
+#     'runsCount',
+#     'runsErrorCount',
+#     'runsSuccessCount',
+#     'runsErrorSyntaxCount',
+#     'runsErrorNameCount',
+#     'runsErrorTypeCount',
+#     'runsErrorAttribiteCount',
+#     
+#     'hasLoop',
+#     'hasNestedLoop',
+#     'hasCondition',
+#     'hasVariable',
+#     'hasExpressions',
+#     'hasAsyncOrAwait',
+#     'hasFunctionClass',
+#     'hasControlFlow',
+#     'hasImports',
+#     'hasStatements',
+#     'hasComprehensions',
+#     'hasSubscripting',
+#     'hasExpressionsArithematic',
+#     'hasExpressionsBool',
+#     'hasExpressionsLogical',
+#     'hasExpressionsBitwise',
+#     'hasExpressionsDict',
+#     'hasExpressionsDataStructure',
+#     'hasExpressionsFunctionCall',
+#     'hasControlFlowConditional',
+#     'hasControlFlowTryException',
+#     'hasExpressionsDict',
+#     'hasVariablesNamed',
+#     'hasConstantsUseful',
+#     'hasExpressionsKeyword',
+#     'hasConstants',
+#     'hasVariables',
+#     
+#     'runsHasLoopCount',
+#     'runsHasNestedLoopCount',
+#     'runsHasConditionCount',
+#     'runsHasVariableCount',
+#     'runsHasExpressionsCount',
+#     'runsHasAsyncOrAwaitCount',
+#     'runsHasFunctionClassCount',
+#     'runsHasControlFlowCount',
+#     'runsHasImportsCount',
+#     'runsHasStatementsCount',
+#     'runsHasComprehensionsCount',
+#     'runsHasSubscriptingCount',
+#     'runsLineOfCodeCountAvg',
+#     
+#     
+#     'draggedCount',
+#     'tabsSwitchedCount',
+#     'tabsSwitchedDescriptionCount',
+#     'tabsSwitchedCodeCount',
+#     'tabsSwitchedOutputCount',
+#     'deletedCodesCount',
+#     'robotCollisionsBoxCount',
+#     'coinCollectedCount',
+#     'keyboardKeyPressedCount',
+#     'studentAttemptsTotal',
+#     'enemiesCount',
+#     'playerShootCount',
+#     'playerShootEndCount',
+#     'playerShootEndEnemyHitCount',
+#     'playerShootEndEnemyMissedHitCount',
+#     'enemysShootEndPlayerHitCount',
+#     'enemysShootEndPlayerNotHitCount',
+#     'itemsCollectedCount'
+# ]
+
+featuresToExclude = [
+             'PracticeTaskId',
+             'EnrolledId', 
+             'SkillId', 
+             'CourseId', 
+             'StudentId', 
+             'LearningActivity_LearningActivityId',  
+             'Difficulty', 
+             'PracticeStatisticsId', 
+             'TheoryStatisticsId',  
+             'EnrolledId', 'SkillId', 'TheoryTaskId', 
+             'LearningActivityId', 'CourseId', 'studentAttemptsTotal'
+]
 
 def getFeatureOptions():
     
-#    numericFeaturesPracticeS = set(util.getNumericFeatures(dfGroupedOriginal.median()))
-#    numericFeaturesTheoryS = set(util.getNumericFeatures(dfPlayerStrategyTheory))
-#    
-#    print('get feature options')
-#    print( numericFeaturesPracticeS  )
-#    print( numericFeaturesTheoryS )
-#    
-#    return util.BuildOptionsFeatures( numericFeaturesPracticeS.union(numericFeaturesTheoryS) )
+    numericFeaturesPracticeS = set(util.getNumericFeatures(dfGroupedOriginal.median()))
+    numericFeaturesTheoryS = set(util.getNumericFeatures(dfPlayerStrategyTheory))
     
-    return util.BuildOptionsFeatures( featureOptionsOverview )
+    mergedList = numericFeaturesPracticeS.union(numericFeaturesTheoryS)
     
+    newFeatureOptionsList = list(set(mergedList) - set(featuresToExclude))
+   
+    return util.BuildOptionsFeatures( newFeatureOptionsList )
+    
+#    return util.BuildOptionsFeatures( featureOptionsOverview )
+    
+    
+        
 
 
 
@@ -786,6 +812,21 @@ def getFeatureOptions():
 
 layout = [
         html.Div([
+    
+#    dbc.Row([
+#            dbc.Col(
+#                    html.Div(
+#                             children=[
+#                                    html.P('Filter by date'),
+#                                    dcc.Dropdown(
+#                                        id = "student-selector-date",
+#                                        #  multi=True,
+#                                        placeholder="Filter by date",
+#                                    ),
+#                                ]
+#                             )
+#        )]
+#     ) ,
 
      dbc.Row([
             dbc.Col(
@@ -806,7 +847,7 @@ layout = [
                     className = " "
                )
                 , width = 12
-            ),  
+            ),
     ])
 
     , dbc.Row([
@@ -896,13 +937,14 @@ layout = [
 
 
 #-------- Students-------------
-@app.callback(Output('student-selector-dropdown', 'options'), [Input('group-selector-main', 'value')])
-def setStudentOptions(schoolSelected):
+@app.callback(Output('student-selector-dropdown', 'options') , 
+              [Input('group-selector-main', 'value')  ])
+def setStudentOptions(  schoolSelected  )  :
         
     if schoolSelected is None or not int(schoolSelected) >= 0:
         return []
     
-    students = getStudentsOfSchool(int(schoolSelected))
+    students = getStudentsOfSchool(int(schoolSelected) )
     
     
     return [{'label': row['Name'], 'value': row['StudentId'] } for index, row  in 
@@ -913,9 +955,9 @@ def setStudentOptions(schoolSelected):
 @app.callback(
          Output('student-date-dropdown', 'options'), 
               [ Input('student-selector-dropdown', 'value') ],
-        state = [ State(component_id='group-selector-main', component_property='value') ]   
+        state = [ State(component_id='group-selector-main', component_property='value') ]
 )
-def setStudentDateOptions(studentSelected, groupSelected):
+def setStudentDateOptions(studentSelected, groupSelected ):
     defaultValue = []
     
     if groupSelected is None   or studentSelected is None or not int(studentSelected) >= 0:
@@ -925,7 +967,7 @@ def setStudentDateOptions(studentSelected, groupSelected):
         return defaultValue
 
 
-    dfStudentData                     = getStudentData(int(studentSelected), int(groupSelected))
+    dfStudentData                     = getStudentData(int(studentSelected), int(groupSelected) )
     
     
     if dfStudentData is None        or     dfStudentData.empty == True :
@@ -1057,6 +1099,26 @@ def update_no_student_selectors_class_disabled(studentSelected, initialClassDate
         initialClassFeaturesS.discard('disabled') 
 
     return ' '.join(initialClassDateS), ' '.join(initialClassDirS), ' '.join(initialClassFeaturesS)
+
+
+
+
+
+
+
+
+@app.callback(Output('student-selector-date', 'options'), [Input('group-selector-main', 'value')])
+def set_options_date(groupId):
+    if groupId is not None and int(groupId) >= 0:
+
+        print('set_options_date Hey There ')
+        groupDateOptions = studentGrouped.getGroupDateOptions(groupId)
+        
+        return groupDateOptions
+    
+    return []
+
+
 
 
 

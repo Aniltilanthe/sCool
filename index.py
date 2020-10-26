@@ -43,13 +43,10 @@ def load_user(usernameOrId):
      # 1. Fetch against the database a user by `id` 
      # 2. Create a new object of `User` class and return it.
 
-    print('inside load_user')
- 
     userDB = studentGrouped.getUserFromUserId(usernameOrId)
-    print(userDB['UserName'])
     
     if  userDB is not None:        
-        return User(userDB['UserName'], userDB['Id'], True)
+        return User(userDB['UserName'], userDB['Id'], active = True, isAdmin = userDB['IsAdmin'], securityStamp = userDB['SecurityStamp'] )
 
 
 
@@ -57,25 +54,14 @@ print( GroupSelector_options )
 
 
 def getUserLA():
-    print('index getUserLA current user')
-    print(current_user)
     if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
         currentUserId = current_user.id
-        print('getUserLA isAdmin or not userDB')
-        print(currentUserId)
         
-        userDB = studentGrouped.getUserFromUserId(currentUserId)
-        
-        print(userDB)
-        
-        if  userDB is not None:        
-            if userDB['IsAdmin']:
-                print('In IsAdmin part')
-                return studentGrouped.dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique().astype(str)
-            else:
-                print('In Not Admin Else Part')
-                return studentGrouped.dfLearningActivityDetails[studentGrouped.dfLearningActivityDetails['User_Id'] == 
-                                                                currentUserId][constants.GROUPBY_FEATURE].unique().astype(str)
+        if  current_user.isAdmin : 
+            return studentGrouped.dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique().astype(str)
+        else:
+            return studentGrouped.dfLearningActivityDetails[studentGrouped.dfLearningActivityDetails['User_Id'] == 
+                                                            currentUserId][constants.GROUPBY_FEATURE].unique().astype(str)
 
 
     return studentGrouped.dfLearningActivityDetails[constants.GROUPBY_FEATURE].unique()
@@ -84,11 +70,14 @@ def getUserLA():
 
 
 def getUserLAOptions():
-    print('index  getUserLAOptions')
     userLA = getUserLA()
-    print(userLA)
     
-    return studentGrouped.BuildOptionsLA( [ groupId for groupId in  userLA  ]  )
+    if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
+        return studentGrouped.BuildOptionsLA( [ groupId for groupId in  userLA  ] , isAdmin =  current_user.isAdmin ) 
+    
+    return studentGrouped.BuildOptionsLA( [ groupId for groupId in  userLA  ] , isAdmin = True  )
+
+
 
 
 def generateControlCard():
@@ -144,20 +133,11 @@ content = html.Div(
     id="page-main", 
     className = "  page-main "
 )
-                                        
-#                                        
-#userInfoLayout = html.Div(
-#        children=[
-#        dcc.Input(id="user-info-username", type="text", placeholder=""),
-#        dcc.Input(id="user-info-id", type="text", placeholder=""),
-#    ],
-#    className = " hidden "
-#)
+   
 
 
 
 app.layout = html.Div([dcc.Location(id="url"), sidebar.sidebar, content,
-#                       userInfoLayout 
                        ],
                        className = constants.THEME
                        )
@@ -169,9 +149,6 @@ app.layout = html.Div([dcc.Location(id="url"), sidebar.sidebar, content,
 
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def render_page_content(pathname):
-    
-    print('inside index render page content')
-    print(current_user)
     
     if pathname == '/login':
         if not current_user.is_authenticated:
@@ -208,10 +185,6 @@ def render_page_content(pathname):
 def render_main_selector_content(pathname,
                selectorOptions ):
     
-    print('inside index render_main_selector_content')
-    print(current_user)
-    print(selectorOptions)
-
     if current_user.is_authenticated  :
         return getUserLAOptions()
     
@@ -265,21 +238,6 @@ def show_hide_sidebar(pathname, currentClasses):
         currentClassesS.add('hidden')
         
     return  ' '.join(currentClassesS) 
-
-
-
-
-
-#@app.callback(
-#    Output("group-selector-main", "options"),
-#    [
-#        Input("user-info-id", "value")
-#    ],
-#)
-#def on_login_update_group_selector_options(usernameOrId):
-#    
-#    return studentGrouped.getUserLAOptions()
-
 
 
 

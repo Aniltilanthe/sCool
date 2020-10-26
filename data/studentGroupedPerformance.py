@@ -84,14 +84,12 @@ dfLearningActivityDetails              = main.getLearningActivityDetails()
 
 dfPractice              = main.getPracticeData()
 dfPractice[constants.featureGroup]            = constants.TypeGroup + '-' + dfPractice[constants.GROUPBY_FEATURE].astype(str) 
-#dfPractice[constants.GROUPBY_FEATURE]            = dfPractice['LearningActivity_LearningActivityId']
 
 dfPracticeTaskDetails   = main.getPracticeTaskDetails()
 dfPracticeTaskDetails   = dfPracticeTaskDetails.drop_duplicates(subset=['PracticeTaskId'], keep='first')
 
 
 dfStudentDetails        = main.getStudentDetails()
-#dfStudentDetails        = dfStudentDetails.drop_duplicates(subset=['StudentId'], keep='first')
 
 
 
@@ -123,8 +121,6 @@ runsErrorAttribiteCount = dfRuns[dfRuns['RunsOutput'].str.contains("AttributeErr
 #----------------
 # ----- Code -----------
 #---------------
-#dfRuns = main.calculateConceptComplexityPoints(dfRuns, 'RunsCode', 'RunsError', 'ConceptComplexityPoints')
-#runsConceptPointsCount = dfRuns.groupby('PracticeStatisticsId')['ConceptComplexityPoints'].sum()
 
 
 dfRuns = main.getConceptFeaturesFromCode(dfRuns, 'RunsCode', 'RunsError', 'ConceptComplexityPoints')

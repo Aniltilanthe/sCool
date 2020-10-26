@@ -74,7 +74,7 @@ menuSubLink2Scroll = {
 		,"menu-sub-link-3" :  {keyLabel : "Tasks Info", keyScrollTo: 'Task-Information'}
 		,"menu-sub-link-4" :  {keyLabel : "General Info", keyScrollTo: 'General-Information'}
 		,"menu-sub-link-7" :  {keyLabel : "Concept Info", keyScrollTo: 'Concept-Information'}
-		,"menu-sub-link-5" :  {keyLabel : "Student Info", keyScrollTo: 'Student-Information'}
+		,"menu-sub-link-5" :  {keyLabel : "Student Info", keyScrollTo: 'student-information'}
 		,"menu-sub-link-6" :  {keyLabel : "Custom", keyScrollTo: ''}
 	}
 
@@ -255,14 +255,8 @@ menuLinksCount      =   len(menuLink.keys())
 )
 def toggle_accordion(*args):
     ctx = dash.callback_context
-
-    print('sidebar  toggle_accordion ')
     
     newToggle = [False] * (menuLinksCount)
-    print(newToggle)
-    print(ctx.triggered)
-    print(args)
-    print(args[ menuLinksCount ])
     
     if not ctx.triggered:
         
@@ -276,32 +270,25 @@ def toggle_accordion(*args):
     triggered_id = [p['prop_id'] for p in ctx.triggered][0]
     clickedButton_id = triggered_id.split('.')[0]
             
-    print('sidebar  clickedButton_id ')
-    print(clickedButton_id)
-    
 #    on INIT url changes is the clickedButton_id
     if len(clickedButton_id.split('-')) == 1 :
         if args[menuLinksCount ] in ["/"]:
-            newToggle[0] = True 
+            for index, menuLinkKey in enumerate(list(menuLink.keys())):
+                if (   menuLink.get(menuLinkKey).get(keyHref) == constants.loginRedirect  ) :
+                    newToggle[index] = True
         else :
             for index, menuLinkKey in enumerate(list(menuLink.keys())):
                 if (  ( args[ menuLinksCount ] is not None  ) 
                         and  args[ menuLinksCount ].lower()   in  menuLink.get(menuLinkKey).get(keyHref).lower()  ) :
                     newToggle[index] = True   
         
-        print('on init url')
-        print(args[menuLinksCount ])
-        print(newToggle)
         return newToggle
 
     clickedButton_index = int(clickedButton_id.split('-')[2])
-    print(clickedButton_index)
     
     if clickedButton_index >= 0  and  args[clickedButton_index] :
         newToggle[clickedButton_index] = not args[menuLinksCount + 1 + clickedButton_index ]   # add 1 for URL pathname param
         
-    
-    print(newToggle)
     
     return newToggle
 
@@ -326,16 +313,11 @@ def setMenuClassOnLogin(pathname):
             if userDB['IsAdmin']:
                 isUserAdmin = True
         
-        print('setMenuClassOnLogin   isUserAdmin')
-        print(isUserAdmin)
-        print(newClasses)
         
         for index, menuKey in enumerate(menuLink):
             currentMenu = menuLink.get(menuKey)
             newClasses[index] = "hidden-v "  if    not isUserAdmin   and   currentMenu.get(keyOnlyForAdmin)   else   "m-top_x-small"
             
-        print(newClasses)
-        
     
     return  newClasses
 
@@ -364,7 +346,6 @@ def changeMenuSetInput(*args):
     triggered_id = [p['prop_id'] for p in ctx.triggered][0]
     clickedButton_id = triggered_id.split('.')[0]
 
-    print(clickedButton_id)
     
     if clickedButton_id     and   clickedButton_id in menuSubLink2Scroll :
          return menuSubLink2Scroll.get(clickedButton_id).get('scrollTo')

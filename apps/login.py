@@ -93,7 +93,7 @@ def login_success(n_clicks, usernameId):
         userDB = studentGrouped.getUserFromUserId(usernameId)
         
         if  userDB is not None: 
-            user = User(userDB['UserName'], userDB['Id'], True)
+            user = User(userDB['UserName'], userDB['Id'], active = True, isAdmin = userDB['IsAdmin'], securityStamp = userDB['SecurityStamp'] )
             print('login success user')
             print(userDB)
             print(user)
@@ -117,13 +117,13 @@ def login():
     print('in server route login')
     if request.method == 'POST':
         print('in server route login POST')
-        if request.args.get('usernameId')   :
-            userDB = studentGrouped.getUserFromUserId( str(request.args.get('usernameId'))  )            
+        if request.args.get('securityStamp')   :
+            userDB = studentGrouped.getUserFromSecurityStamp( str(request.args.get('securityStamp'))  )
             
             print(userDB)
         
-            if  userDB is not None:            
-                user = User(userDB['UserName'], userDB['Id'], True)
+            if  userDB is not None:
+                user = User(userDB['UserName'], userDB['Id'], active = True, isAdmin = userDB['IsAdmin'], securityStamp = userDB['SecurityStamp'] )
                 if user:
                     login_user(user)
                     print(user)
@@ -137,6 +137,9 @@ def login():
             return redirect('/login')
     else:
         return redirect('/login')
+
+
+
 #
 ## Adding this route allows us to use the POST method on our login app.
 ## It also allows us to implement HTTP Redirect when the login form is submitted.

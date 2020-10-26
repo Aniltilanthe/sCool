@@ -17,6 +17,7 @@ from dateutil.parser import parse
 import flask
 import dash
 import dash_table
+from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
@@ -138,7 +139,7 @@ def convert_list_column_tostr_NL(val) :
 
 #------------------------------------
 
-def plotSingleClass( titleTextAdd, school ):
+def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
      
     graphIndex = 1
     graphs = []
@@ -146,9 +147,23 @@ def plotSingleClass( titleTextAdd, school ):
         
     try :
         groupOriginal = dfGroupedOriginal.get_group(school)
+        groupOriginal['CreatedAtDate'] = groupOriginal['CreatedAt'].dt.date
+        
+        if filterByDate:
+            print('plotSingleClass filterByDates')
+            print(filterByDate)
+            dateGroup = groupOriginal.groupby(  [ groupOriginal['CreatedAt'].dt.date ] )
+            groupOriginal = dateGroup.get_group(filterByDate)
         
         try :
             groupOriginalTheory = dfGroupedPlayerStrategyTheory.get_group(school)
+            groupOriginalTheory['CreatedAtDate'] = groupOriginalTheory['CreatedAt'].dt.date
+            
+            if filterByDate :
+                dateGroup = groupOriginalTheory.groupby(  [ groupOriginalTheory['CreatedAt'].dt.date ] )
+                groupOriginalTheory = dateGroup.get_group(filterByDate)
+#                groupOriginalTheory = groupOriginalTheory[groupOriginalTheory['CreatedAtDate'].isin(filterByDates) ]
+            
         except Exception as e: 
             print('plotSingleClass 1 ')
             print(e)
@@ -166,7 +181,7 @@ def plotSingleClass( titleTextAdd, school ):
                     ))
 
 #---------------------------        Datatable task wise success fail    ---------------------------
-        dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', constants.featureDescription, labelSuccess, labelFail, 'SessionDuration', 'Type', constants.featureTask])
+        dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', constants.featureDescription, labelSuccess, labelFail, 'SessionDuration', 'Type', constants.featureTaskId])
         
         
         pieDataTaskWisePractice = groupOriginal.groupby(['PracticeTaskId', 'StudentId'], as_index=False).sum()
@@ -189,8 +204,8 @@ def plotSingleClass( titleTextAdd, school ):
                 index_dfTaskWiseSuccessFail += 1
 
         except Exception as e: 
-                print('in the theory exception ')
-                print(e)
+            print('in the theory exception ')
+            print(e)
         
         # convert column of DataFrame to Numeric Int
         dfTaskWiseSuccessFail[labelSuccess] = pd.to_numeric(dfTaskWiseSuccessFail[labelSuccess], downcast='integer')
@@ -314,6 +329,8 @@ def plotSingleClass( titleTextAdd, school ):
             studentWiseDataOriginalTaskPerformed[featureTaskDesc] = studentWiseDataOriginalTaskPerformed[featureTaskDesc].apply(convert_list_column_tostr_NL)
             studentWiseDataOriginalTaskPerformed[featureTaskType] = TaskTypePractice
             
+            studentWiseDataOriginalTaskPerformed = studentWiseDataOriginalTaskPerformed.sort_values(by=[ countTaskCompletedByStudentFeature ], ascending=False)
+            
             table_header = [
                 html.Thead(html.Tr([html.Th("Student"), html.Th("No of Tasks completed"), html.Th("Practice Tasks", className="c-table-w-content-main")
                                     ]))
@@ -324,8 +341,7 @@ def plotSingleClass( titleTextAdd, school ):
                 tds = []
                 for feature in studentWiseDataOriginalTaskPerformed[['Name',countTaskCompletedByStudentFeature, constants.featureTask, ]].columns:
                     if feature == constants.featureTask:
-                        print(list(row[feature]))
-                        print(  [ taskId  for taskId in  list(row[feature]) ] )
+                        
                         tds.append( html.Td( html.Div(children = [ 
                                 html.Details(
                                         children = [
@@ -352,7 +368,8 @@ def plotSingleClass( titleTextAdd, school ):
             
             table = dbc.Table(table_header + table_body, bordered=True)
             
-            graphs.append(html.Div( graphTitle
+            graphs.append(html.Div( graphTitle,
+                                   className= "heading-sub practice"
                         )) 
             graphs.append(html.Div(table ,
                              className = "c-table c-table-oddeven font-size_small"
@@ -379,6 +396,8 @@ def plotSingleClass( titleTextAdd, school ):
             studentWiseDataOriginalTaskPerformedTheory[featureTaskDesc] = studentWiseDataOriginalTaskPerformedTheory[featureTaskDesc].apply(convert_list_column_tostr_NL)
             studentWiseDataOriginalTaskPerformedTheory[featureTaskType] = TaskTypeTheory
             
+            
+            studentWiseDataOriginalTaskPerformedTheory = studentWiseDataOriginalTaskPerformedTheory.sort_values(by=[ countTaskCompletedByStudentFeature ], ascending=False)
             
             table_header = [
                 html.Thead(html.Tr([html.Th("Student"), html.Th("No of Tasks completed"), html.Th("Theory Tasks", className="c-table-w-content-main")
@@ -415,7 +434,8 @@ def plotSingleClass( titleTextAdd, school ):
             
             table = dbc.Table(table_header + table_body, bordered=True)
             
-            graphs.append(html.Div( graphTitle
+            graphs.append(html.Div( graphTitle,
+                                   className= "heading-sub theory"
                         )) 
             graphs.append(html.Div(table ,
                              className = "c-table c-table-oddeven font-size_small"
@@ -447,7 +467,7 @@ featureX = 'Count (no. of students used)'
 featureY = 'Details'
 featurePracticeTaskGroup = 'Task-Id'            
 
-def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 ) :
+def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate = '' ) :
     
     graphs = []
     
@@ -456,6 +476,12 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 ) :
 #     Step 1 : add the code of each student in table
     try :
         currentGroupData = dfGroupedOriginal.get_group(groupId)
+        
+        if filterByDate:
+            dateGroup = currentGroupData.groupby(  [ currentGroupData['CreatedAt'].dt.date ] )
+            currentGroupData = dateGroup.get_group(filterByDate)
+        
+        
         currentGroupDataNoDup = currentGroupData.drop_duplicates(subset=['PracticeTaskId', 'StudentId'], keep='last')
         
         taskWiseConceptPracticeGrouped = currentGroupDataNoDup.groupby(['PracticeTaskId'])
@@ -507,19 +533,25 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 ) :
             
     
 #    Step 2 :- add the plot - concepts used by count of students
-    graphs = graphs + plotGroupTaskWiseConcepts( groupId, isGrouped = isGrouped, taskId = taskId )
+    graphs = graphs + plotGroupTaskWiseConcepts( groupId, isGrouped = isGrouped, taskId = taskId , filterByDate = filterByDate)
     
     
     return graphs
     
     
     
-def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 ) :
+def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDate = '' ) :
     
     graphs = []
     
     try :
         currentGroupData = dfGroupedOriginal.get_group(groupId)
+        
+        if filterByDate:
+            dateGroup = currentGroupData.groupby(  [ currentGroupData['CreatedAt'].dt.date ] )
+            currentGroupData = dateGroup.get_group(filterByDate)
+
+
         currentGroupDataNoDup = currentGroupData.drop_duplicates(subset=['PracticeTaskId', 'StudentId'], keep='last')
 
         taskWiseConceptPracticeGrouped = currentGroupDataNoDup.groupby(['PracticeTaskId'])
@@ -638,11 +670,18 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 ) :
         print(e)               
 
 
-def getGroupPTaskDoneOptions(groupId) :
+def getGroupPTaskDoneOptions(groupId , filterByDate = '' ) :
     options = []
     
     try :
         currentGroupData = dfGroupedOriginal.get_group(groupId)
+        
+        if filterByDate:
+            dateGroup = currentGroupData.groupby(  [ currentGroupData['CreatedAt'].dt.date ] )
+            currentGroupData = dateGroup.get_group(filterByDate)
+
+        
+        
         currentGroupDataNoDup = currentGroupData.drop_duplicates(subset=['PracticeTaskId', 'StudentId'], keep='last')
         
         taskWiseConceptPracticeGrouped = currentGroupDataNoDup.groupby(['PracticeTaskId']) 
@@ -662,9 +701,10 @@ def getGroupPTaskDoneOptions(groupId) :
         print(e)    
     
     return options
+
+
         
-        
-def plotGroupConceptDetails(groupId):
+def plotGroupConceptDetails(groupId, filterByDate = '' ):
     
     graphs = []
     
@@ -675,6 +715,13 @@ def plotGroupConceptDetails(groupId):
       
     try :
         groupPractice = dfGroupedPractice.get_group(groupId)
+        
+        if filterByDate:
+            dateGroup = groupPractice.groupby(  [ groupPractice['CreatedAt'].dt.date ] )
+            groupPractice = dateGroup.get_group(filterByDate)
+        
+        
+        
         
     #        sum - to get count of students who used the concept
         studentWiseDataConcepts = groupPractice.sum()
@@ -717,7 +764,7 @@ def plotGroupConceptDetails(groupId):
         
 #        Task wise concepts used - grouped together
         try :
-            figBar = plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 )
+            figBar = plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0, filterByDate = filterByDate )
             graphs.append(
                     
             
@@ -751,6 +798,9 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
     
     if isColored:
         try :
+            
+            df = df.sort_values(by=[ featureX ])
+            
             fig = px.bar( df
                 , x             =  featureX
                 , y             =  featureY
@@ -787,6 +837,10 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
         
     else:    
         try :
+            
+            df = df.sort_values(by=[ featureX ])
+            
+            
             fig = px.bar( df
                 , x             =  featureX
                 , y             =  featureY
@@ -876,7 +930,7 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
     return graphs, graphDistributions
 
 
-def plotSingleClassGeneral( titleTextAdd, school ):
+def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
     
     graphs = []
     
@@ -894,9 +948,22 @@ def plotSingleClassGeneral( titleTextAdd, school ):
         groupPractice = dfGroupedPractice.get_group(school)
         groupOriginal = dfGroupedOriginal.get_group(school)
         
+        if filterByDate:
+            dateGroup = groupPractice.groupby(  [ groupPractice['CreatedAt'].dt.date ] )
+            groupPractice = dateGroup.get_group(filterByDate)
+            dateGroup = groupOriginal.groupby(  [ groupOriginal['CreatedAt'].dt.date ] )
+            groupOriginal = dateGroup.get_group(filterByDate)
+
+        
+        
         try :
             groupOriginalTheory = dfGroupedPlayerStrategyTheory.get_group(school)
+            
+            if filterByDate :
+                dateGroup = groupOriginalTheory.groupby(  [ groupOriginalTheory['CreatedAt'].dt.date ] )
+                groupOriginalTheory = dateGroup.get_group(filterByDate)
         except Exception as e: 
+            print(' plotSingleClassGeneral  groupOriginalTheory value set error ')
             print(e)
         
         
@@ -951,8 +1018,16 @@ def plotSingleClassGeneral( titleTextAdd, school ):
             studentWiseDataTheory[featureDescription] = getTheoryDescription(studentWiseDataTheory)
             studentWiseDataTheory[constants.featureTaskType] = constants.TaskTypeTheory
             
+            #Drop duplicates keeping only the first row for Student and Task
+            studentWiseDataTheory = studentWiseDataTheory.drop_duplicates(subset=['StudentId'], keep='first')
+            
+            print(' plotSingleClassGeneral  studentWiseDataTheory for plots ++++++++++++++++++++++++++++++++++++++++++++++++++++ ')
+            print(studentWiseDataTheory[['Name', 'Points', 'SessionDuration','StudentId', "Result"]])
+            
+            
         except Exception as e: 
-                print(e)
+            print(' plotSingleClassGeneral  studentWiseDataTheory value set error !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ')
+            print(e)
         
     #            2. other features        
     
@@ -994,9 +1069,12 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                             quantileIndex += 1
                             
                             
-                            featurePlot, graphDistributions = getFeaturePlot(studentWiseDataTheory, featuresPractice[first], featuresPractice[second], 
+                            
+                            dfTheory2Plot = studentWiseDataTheory.groupby(['StudentId', 'Name', 'TaskType'], as_index=False).sum()
+                            featurePlot, graphDistributions = getFeaturePlot(dfTheory2Plot, featuresPractice[first], featuresPractice[second], 
                                                                    '(Theory) Details of students ' + titleFirst,
-                                                                   hoverDataTheory, isColored = True,
+                                                                   hoverDataTheory, 
+                                                                   isColored = True,
                                                                    hasDistribution = True)
                             graphs.append(
                                     html.Div(
@@ -1029,12 +1107,13 @@ def plotSingleClassGeneral( titleTextAdd, school ):
             if (rowTheory not in featurePairsToPlotSingle) :
                 
                 try :
-                #                           for setting title  
+                    #                           for setting title  
                     titleFirst = rowTheory[0]
                     if rowTheory[0] in feature2UserNamesDict:
                         titleFirst = feature2UserNamesDict.get(rowTheory[0])  
                         
-                    featurePlot, graphDistributions = getFeaturePlot(studentWiseDataTheory, rowTheory[0], rowTheory[1] , 
+                    dfTheory2Plot = studentWiseDataTheory.groupby(['StudentId', 'Name', 'TaskType'], as_index=False).sum()
+                    featurePlot, graphDistributions = getFeaturePlot(dfTheory2Plot, rowTheory[0], rowTheory[1] , 
                                                                    '(Theory) Details of students ' + titleFirst,
                                                                    hoverDataTheory, isColored = True,
                                                                    hasDistribution = True)
@@ -1043,13 +1122,14 @@ def plotSingleClassGeneral( titleTextAdd, school ):
                                     html.Div(
                                             children = featurePlot
                                     )
-                    )           
+                    )
                     graphs.append(  html.Div(getPlotDistributionPlotChildrens(graphDistributions, quantileIndex) ,
                         className = "c-container"
                     ))
                     quantileIndex += 1
                     
                 except Exception as e: 
+                    print(' plotSingleClassGeneral  rowTheory Theory plots ')
                     print(e)
 
 
@@ -1076,7 +1156,7 @@ def getPlotDistributionPlotChildrens(graphDistributions, quantileIndex = 0):
 
 
 #Student Interaction with Game - TIMELINE
-def plotClassOverview(schoolKey):
+def plotClassOverview(schoolKey, filterByDate = '' ):
     
     graphs = []
     rows = []
@@ -1088,6 +1168,10 @@ def plotClassOverview(schoolKey):
         
     studentDataDf = studentGrouped.getStudentsOfSchoolDF(schoolKey)
     
+    if filterByDate:
+        dateGroup = studentDataDf.groupby(  [ studentDataDf['CreatedAt'].dt.date ] )
+        studentDataDf = dateGroup.get_group(filterByDate)
+
     
     if studentDataDf is None    or   studentDataDf.empty :
         graphs.append(
@@ -1149,14 +1233,20 @@ def plotClassOverview(schoolKey):
     return graphs
 
 
-def plotGroupOverview(groupId):
+def plotGroupOverview(groupId, filterByDate = '' ):
     
     groupStudents     =  getStudentsOfSchool(groupId)
     studentDataDf     =  studentGrouped.getStudentsOfSchoolDF(groupId)
+    
+    if filterByDate:
+        dateGroup = studentDataDf.groupby(  [ studentDataDf['CreatedAt'].dt.date ] )
+        studentDataDf = dateGroup.get_group(filterByDate)
+
+
     plots               = []
     
 #    if not studentDataDf is None and not studentDataDf.empty:
-    plots = util.plotGroupOverview(groupId, groupStudents, studentDataDf)
+    plots = util.plotGroupOverview(groupId, groupStudents, studentDataDf, classes = "c-card-small")
     
     return plots
 
@@ -1168,6 +1258,21 @@ def plotGroupOverview(groupId):
 layout = [
         html.Div([
                    
+    dbc.Row([
+            dbc.Col( 
+                    html.Div(
+                             children=[
+                                    html.P('Filter by date'),
+                                    dcc.Dropdown(
+                                        id = "groupDetails-selector-date",
+#                                        multi=True,
+                                        placeholder="Filter by date",
+                                    ),
+                                ]
+                             )
+        )]
+    ) ,
+                             
     html.Div(id='groupDetails-Group-Overview-Container')
     , dbc.Row([
             dbc.Col( 
@@ -1176,6 +1281,7 @@ layout = [
                                                href="", target="_blank",
                                                download='group-overview.csv' )
       )])
+    
     
     , dbc.Row([
             dbc.Col( 
@@ -1215,58 +1321,69 @@ layout = [
 #-----------------------------------------
 # callback functions---------------------
 #        ---------------------------------
-@app.callback(Output('groupDetails-Group-Container', 'children'), [Input('group-selector-main', 'value')])
-def display_graphs(schoolSelected):
-    graphs = []
-    
-    if schoolSelected is None or not int(schoolSelected) >= 0 :
-        return html.Div(graphs)
-    
-#    graphs = plotSingleClass('School', format(schoolSelected) )
-    graphs = plotSingleClass('School', int(schoolSelected) )
-    
-    return html.Div(graphs)
-
-
-@app.callback(Output('groupDetails-Group-General-Container', 'children'), [Input('group-selector-main', 'value')])
-def display_class_general(schoolSelected):
-    graphs = []
-    
-    if schoolSelected is None or not int(schoolSelected) >= 0 :
-        return html.Div(graphs)
-    
-#    graphs = plotSingleClass('School', format(schoolSelected) )
-    graphs = plotSingleClassGeneral('School', int(schoolSelected) )
-    
-    return html.Div(graphs)
-
-
-@app.callback(Output('groupDetails-Group-Concept-Container', 'children'), [Input('group-selector-main', 'value')])
-def display_class_concept(schoolSelected):
-    graphs = []
-    
-    if schoolSelected is None or not int(schoolSelected) >= 0 :
-        return html.Div(graphs)
-    
-    graphs = plotGroupConceptDetails(int(schoolSelected) )
-    
-    return html.Div(graphs)
-#----------------------------------------
-
-@app.callback(Output('groupDetails-Group-Overview-Container', 'children'), [Input('group-selector-main', 'value')])
-def setClassOverview(groupMain):
+@app.callback(Output('groupDetails-Group-Overview-Container', 'children'), 
+              [Input('group-selector-main', 'value') ,  Input('groupDetails-selector-date', 'value') ])
+def setClassOverview(groupMain, filterByDate):
     graphs = []
 
     if groupMain is None or not int(groupMain) >= 0:
         return html.Div(graphs)
     
-    graphs =    plotGroupOverview(int(groupMain))  
+    graphs =    plotGroupOverview(int(groupMain), filterByDate = filterByDate )  
     
-    graphs =  graphs + plotClassOverview( int(groupMain) )    
+    graphs =  graphs + plotClassOverview( int(groupMain) , filterByDate = filterByDate )  
+    
+    graphs = graphs + [ html.Hr() ]
     
 
     return  html.Div(graphs)
+#----------------------------------------
     
+
+@app.callback(Output('groupDetails-Group-Container', 'children'), 
+              [Input('group-selector-main', 'value')  ,  Input('groupDetails-selector-date', 'value') ])
+def display_graphs(learningActivitySelected, filterByDate):
+    graphs = []
+    
+    if learningActivitySelected is None or not int(learningActivitySelected) >= 0 :
+        return html.Div(graphs)
+    
+    graphs = plotSingleClass('School', int(learningActivitySelected), filterByDate = filterByDate )
+    
+    graphs = graphs + [ html.Hr() ]
+    
+    return html.Div(graphs)
+
+
+@app.callback(Output('groupDetails-Group-General-Container', 'children'), 
+              [Input('group-selector-main', 'value')  ,  Input('groupDetails-selector-date', 'value') ])
+def display_class_general(learningActivitySelected, filterByDate):
+    graphs = []
+    
+    if learningActivitySelected is None or not int(learningActivitySelected) >= 0 :
+        return html.Div(graphs)
+    
+    graphs = plotSingleClassGeneral('School', int(learningActivitySelected), filterByDate = filterByDate )
+    
+    graphs = graphs + [ html.Hr() ]
+    
+    return html.Div(graphs)
+
+
+@app.callback(Output('groupDetails-Group-Concept-Container', 'children'), 
+              [Input('group-selector-main', 'value')  ,  Input('groupDetails-selector-date', 'value') ])
+def display_class_concept(learningActivitySelected, filterByDate):
+    graphs = []
+    
+    if learningActivitySelected is None or not int(learningActivitySelected) >= 0 :
+        return html.Div(graphs)
+    
+    graphs = plotGroupConceptDetails(int(learningActivitySelected), filterByDate = filterByDate )
+    
+    graphs = graphs + [ html.Hr() ]
+    
+    return html.Div(graphs)
+#----------------------------------------
 
 
 # **IMPORTANT - Quantile Count must be updated when Adding Distribution Quantile Plots !!!!
@@ -1303,33 +1420,52 @@ def onClickDistributionCollapseButton(*args):
 
 
 
+
+
+@app.callback(Output('groupDetails-selector-date', 'options'), [Input('group-selector-main', 'value')])
+def set_options_date(groupId):
+    if groupId is not None and int(groupId) >= 0:
+
+        print('set_options_date Hey There ')
+        groupDateOptions = studentGrouped.getGroupDateOptions(groupId)
+        
+        return groupDateOptions
+    
+    return []
+
+
+
+
+    
+
 #On Select a Group - set Group Task Done Options - see task wise information             
 @app.callback(
-    [Output("groupDetails-taskId-selector", "options") 
+    [Output("groupDetails-taskId-selector", "options")
      ],
-    [Input("group-selector-main", "value")]
+    [Input("group-selector-main", "value") ,  Input('groupDetails-selector-date', 'value') ]
 )
-def onSelectGroupSetTaskOptions(groupId):
+def onSelectGroupSetTaskOptions(  groupId , filterByDate  ):
     if groupId is not None and int(groupId) >= 0:
-        return [getGroupPTaskDoneOptions(groupId)]
+        return [getGroupPTaskDoneOptions(groupId , filterByDate = filterByDate) ]
     
     return [[{'label': 'Select a group', 'value' : '0'}]]
     
 
 @app.callback(
-    [Output("groupDetails-taskId-container", "children") 
+    [Output("groupDetails-taskId-container", "children")
      ],
     [Input("groupDetails-taskId-selector", "value")],
     [State('group-selector-main', 'value'),
+     State('groupDetails-selector-date', 'value')
      ],
 )
-def onSelectTaskShowTaskWiseConcept(taskId, groupId):
+def onSelectTaskShowTaskWiseConcept(taskId, groupId, filterByDate):
     graphs = []
     
     if not taskId is None and int(taskId) >= 0 and groupId is not None and int(groupId) >= 0:
-        graphs = getGroupTaskWiseDetails(int(groupId), isGrouped = False, taskId = int(taskId) )
-#        graphs = plotGroupTaskWiseConcepts( int(groupId), isGrouped = False, taskId = int(taskId) )  
+        graphs = getGroupTaskWiseDetails(int(groupId), isGrouped = False, taskId = int(taskId), filterByDate = filterByDate )
         
+    graphs = graphs + [ html.Hr() ]
     
     return  [html.Div(graphs)]
 

@@ -148,6 +148,7 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
     studentDataDf[constants.featureTask]        =    studentDataDf[constants.featureTaskId].astype(str)
     
     
+#    only the last successful task is taken into account for calculations !
     studentDataDf = studentDataDf.drop_duplicates(subset=[constants.featureStudent, constants.featureTask], keep='last')
     
     
@@ -162,28 +163,7 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
         if selectedFeatureMulti is not None:
             selectedFeatureMulti = [groupBy] + groupBySub + selectedFeatureMulti
         
-#        studentDataDf[constants.featureConceptsUsedDetailsStr]     = getPracticeConceptsUsedDetailsStr(studentDataDf)
-                
-#        if    groupBy == constants.featureTask  :
-##            groupByAll = [ groupBy, constants.featureTaskType ]
-##            groupByAll = [ groupBy ]
-#            
-#            studentDataDfSum, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(studentDataDf, 
-#                                                                   groupBy = groupBy  , 
-#                                                                   groupBySub = groupBySub  , 
-#                                                                   groupByAll = groupByAll  , 
-#                                                                   hoverData = hoverData.copy()   )
-#            hoverName   = groupBy
-##            groupBy     = constants.featureTaskType
-#            
-#            if selectedFeatureMulti is not None:
-#                selectedFeatureMulti = groupByAll + groupBySub + selectedFeatureMulti
-#            print('hoverData 2   ' +  str(hoverData) + '   hoverName ' + str(hoverName) + '   groupBy ' + str(groupBy))
-#        
-        
-        
         if   groupBy  in  featureGroupByOptions  :
-#        elif   groupBy  in  [ constants.featureSkill , constants.featureCourse , constants.featureStudent , ]  :
             
             studentDataDfSum, hoverData, groupByAll = util.groupedBySelectedFeaturesDf(studentDataDf, 
                                                                    groupBy = groupBy  , 

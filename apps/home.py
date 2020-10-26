@@ -140,14 +140,17 @@ def plotGameOverview():
     plotRow = []    
     plotRow.append(
             html.Div([
-                   util.generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
+                    util.generateCardBase([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
                                         '' + util.seconds_2_dhms(dfAllData['SessionDuration'].sum().round(decimals=2)), 
-                                        '' + str(dfAllData['SessionDuration'].mean().round(decimals=2)) + 's', 
-                                        '' + str(dfAllData['SessionDuration'].std().round(decimals=2)) + 's', 
-                                        'total',
-                                        'mean',
-                                        'std',
                                         )
+#                   util.generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
+#                                        '' + util.seconds_2_dhms(dfAllData['SessionDuration'].sum().round(decimals=2)), 
+#                                        '' + str(dfAllData['SessionDuration'].mean().round(decimals=2)) + 's', 
+#                                        '' + str(dfAllData['SessionDuration'].std().round(decimals=2)) + 's', 
+#                                        'total',
+#                                        'mean',
+#                                        'std',
+#                                        )
                 ],
                 className="col-sm-4",
             ))
@@ -166,14 +169,19 @@ def plotGameOverview():
 
     plotRow.append(
             html.Div([
-                   util.generateCardDetail('Points Collected', 
+                    
+                util.generateCardBase('Points Collected', 
                                         '' + util.millify(dfAllData['Points'].sum().round(decimals=2)), 
-                                        '' + str(dfAllData['Points'].mean().round(decimals=2)), 
-                                        '' + str(dfAllData['Points'].std().round(decimals=2)), 
-                                        'total',
-                                        'mean',
-                                        'std',
                                         )
+                    
+#                   util.generateCardDetail('Points Collected', 
+#                                        '' + util.millify(dfAllData['Points'].sum().round(decimals=2)), 
+#                                        '' + str(dfAllData['Points'].mean().round(decimals=2)), 
+#                                        '' + str(dfAllData['Points'].std().round(decimals=2)), 
+#                                        'total',
+#                                        'mean',
+#                                        'std',
+#                                        )
                 ],            
                 className="col-sm-4",
             ))
@@ -192,9 +200,6 @@ featureGroupByOptions   = [constants.featureStudent, constants.featureTask, cons
 def getGroupByFilterOptions(selectedGroupBy = constants.featureGroup):
     
     if selectedGroupBy == constants.featureTask :
-        
-        print('getGroupByFilterOptions')
-        print(list(dfPracticeTaskDetails[constants.featureTask].unique()) +  list(dfTheoryTaskDetails[constants.featureTask].unique()))
         
         return list(dfPracticeTaskDetails[constants.featureTask].unique()) +  list(dfTheoryTaskDetails[constants.featureTask].unique())
     
@@ -326,7 +331,6 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
     dfOriginalStd = dfOriginalStd.round(decimals=2)
     dfOriginalStd.columns = dfOriginalStd.columns.droplevel(1)
     
-    print('selectedFigureType   ' + str(selectedFigureType) + '   feature1   ' + str(feature1)  + '   feature2   ' + str(feature2) )
         
     if 'gameDataDfGroupedSum' in locals()     and    ( gameDataDfGroupedSum is not None  )    and   ( not  gameDataDfGroupedSum.empty )   :
         
@@ -334,10 +338,6 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         plotTitle   = ' Details of students ' 
         plotTitle   = plotTitle + str( constants.feature2UserNamesDict.get(feature1) if feature1 in constants.feature2UserNamesDict.keys() else feature1 )
         plotTitle   = plotTitle + ' vs ' + str( constants.feature2UserNamesDict.get(feature2) if feature2 in constants.feature2UserNamesDict.keys() else feature2 )
-        
-        
-        
-        print('selectedFigureType   ' + str(selectedFigureType) + '   feature1   ' + str(feature1)  + '   feature2   ' + str(feature2) )
         
         rows = util.getCustomPlot(
                           df                    = gameDataDfGroupedSum, 
@@ -570,9 +570,6 @@ def update_feature_multi_disabled(selectedFigureType, initialClass):
     ],
 )
 def update_feature_groupby_filter_option_reset(selectedGroupBy):
-    
-    print('update_feature_groupby_filter_option_reset')
-    print(selectedGroupBy)
     
     return "", util.BuildOptions( getGroupByFilterOptions(selectedGroupBy) ) 
 

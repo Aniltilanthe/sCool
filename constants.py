@@ -6,6 +6,11 @@ Created on Mon Jul  6 22:42:22 2020
 """
 
 
+DatabaseName = 'sCool-2020-05-28'
+
+
+
+
 
 
 keyLabel                    = 'label'

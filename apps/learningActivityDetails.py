@@ -1277,7 +1277,7 @@ def plotGroupOverview(groupId, filterByDate = '' ):
     plots               = []
     
 #    if not studentDataDf is None and not studentDataDf.empty:
-    plots = util.plotGroupOverview(groupId, groupStudents, studentDataDf, classes = "c-card-small")
+    plots = util.plotGroupOverview(groupId, groupStudents, studentDataDf, classes = "c-card-medium")
     
     return plots
 

@@ -46,7 +46,7 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = "")
                     ))
     plotRow.append( html.Div([
                                 generateCardBase([html.I(className="fas fa-users m-right-small"),   'No of Students'], len(studentDataDf[constants.STUDENT_ID_FEATURE].unique()),
-#                                        classes = classes
+                                        classes = classes
                                         )
                             ],
                             className="col-sm-6",
@@ -56,7 +56,7 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = "")
                      className = "row")
     )
 
-    plotRow = []    
+    plotRow = []
     plotRow.append(
             html.Div([
                     
@@ -104,7 +104,7 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = "")
 #                                        'std',
 #                                        classes = classes
 #                                        )
-                ],            
+                ],    
                 className="col-sm-4",
             ))
             

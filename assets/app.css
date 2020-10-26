@@ -113,6 +113,10 @@ html {
   margin: 0.5rem;
   padding: 0.5rem;
 } 
+.c-card.c-card-medium {
+  margin: 0.8rem;
+  padding: 0.8rem;
+} 
 .c-card:hover {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 }
@@ -122,6 +126,9 @@ html {
 .c-card.c-card-small .card_label {
     font-size: 1rem;
 } 
+.c-card.c-card-medium .card_label {
+    font-size: 1.3rem;
+}
 .c-card .card_value {
 	font-weight: bold;
     font-size: 3rem;
@@ -130,8 +137,15 @@ html {
 	font-weight: bold;
     font-size: 1.3rem;
 } 
+.c-card.c-card-medium .card_value {
+	font-weight: bold;
+    font-size: 2rem;
+} 
 .c-card.c-card-small .card_value_details {
     font-size: 1rem;
+} 
+.c-card.c-card-medium .card_value_details {
+    font-size: 1.5rem;
 } 
 .c-card .card_value1, .c-card .card_value2 {
 	width: 50%;
@@ -161,6 +175,9 @@ html {
 }
 .c-card.c-card-small .c-details {
 	font-size: 1rem;
+}
+.c-card.c-card-medium .c-details {
+	font-size: 1.5rem;
 }
 
 .c-container {

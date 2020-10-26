@@ -23,7 +23,7 @@ from flask import redirect
 from flask_login import logout_user, current_user, LoginManager, UserMixin
 
 from app import app, server, login_manager, User
-from apps import groups, groupDetails, groupStudents, custom, home, sidebar, login
+from apps import groups, learningActivityDetails, groupStudents, custom, home, sidebar, login
 from data import studentGrouped
 
 import constants
@@ -164,13 +164,13 @@ def render_page_content(pathname):
         if pathname in ["/Overview", "/Groups"]:
             return groups.layout
         elif pathname  in ["/", "/Details"]:
-            return groupDetails.layout
+            return learningActivityDetails.layout
         elif pathname == "/Custom":
             return custom.layout
         elif pathname == "/Students":
             return groupStudents.layout        
 
-        return groupDetails.layout
+        return learningActivityDetails.layout
 
     
     # DEFAULT NOT LOGGED IN: /login

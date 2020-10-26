@@ -27,8 +27,3 @@ window.dash_clientside.ui = {
 		bodyStyles.setProperty('--theme-color', newThemeColor);
 	},
 }
-
-
-$(document).ready(function(){
-  $('textarea').autoResize();
-});

@@ -69,8 +69,6 @@ class User(UserMixin):
         self.securityStamp = securityStamp
 
     def is_active(self):
-        # Here you should write whatever the code is
-        # that checks the database if your user is active
         return self.active
 
     def is_anonymous(self):

@@ -315,9 +315,6 @@ def onChangeCustomizeAppTheme(*args):
 @app.callback(Output("tabCourseSkillTask", "children"), [Input("url", "pathname")],
     )
 def render_tab_task_content(pathname ):
-    
-    print('inside settings render_tab_task_content')
-    print(current_user)
 
     if current_user and current_user.is_authenticated  :
         return getCourseTask()

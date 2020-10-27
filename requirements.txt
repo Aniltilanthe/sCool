@@ -12,3 +12,4 @@ pip install seaborn
 pip install scipy
 pip install statsmodels
 pip install dash-auth
+pip install dash_bootstrap_components

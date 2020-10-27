@@ -319,8 +319,10 @@ def render_tab_task_content(pathname ):
     print('inside settings render_tab_task_content')
     print(current_user)
 
-    if current_user.is_authenticated  :
+    if current_user and current_user.is_authenticated  :
         return getCourseTask()
+    
+    return html.Div()
 
 
 

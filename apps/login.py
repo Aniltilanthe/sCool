@@ -53,23 +53,26 @@ already_login_alert = dbc.Alert(
 layout = dbc.Row(
         dbc.Col(
             [
-                dcc.Location(id='login-url',refresh=True,pathname='/login'),
-                html.Div(id='login-trigger',style=dict(display='none')),
-                html.Div(id='login-alert'),
-                dbc.FormGroup(
-                    [
+                
+                html.H1('Login from main app only'),
+                
+                # dcc.Location(id='login-url',refresh=True,pathname='/login'),
+                # html.Div(id='login-trigger',style=dict(display='none')),
+                # html.Div(id='login-alert'),
+                # dbc.FormGroup(
+                #     [
 
-                        dbc.Input(id='login-username', autoFocus=True),
-                        dbc.FormText('Email'),
+                #         dbc.Input(id='login-username', autoFocus=True),
+                #         dbc.FormText('Email'),
                         
-                        html.Br(),
-                        dbc.Input(id='login-password', type='password'),
-                        dbc.FormText('Password'),
+                #         html.Br(),
+                #         dbc.Input(id='login-password', type='password'),
+                #         dbc.FormText('Password'),
                         
-                        html.Br(),
-                        dbc.Button('Submit',color='primary', id='login-button'),
-                    ]
-                )
+                #         html.Br(),
+                #         dbc.Button('Submit',color='primary', id='login-button'),
+                #     ]
+                # )
             ],
             width=6
         )
@@ -77,36 +80,36 @@ layout = dbc.Row(
 
 
 
-@app.callback(
-    [Output('login-url', 'pathname'),
-     Output('login-alert', 'children')
-     ],
-    [Input('login-button', 'n_clicks')],
-    [State('login-username', 'value')]
-)
-def login_success(n_clicks, usernameId):
-    '''
-    logs in the user
-    '''
-    if not n_clicks is None and n_clicks > 0:
-        print('login success user')
-        userDB = studentGrouped.getUserFromUserId(usernameId)
+# @app.callback(
+#     [Output('login-url', 'pathname'),
+#      Output('login-alert', 'children')
+#      ],
+#     [Input('login-button', 'n_clicks')],
+#     [State('login-username', 'value')]
+# )
+# def login_success(n_clicks, usernameId):
+#     '''
+#     logs in the user
+#     '''
+#     if not n_clicks is None and n_clicks > 0:
+#         print('login success user')
+#         userDB = studentGrouped.getUserFromUserId(usernameId)
         
-        if  userDB is not None: 
-            user = User(userDB['UserName'], userDB['Id'], active = True, isAdmin = userDB['IsAdmin'], securityStamp = userDB['SecurityStamp'] )
-            print('login success user')
-            print(userDB)
-            print(user)
-            if user:
-                login_user(user)
+#         if  userDB is not None: 
+#             user = User(userDB['UserName'], userDB['Id'], active = True, isAdmin = userDB['IsAdmin'], securityStamp = userDB['SecurityStamp'] )
+#             print('login success user')
+#             print(userDB)
+#             print(user)
+#             if user:
+#                 login_user(user)
 
-                return constants.loginRedirect, success_alert
-            else:
-                return no_update, failure_alert
-        else:
-            return no_update, failure_alert
-    else:
-        return no_update, ''
+#                 return constants.loginRedirect, success_alert
+#             else:
+#                 return no_update, failure_alert
+#         else:
+#             return no_update, failure_alert
+#     else:
+#         return no_update, ''
 
 
 

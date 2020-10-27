@@ -151,14 +151,14 @@ app.layout = html.Div([dcc.Location(id="url"), sidebar.sidebar, content,
 def render_page_content(pathname):
     
     if pathname == '/login':
-        if not current_user.is_authenticated:
+        if current_user and not current_user.is_authenticated:
             return login.layout
     elif pathname == '/logout':
-        if current_user.is_authenticated:
+        if current_user and current_user.is_authenticated:
             logout_user()
         
 
-    if current_user.is_authenticated:
+    if current_user and current_user.is_authenticated:
         if pathname in ["/Home"]:
             return home.layout
         if pathname in ["/Overview", "/Groups"]:
@@ -208,7 +208,7 @@ def show_hide_topbar(pathname, currentClasses):
 
     currentClassesS.discard('hidden')
     
-    if pathname in  ["/Home", "/login"] :
+    if pathname in  ["/Home", "/login"]  or   not  ( current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated) :
         currentClassesS.add('hidden')
         
     return  ' '.join(currentClassesS)

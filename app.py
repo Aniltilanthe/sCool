@@ -71,9 +71,6 @@ class User(UserMixin):
     def is_active(self):
         return self.active
 
-    def is_anonymous(self):
-        return False
-
     def is_authenticated(self):
         return True
 

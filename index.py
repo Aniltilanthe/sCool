@@ -6,20 +6,11 @@ Created on Thu Jun 11 18:04:10 2020
 """
 
 # -*- coding: utf-8 -*-
-import pandas as pd
-import numpy as np
-
-import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-import plotly.express as px
-import plotly.graph_objects as go
-import plotly.figure_factory as ff
-from plotly import graph_objs as go
 
-from flask import redirect
 from flask_login import logout_user, current_user, LoginManager, UserMixin
 
 from app import app, server, login_manager, User
@@ -40,17 +31,12 @@ dfUser                  =  studentGrouped.dfUser
     
 @login_manager.user_loader
 def load_user(usernameOrId):
-     # 1. Fetch against the database a user by `id` 
-     # 2. Create a new object of `User` class and return it.
-
     userDB = studentGrouped.getUserFromUserId(usernameOrId)
     
     if  userDB is not None:        
         return User(userDB['UserName'], userDB['Id'], active = True, isAdmin = userDB['IsAdmin'], securityStamp = userDB['SecurityStamp'] )
 
 
-
-print( GroupSelector_options )
 
 
 def getUserLA():

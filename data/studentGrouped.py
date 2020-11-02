@@ -298,16 +298,20 @@ def get_merge_list(values):
     return list(set([a for b in values.tolist() for a in b]))
 
 #get List of Students for a group
-def getStudentsOfSchool(groupSelected):
-        
-#    students = list(dfStudentDetails[dfStudentDetails[constants.GROUPBY_FEATURE] == groupSelected][constants.STUDENT_ID_FEATURE].unique())
+def getStudentsOfLearningActivity(learningActivityId):
+    '''
+    Get list of students of a Learning Activitiy.
+
+    Returns:
+        Return Theory Task details dataframe
+    '''
     
-    students = list(dfEnrolledDetails[dfEnrolledDetails[constants.GROUPBY_FEATURE] == groupSelected][constants.STUDENT_ID_FEATURE].unique())
+    students = list(dfEnrolledDetails[dfEnrolledDetails[constants.GROUPBY_FEATURE] == learningActivityId][constants.STUDENT_ID_FEATURE].unique())
     
     return students
 
 #get students DataFrame a group
-def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
+def getStudentsOfLearningActivityDF(groupSelected, isOriginal = False):
     
     
     if not(isOriginal) and groupSelected in dfGroupedPractice.groups.keys():
@@ -362,7 +366,7 @@ def getStudentsOfSchoolDF(groupSelected, isOriginal = False):
             studentDF = schoolTheory
     
     
-    groupStudents = getStudentsOfSchool(groupSelected)
+    groupStudents = getStudentsOfLearningActivity(groupSelected)
     
     groupStudents = studentDF['StudentId'].unique()
     

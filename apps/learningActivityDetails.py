@@ -119,7 +119,7 @@ StudentSelector_students = list()
 
 #--------------------------- helper functions -----------------------    
 getTaskWiseSuccessFail                  =  studentGrouped.getTaskWiseSuccessFail
-getStudentsOfSchool                     =  studentGrouped.getStudentsOfSchool
+getStudentsOfLearningActivity                     =  studentGrouped.getStudentsOfLearningActivity
 
 
 getPracticeDescription                  =  studentGrouped.getPracticeDescription
@@ -1197,7 +1197,7 @@ def plotClassOverview(schoolKey, filterByDate = '' ):
                      'Attempts', 'Points' 
                      ]
         
-    studentDataDf = studentGrouped.getStudentsOfSchoolDF(schoolKey)
+    studentDataDf = studentGrouped.getStudentsOfLearningActivityDF(schoolKey)
     
     if filterByDate:
         dateGroup = studentDataDf.groupby(  [ studentDataDf['CreatedAt'].dt.date ] )
@@ -1266,8 +1266,8 @@ def plotClassOverview(schoolKey, filterByDate = '' ):
 
 def plotGroupOverview(groupId, filterByDate = '' ):
     
-    groupStudents     =  getStudentsOfSchool(groupId)
-    studentDataDf     =  studentGrouped.getStudentsOfSchoolDF(groupId)
+    groupStudents     =  getStudentsOfLearningActivity(groupId)
+    studentDataDf     =  studentGrouped.getStudentsOfLearningActivityDF(groupId)
     
     if filterByDate:
         dateGroup = studentDataDf.groupby(  [ studentDataDf['CreatedAt'].dt.date ] )
@@ -1515,5 +1515,5 @@ def update_download_link__details_group(groupMain):
     if groupMain is None or not int(groupMain) >= 0 or groupMain == "":
         return "", "hidden"
     
-    csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfSchoolDF(int(groupMain)) )
+    csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(int(groupMain)) )
     return csv_string, ""

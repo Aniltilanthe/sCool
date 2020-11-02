@@ -94,11 +94,11 @@ dfGroupedPlayerStrategyTheory           = studentGrouped.dfGroupedPlayerStrategy
 
 #--------------------------- helper functions -----------------------    
 getTaskWiseSuccessFail                  =  studentGrouped.getTaskWiseSuccessFail
-getStudentsOfSchool                     =  studentGrouped.getStudentsOfSchool
+getStudentsOfLearningActivity           =  studentGrouped.getStudentsOfLearningActivity
 
 
 getPracticeDescription                  =  studentGrouped.getPracticeDescription
-getTheoryDescription                     =  studentGrouped.getTheoryDescription
+getTheoryDescription                    =  studentGrouped.getTheoryDescription
 
 
 
@@ -203,7 +203,7 @@ def getStudentData(StudentId, schoolKey, selectedDate = '' ):
 
 #Check if Student is in a Group
 def isStudentInGroup(StudentId, groupId) :
-    groupStudents = getStudentsOfSchool(groupId)
+    groupStudents = getStudentsOfLearningActivity(groupId)
     
     if  not StudentId in groupStudents:
         return False
@@ -944,7 +944,7 @@ def setStudentOptions(  schoolSelected  )  :
     if schoolSelected is None or not int(schoolSelected) >= 0:
         return []
     
-    students = getStudentsOfSchool(int(schoolSelected) )
+    students = getStudentsOfLearningActivity(int(schoolSelected) )
     
     
     return [{'label': row['Name'], 'value': row['StudentId'] } for index, row  in 

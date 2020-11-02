@@ -55,7 +55,7 @@ dfGroupedPlayerStrategyTheory           = studentGrouped.dfGroupedPlayerStrategy
 
 #--------------------------- helper functions START -----------------------    
 getTaskWiseSuccessFail                  =  studentGrouped.getTaskWiseSuccessFail
-getStudentsOfSchool                     =  studentGrouped.getStudentsOfSchool
+getStudentsOfLearningActivity                     =  studentGrouped.getStudentsOfLearningActivity
 getPracticeConceptsUsedDetailsStr          =  studentGrouped.getPracticeConceptsUsedDetailsStr
 getStudentWiseData                      =  studentGrouped.getStudentWiseData
 
@@ -232,8 +232,7 @@ def getTable(df, groupKey, isMinNotHighlight, isMean, featureAdder):
 
 def plotGroupOverview(groupSelected):
     
-    groupStudents     =  getStudentsOfSchool(groupSelected)
-#    studentDataDf     =  studentGrouped.getStudentsOfSchoolDF(groupSelected)
+    groupStudents     =  getStudentsOfLearningActivity(groupSelected)
     studentDataDf       = getGroupData(groupSelected, [])
     
     plots = util.plotGroupOverview(groupSelected, groupStudents, studentDataDf)
@@ -252,10 +251,10 @@ def getGroupData(schoolKey, schoolKeys2Compare):
     if (None == schoolKeys2Compare) :
         schoolKeys2Compare = []
     
-    studentDataDf = studentGrouped.getStudentsOfSchoolDF(schoolKey, isOriginal = True)
+    studentDataDf = studentGrouped.getStudentsOfLearningActivityDF(schoolKey, isOriginal = True)
     
     for sckoolKey2Com in schoolKeys2Compare:
-        studentDataDf2Com = studentGrouped.getStudentsOfSchoolDF(sckoolKey2Com, isOriginal = True)
+        studentDataDf2Com = studentGrouped.getStudentsOfLearningActivityDF(sckoolKey2Com, isOriginal = True)
         
         if 'studentDataDf2Com' in locals()    and    studentDataDf2Com is not None :
             studentDataDf = pd.concat([studentDataDf, studentDataDf2Com], ignore_index=True, sort=False)

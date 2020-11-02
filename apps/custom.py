@@ -61,7 +61,7 @@ dfGroupedPlayerStrategyTheory           = studentGrouped.dfGroupedPlayerStrategy
 
 #--------------------------- helper functions START -----------------------    
 getTaskWiseSuccessFail                  =  studentGrouped.getTaskWiseSuccessFail
-getStudentsOfSchool                     =  studentGrouped.getStudentsOfSchool
+getStudentsOfLearningActivity                     =  studentGrouped.getStudentsOfLearningActivity
 getPracticeConceptsUsedDetailsStr          =  studentGrouped.getPracticeConceptsUsedDetailsStr
 getStudentWiseData                      =  studentGrouped.getStudentWiseData
 
@@ -137,7 +137,7 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
         selectedDistribution = []
     
     
-    studentDataDf = studentGrouped.getStudentsOfSchoolDF(schoolKey, isOriginal = True)
+    studentDataDf = studentGrouped.getStudentsOfLearningActivityDF(schoolKey, isOriginal = True)
     
     
     
@@ -416,6 +416,6 @@ def update_download_link_custom_group(groupMain):
     if groupMain is None or not int(groupMain) >= 0 or groupMain == "":
         return "", "disabled"
     
-    csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfSchoolDF(int(groupMain)) )
+    csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(int(groupMain)) )
     return csv_string, ""
 

@@ -296,8 +296,7 @@ def toFormatDatetime(df, feature):
     try :
          df[feature] = pd.to_datetime(df[feature])
     except Exception as e: 
-            print('toFormatDatetime 1 ')
-            print(e)
+        print('toFormatDatetime exception in Datetime - Erroneous Date !!! ')
 
 
 def toFormatNumeric(df, feature):
@@ -422,16 +421,20 @@ def getColorMarkers():
 
 #------------------------------------Library functions End------------------------
 
-
-
-#----------------------------------Theroy Part Start-----------------------------------
-    
-    
+#-------------------------------------------------------------------------------------
 #------------------------------------ DB Queries -------------------------------------
 
+#----------------------------------Theroy Part Start-----------------------------------
 
+
+#
 def getTheoryData():
-    
+    '''
+    Get Theory Students Data.
+
+    Returns:
+        Return Theory Students Data, numerical solution data, non numerical solution data.
+    '''
 
     dfDB = pd.read_sql_query('SELECT  '
     
@@ -500,6 +503,13 @@ def getTheoryData():
 
 
 def getTheoryTaskDetails():
+    '''
+    Get Theory Task details Data.
+
+    Returns:
+        Return Theory Task details dataframe
+    '''
+    
     
     dfTheoryTaskDetails = pd.read_sql_query('SELECT  '
              
@@ -645,15 +655,11 @@ def getEnrolledDetails():
      + ', course.CourseId, course.User_Id , course.isVisible '
  
      + ', s.StudentId, s.Name '
-     
-#     + ', la.LearningActivityId, la.Title, la.Description, la.BeginDate, la.EndDate, la.GroupType, la.SchoolName  '
-#     + ', la.Grade, la.NrOfParticipants, la.JoinCode, la.Notes, la.User_Id  '
     
      + '  FROM [' + DatabaseName +'].[dbo].[Enrolleds] enrol ' 
  
      + '  JOIN [' + DatabaseName +'].[dbo].[Courses] course  ON course.CourseId = enrol.Course_CourseId ' 
      + '  JOIN [' + DatabaseName +'].[dbo].[Students] s   ON s.StudentId = enrol.Student_StudentId ' 
-#     + '  JOIN [' + DatabaseName +'].[dbo].[LearningActivity] la  ON la.LearningActivityId = enrol.LearningActivity_LearningActivityId ' 
      
      + '  WHERE s.IsConsentGiven = 1 '
      , conn)
@@ -740,17 +746,14 @@ def getLearningActivityDetails():
 GROUPBY_FEATURE     = constants.GROUPBY_FEATURE
 
 def getGroupedDataStudent(df):
-    #plot for these - grouped with Year, Month !!!
-    #return df.groupby(  [df['CreatedAt'].dt.year, df['CreatedAt'].dt.month]  )
-    #other option - grouped by date
-#    return df.groupby(  [ df['CreatedAt'].dt.date ] )
     return df.groupby(  [df[GROUPBY_FEATURE]] )
 
 
 def getGroupedData(df):
-#    return df.groupby(  [df['CreatedAt'].dt.date] )
     return df.groupby(  [df[GROUPBY_FEATURE]] )
   
+    
+#---------------------------------------------------------------------------------------------
 #---------------------------------- Code Parser ----------------------------------------------
 
 def hasRecursion(expr):

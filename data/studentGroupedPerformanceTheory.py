@@ -46,33 +46,6 @@ dfTheoryTaskDetails = main.getTheoryTaskDetails()
 dfTheoryTaskDetails = dfTheoryTaskDetails.drop_duplicates(subset=['TheoryTaskId'], keep='first')
 
 
-dfStudentDetails = main.getStudentDetails()
-dfStudentDetails = dfStudentDetails.drop_duplicates(subset=['StudentId'], keep='first')
-
-
-
-markers = ['.', 'o', 'v', '^', '<', '>', '*', 's', '+', 'x', 'D', 'H', '|', '-']
-markerfacecolors = ['navy', 'seagreen', 'red', 'cyan', 'magenta', 'maroon'
-                   ,'darkviolet' , 'green', 'tomato', 'grey', 'mediumturqoise']
-colors = ['skyblue', 'palegreen', 'mistyrose', 'cadetblue', 'pink', 'lightcoral'
-         ,'violet' , 'lime', 'tomato', 'lightgrey', 'darkslategray']
-
-#User understandable Column names
-feature2UserNamesDict = {
-		"Attempts" : "Task Attempts (avg)"
-		,"TheoryStatisticsId" : "Theory Task Id"
-		,"Points" : "Points"
-		,"SessionDuration" : 'Session Duration'
-		,"TaskType" : "Task Type"
-		,"enemiesCount" : "No. of Enemies"
-		,"playerShootCount" : "No. of time Player shoot"
-		,"playerShootEndCount" : "No. of time Player shoot bullet reached end"
-		,"playerShootEndEnemyHitCount" : "No. of times Player shoot Enemy"
-		,"enemysShootEndPlayerNotHitCount" : "No. of times Enemies shoot missed Player"
-		,"enemysShootEndPlayerHitCount" : "No. of times Enemies shoot Player"
-		,"itemsCollectedCount" : "No. of Items collected"
-	}
-
 
 
 groupedSkillStudents = df.groupby(['Difficulty', 'TheoryTaskId', 'SkillId', 'StudentId'])['Attempts'].agg('sum').reset_index()
@@ -287,10 +260,6 @@ dfPlayerStrategyN[featuresToInt] = dfPlayerStrategyN[featuresToInt].astype(int)
 #STEP 0 : group data . by date or courseId, group of students of same school
 #*****************************************************************************
 def getGroupedData(df):
-    #plot for these - grouped with Year, Month !!!
-    #return df.groupby(  [df['CreatedAt'].dt.year, df['CreatedAt'].dt.month]  )
-    #other option - grouped by date
-#    return df.groupby(  [df['CreatedAt'].dt.date] )
     return df.groupby(  [df[ constants.GROUPBY_FEATURE ]] )
      
 

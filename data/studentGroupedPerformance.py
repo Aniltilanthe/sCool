@@ -25,7 +25,7 @@ import constants
 np.random.seed(19680801)
 
 
-
+# features to Int type
 featuresToInt = ['coinCollectedCount', 'keyboardKeyPressedCount', 'robotCollisionsBoxCount'
               , 'deletedCodesCount', 'tabsSwitchedCodeCount', 'tabsSwitchedDescriptionCount', 'tabsSwitchedCount'
               , 'draggedCount', 'runsHasVariableCount', 'runsHasConditionCount', 'runsHasNestedLoopCount'
@@ -53,6 +53,8 @@ featuresToInt = ['coinCollectedCount', 'keyboardKeyPressedCount', 'robotCollisio
               , 'runsHasVariablesCount'
               ]
                     
+
+# Has programming concept in code features  - used for data analysis of student code
 hasFeatures = [
         'hasLoop', 'hasNestedLoop', 'hasCondition', 'hasVariable', 
        
@@ -64,12 +66,7 @@ hasFeatures = [
        
        'hasAsyncOrAwait', 
        'hasFunctionClass', 
-#       'hasControlFlow', 
-#       'hasImports',
-       'hasStatements', 
-#       'hasComprehensions', 
-#       'hasSubscripting'     
-#       'hasVariables'
+       'hasStatements',
        ]
 
 featuresToInt = featuresToInt + hasFeatures
@@ -78,18 +75,17 @@ featuresToInt = featuresToInt + hasFeatures
 
 
 
-dfLearningActivityDetails              = main.getLearningActivityDetails()
+#----------------------------------------------------------------------
+# Practice Data
+#-----------------------------------------------------------------------
 
 
 
 dfPractice              = main.getPracticeData()
 dfPractice[constants.featureGroup]            = constants.TypeGroup + '-' + dfPractice[constants.GROUPBY_FEATURE].astype(str) 
 
-dfPracticeTaskDetails   = main.getPracticeTaskDetails()
-dfPracticeTaskDetails   = dfPracticeTaskDetails.drop_duplicates(subset=['PracticeTaskId'], keep='first')
 
 
-dfStudentDetails        = main.getStudentDetails()
 
 
 
@@ -526,11 +522,7 @@ dfPlayerStrategyPracticeTask = dfPlayerStrategyPracticeTask.loc[:,~dfPlayerStrat
                           
 
 def getGroupedData(df):
-    #plot for these - grouped with Year, Month !!!
-    #return df.groupby(  [df['CreatedAt'].dt.year, df['CreatedAt'].dt.month]  )
-    #other option - grouped by date
     return df.groupby(  [df[constants.GROUPBY_FEATURE]] )
-#    return df.groupby(  [ df['CreatedAt'].dt.date ] )
 
 
 dfGrouped = getGroupedData(dfPlayerStrategyPractice)
@@ -540,11 +532,10 @@ dfGroupedPracticeTaskWise = getGroupedData(dfPlayerStrategyPracticeTask)
 
 
 #---------------------------------------------------------------
-#How many students used loops/certain concept in a certain task?
+#Task wise information - How many students used loops/certain concept in a certain task?
 #---------------------------------------------------------------
 def getGroupedDataSchoolTask(df):
     return df.groupby(  [df[ constants.GROUPBY_FEATURE ], df['PracticeTaskId']] )
-#    return df.groupby(  [df['CreatedAt'].dt.date, df['PracticeTaskId']] )
 
 
 dfGroupedBySchoolTask = getGroupedDataSchoolTask(dfPractice)
@@ -565,6 +556,6 @@ dfGroupedByTask = getGroupedDataTask(dfPractice)
 
 
 #----------------------------------------------------------------------
-#---------------------- creteing student gantt chart data
+#---------------------- students practice data original with min feature extraction
 
 dfGroupedOriginal = main.getGroupedDataStudent(dfPlayerStrategyPracticeOriginal)

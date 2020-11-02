@@ -92,7 +92,10 @@ def plotGroupOverview(groupSelected, groupStudents, studentDataDf, classes = "")
             ))
     plotRow.append(
             html.Div([
-                    generateCardBase('Points', 
+                    generateCardBase(
+                            [html.I(className="far fa-star m-right-small"),    
+                            'Points' ]
+                               ,
                                         '' + millify(studentDataDf['Points'].sum().round(decimals=2)), 
                                         classes = classes)
 #                   generateCardDetail('Points', 
@@ -148,16 +151,6 @@ def plotStudentOverview(studentDataDf, classes = ""):
                                             '' + seconds_2_dhms(studentDataDf[constants.featureSessionDuration].sum().round(decimals=2)),
                                             classes = classes
                                             )
-                        
-#                       generateCardDetail([html.I(className="fas fa-clock m-right-small"),   'Game Time'], 
-#                                            '' + seconds_2_dhms(studentDataDf[constants.featureSessionDuration].sum().round(decimals=2)), 
-#                                            '' + str(studentDataDfMean[constants.featureSessionDuration]) + 's', 
-#                                            '' + str( studentDataDfStd[constants.featureSessionDuration] ) + 's', 
-#                                            'total',
-#                                            'mean',
-#                                            'std',
-#                                            classes = classes
-#                                            )
                     ],
                     className="col-sm-4",
                 ))
@@ -184,23 +177,12 @@ def plotStudentOverview(studentDataDf, classes = ""):
         plotRow.append(
                 html.Div([
                         
-                        generateCardBase(((constants.feature2UserNamesDict.get(constants.featurePoints)) if constants.featurePoints in constants.feature2UserNamesDict.keys() else constants.featurePoints ) 
-                                , 
+                        generateCardBase([html.I(className="far fa-star m-right-small"),    
+                                 ((constants.feature2UserNamesDict.get(constants.featurePoints)) if constants.featurePoints in constants.feature2UserNamesDict.keys() else constants.featurePoints ) ]
+                               , 
                                             '' + millify(studentDataDf[ constants.featurePoints ].sum().round(decimals=2)), 
                                             classes = classes
                                             )
-                        
-#                       generateCardDetail(
-#                               ((constants.feature2UserNamesDict.get(constants.featurePoints)) if constants.featurePoints in constants.feature2UserNamesDict.keys() else constants.featurePoints ) 
-#                                , 
-#                                            '' + millify(studentDataDf[ constants.featurePoints ].sum().round(decimals=2)), 
-#                                            '' + str(studentDataDfMean[ constants.featurePoints ]), 
-#                                            '' + str( studentDataDfStd[ constants.featurePoints ] ), 
-#                                            'total',
-#                                            'mean',
-#                                            'std',
-#                                            classes = classes
-#                                            )
                     ],            
                     className="col-sm-4",
                 ))

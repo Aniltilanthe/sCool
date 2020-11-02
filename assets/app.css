@@ -296,7 +296,8 @@ html {
 .theme-app .c-card .card_value1, .theme-app  .c-card .card_value2,
 .theme-app .c-card .card_value_details,
 .theme-app .c-card .card_value_title,
-.theme-app  i.fas {
+.theme-app  i.fas,
+.theme-app  i.far {
 	color: var(--theme-background-color);
 }
 
@@ -319,13 +320,23 @@ html {
 .theme-app .btn-outline-info:hover i.fas,
 .theme-app .btn-outline-primary:hover  i.fas, 
 .theme-app .btn-outline-primary:active  i.fas,
-.theme-app .btn-outline-primary:not(:disabled):not(.disabled):active  i.fas {
+.theme-app .btn-outline-primary:not(:disabled):not(.disabled):active  i.fas,
+.theme-app .highlight  i.far, 
+.theme-app .btn:hover  i.far, 
+.theme-app .btn:active  i.far, 
+.theme-app .btn-outline-info:hover i.far,
+.theme-app .btn-outline-primary:hover  i.far, 
+.theme-app .btn-outline-primary:active  i.far,
+.theme-app .btn-outline-primary:not(:disabled):not(.disabled):active  i.far {
 	color: var(--theme-color);
 }
 
 .theme-app .highlight:focus  i.fas, 
 .theme-app  button:not(:disabled) i.fas,
-.theme-app  .btn-outline-info:focus i.fas,  {
+.theme-app  .btn-outline-info:focus i.fas,
+.theme-app .highlight:focus  i.far, 
+.theme-app  button:not(:disabled) i.far,
+.theme-app  .btn-outline-info:focus i.far,  {
 	color: var(--theme-background-color);
 }
 .theme-app .highlight:focus, 

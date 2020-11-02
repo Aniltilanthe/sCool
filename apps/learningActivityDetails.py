@@ -1364,7 +1364,7 @@ def setClassOverview(groupMain, filterByDate):
     
     graphs =  graphs + plotClassOverview( int(groupMain) , filterByDate = filterByDate )  
     
-    graphs = graphs + [ html.Hr() ]
+#    graphs = graphs + [ html.Hr() ]
     
 
     return  html.Div(graphs)
@@ -1381,7 +1381,7 @@ def display_graphs(learningActivitySelected, filterByDate):
     
     graphs = plotSingleClass('School', int(learningActivitySelected), filterByDate = filterByDate )
     
-    graphs = graphs + [ html.Hr() ]
+    graphs = [ html.Hr() ] + graphs + [ html.Hr() ]
     
     return html.Div(graphs)
 

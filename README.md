@@ -12,7 +12,7 @@ pip install -r requirements.txt
 
 * Set Up
 
-- Change the Database name (**DatabaseName**) in **constants.py**
+  - Change the Database name (**DatabaseName**) in **constants.py**
 
 
 

@@ -165,16 +165,24 @@ def render_page_content(pathname):
 
 
 
-@app.callback(Output("group-selector-main", "options"), [Input("url", "pathname")],
-    state=[ State(component_id = "group-selector-main", component_property='options') ]
+@app.callback( [Output("group-selector-main", "options") , Output("group-selector-main", "value") ], 
+                [Input("url", "pathname")],
+                state=[ State(component_id = "group-selector-main", component_property='options') ]
     )
 def render_main_selector_content(pathname,
                selectorOptions ):
     
     if current_user.is_authenticated  :
-        return getUserLAOptions()
+        userOptions = getUserLAOptions()
+        value = ''
+        
+        if len(userOptions) == 1:
+            value = userOptions[0]['value']
+        
+        return userOptions, value
     
-
+    
+    return [], ''
 
 
 # Update bar plot

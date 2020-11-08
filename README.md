@@ -5,10 +5,15 @@ sCool Data analysis and visualization
 
 * Installation
 
+```
 pip install -r requirements.txt
+```
 
 
 
+* Set Up
+
+  - Change the Database name (**DatabaseName**) in **constants.py**
 
 
 

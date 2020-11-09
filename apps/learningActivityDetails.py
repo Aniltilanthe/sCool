@@ -314,7 +314,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
         graphTitle = '(Practice) Count of tasks completed by students'
         try: 
             studentWiseDataOriginalTaskPerformed = groupOriginal
-            studentWiseDataOriginalTaskPerformed[featureTaskDesc] = studentWiseDataOriginalTaskPerformed['Title'] + ' (Id: ' + studentWiseDataOriginalTaskPerformed['PracticeTaskId'].astype(str) + ')' 
+            studentWiseDataOriginalTaskPerformed[featureTaskDesc] = studentWiseDataOriginalTaskPerformed['Title'] + '-' + studentWiseDataOriginalTaskPerformed['PracticeTaskId'].astype(str)  
             studentWiseDataOriginalTaskPerformed[constants.featureTask] = constants.TaskTypePractice + '-' + studentWiseDataOriginalTaskPerformed['PracticeTaskId'].astype(str) 
             studentWiseDataOriginalTaskPerformed = studentWiseDataOriginalTaskPerformed [ studentWiseDataOriginalTaskPerformed['Result'] == 1][['StudentId', 'PracticeTaskId'
                           , 'Result', 'Name', featureTaskDesc, constants.featureTask]].groupby(
@@ -382,8 +382,8 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                                               , left_on='TheoryTaskId', right_on='TheoryTaskId'
                                                 , left_index=False, right_index=False
                                                 , how='inner')
-            studentWiseDataOriginalTaskPerformedTheory[featureTaskDesc] = studentWiseDataOriginalTaskPerformedTheory['Title'] + ' (Id: ' + studentWiseDataOriginalTaskPerformedTheory['TheoryTaskId'].astype(str) + ')' 
-            studentWiseDataOriginalTaskPerformedTheory[constants.featureTask] = constants.TaskTypeTheory + '-' + studentWiseDataOriginalTaskPerformedTheory['TheoryTaskId'].astype(str) 
+            studentWiseDataOriginalTaskPerformedTheory[featureTaskDesc] = studentWiseDataOriginalTaskPerformedTheory['Title'] + '-' +  studentWiseDataOriginalTaskPerformedTheory['TheoryTaskId'].astype(str)
+            studentWiseDataOriginalTaskPerformedTheory[constants.featureTask] = constants.TaskTypeTheory + '-' +  studentWiseDataOriginalTaskPerformedTheory['TheoryTaskId'].astype(str)
             studentWiseDataOriginalTaskPerformedTheory = studentWiseDataOriginalTaskPerformedTheory [ studentWiseDataOriginalTaskPerformedTheory['Result'] == 1][['StudentId', 'TheoryTaskId'
                           , 'Result', 'Name', featureTaskDesc, constants.featureTask]].groupby(
                           ['StudentId', 'Name']).agg({'TheoryTaskId': ['nunique'], featureTaskDesc: ['unique'], constants.featureTask : ['unique'], })
@@ -569,7 +569,7 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDa
             studentWiseDataConceptsTask = pd.DataFrame(studentWiseDataConceptsTask)
             studentWiseDataConceptsTask['PracticeTaskId'] = taskId
             studentWiseDataConceptsTask['Title'] = dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == taskId ]['Title'].astype(str).values[0]
-            studentWiseDataConceptsTask[featurePracticeTaskGroup] = constants.TaskTypePractice + '-' + str(taskId)
+            studentWiseDataConceptsTask[featurePracticeTaskGroup] = constants.TaskTypePractice + '-' +  str(taskId)
             studentWiseDataConceptsTask[featureY] = studentWiseDataConceptsTask.index
             studentWiseDataConceptsTask = studentWiseDataConceptsTask.rename(columns={0: featureX})
             studentWiseDataConceptsTask.drop(studentWiseDataConceptsTask[~studentWiseDataConceptsTask[featureY].isin(colY)].index, inplace = True)
@@ -625,7 +625,7 @@ def plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0 , filterByDa
             studentWiseDataConceptsTask = pd.DataFrame(studentWiseDataConceptsTask)
             studentWiseDataConceptsTask['PracticeTaskId'] = groupKeyTaskId
             studentWiseDataConceptsTask['Title'] = dfPracticeTaskDetails[ dfPracticeTaskDetails['PracticeTaskId'] == int(groupKeyTaskId) ]['Title'].astype(str).values[0]
-            studentWiseDataConceptsTask[featurePracticeTaskGroup] = constants.TaskTypePractice + '-' + str(groupKeyTaskId)
+            studentWiseDataConceptsTask[featurePracticeTaskGroup] = constants.TaskTypePractice + '-' +  str(groupKeyTaskId)
             studentWiseDataConceptsTask[featureY] = studentWiseDataConceptsTask.index
             studentWiseDataConceptsTask = studentWiseDataConceptsTask.rename(columns={0: featureX})
             studentWiseDataConceptsTask.drop(studentWiseDataConceptsTask[~studentWiseDataConceptsTask[featureY].isin(colY)].index, inplace = True)

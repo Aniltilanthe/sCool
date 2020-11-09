@@ -136,9 +136,9 @@ def getStudentData(StudentId, schoolKey, selectedDate = '' ):
         
         studentData = studentData.sort_values(by='Start')
         
-        studentData['GroupBy']              = constants.TaskTypePractice + '-' + studentData['PracticeTaskId'].astype(str) 
-        studentData['Task']                 = constants.TaskTypePractice + '-' + studentData['PracticeTaskId'].astype(str) 
-        studentData['IndexCol']             = studentData['Task'] + '-' + studentData['Result'].astype('Int64').astype(str) 
+        studentData['GroupBy']              = constants.TaskTypePractice + '-' + studentData['PracticeTaskId'].astype(str)  
+        studentData['Task']                 = constants.TaskTypePractice  + '-' + studentData['PracticeTaskId'].astype(str)  
+        studentData['IndexCol']             = studentData['Task'] + '-' +  studentData['Result'].astype('Int64').astype(str)   
         
         studentData['Finish']               = np.where(studentData['Finish'].isnull(), studentData['Start'].shift(-1), studentData['Finish'])
         
@@ -175,8 +175,8 @@ def getStudentData(StudentId, schoolKey, selectedDate = '' ):
         schoolTheoryStudent[featureDescription] = '<b>Title</b>:' + schoolTheoryStudent['Title'].astype(str)  + '<br>'+ schoolTheoryStudent[featureDescription].astype(str) 
     
         schoolTheoryStudent['GroupBy']      = constants.TaskTypeTheory + '-' + schoolTheoryStudent['TheoryTaskId'].astype(str) 
-        schoolTheoryStudent['Task']         = constants.TaskTypeTheory + '-' + schoolTheoryStudent['TheoryTaskId'].astype(str) 
-        schoolTheoryStudent['IndexCol']     = schoolTheoryStudent['Task'] + '-' + schoolTheoryStudent['Result'].astype(str)
+        schoolTheoryStudent['Task']         = constants.TaskTypeTheory + '-' +  schoolTheoryStudent['TheoryTaskId'].astype(str)  
+        schoolTheoryStudent['IndexCol']     = schoolTheoryStudent['Task'] + '-' +  schoolTheoryStudent['Result'].astype(str) 
         
         schoolTheoryStudent[constants.featureTaskType] = constants.TaskTypeTheory
         
@@ -415,7 +415,7 @@ def getCourseProgressCard(courseId, dfTasksCompleted ):
                     children = [
                                 dbc.Progress(str(progressSkill) + "%", value = progressSkill, className= " c-progress ",
                                              color = "success" if progressSkill == 100 else "primary", ), 
-                                html.Div( skillTitle + ' (Id:' +str(skillIdAttempt) + ')' ),
+                                html.Div( skillTitle + '-' +  str(skillIdAttempt) ),
                                 html.Div(
                                         children = [ 'Skill' ],
                                         className="card_value_label"
@@ -444,7 +444,7 @@ def getCourseProgressCard(courseId, dfTasksCompleted ):
                 children = [
                             dbc.Progress(str(progressCourse) + "%", value = progressCourse, className= " c-progress ",
                                              color = "success" if progressCourse == 100 else "primary", ), 
-                            html.Div( courseTitle + ' (Id:' +str(courseId) + ')' ),
+                            html.Div( courseTitle + '-' +  str(courseId)  ),
                             html.Div(
                                     children = [ 'Course' ],
                                     className="card_value_label"
@@ -582,7 +582,7 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
             constants.TaskTypeTheory + '-0' : constants.colorTheoryError,
     }
     
-    studentData['IndexSuccFail'] = studentData[constants.featureTaskType] + '-' + studentData['Result'].astype(str)
+    studentData['IndexSuccFail'] = studentData[constants.featureTaskType] + '-' +  studentData['Result'].astype(str)
     
     
     graphHeightRows =  ( studentData.shape[0] * 40 )

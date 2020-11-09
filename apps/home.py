@@ -254,10 +254,10 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         
     gameData = pd.concat([dfPlayerStrategyPracticeOriginal, dfPlayerStrategyTheory], ignore_index=True)
     
-    gameData[constants.featureStudent]     =    gameData['Name'].astype(str) + ' (Id:' +  gameData['StudentId'].astype(str) + ')'
-    gameData[constants.featureGroup]       =    constants.TypeGroup  + ' (Id:' + gameData['LearningActivityId'].astype(str) + ')'
-    gameData[constants.featureCourse]      =    constants.TypeCourse  + ' (Id:' +   gameData['CourseId'].astype(str) + ')'
-    gameData[constants.featureSkill]       =    constants.TypeSkill  + ' (Id:' +  gameData['SkillId'].astype(str) + ')'
+    gameData[constants.featureStudent]     =    gameData['Name'].astype(str) + '-' +   gameData['StudentId'].astype(str) 
+    gameData[constants.featureGroup]       =    constants.TypeGroup  + '-' + gameData['LearningActivityId'].astype(str) 
+    gameData[constants.featureCourse]      =    constants.TypeCourse  + '-' +   gameData['CourseId'].astype(str) 
+    gameData[constants.featureSkill]       =    constants.TypeSkill  + '-' +   gameData['SkillId'].astype(str) 
     gameData[constants.featureTask]        =    gameData[constants.featureTaskId].astype(str)
             
     

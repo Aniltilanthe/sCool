@@ -136,10 +136,10 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
     
     
     
-    studentDataDf[constants.featureStudent]     =    studentDataDf['Name'].astype(str)  + ' (Id:' + studentDataDf['StudentId'].astype(str)  + ')'
+    studentDataDf[constants.featureStudent]     =    studentDataDf['Name'].astype(str)  + '-' + studentDataDf['StudentId'].astype(str)
 #    studentDataDf[constants.featureGroup]       =    constants.TypeGroup + '-' + studentDataDf['GroupId'].astype(str)
-    studentDataDf[constants.featureCourse]      =    constants.TypeCourse  + ' (Id:' +  studentDataDf['CourseId'].astype(str)  + ')'
-    studentDataDf[constants.featureSkill]       =    constants.TypeSkill  + ' (Id:' +  studentDataDf['SkillId'].astype(str)  + ')'
+    studentDataDf[constants.featureCourse]      =    constants.TypeCourse  + '-' +  studentDataDf['CourseId'].astype(str) 
+    studentDataDf[constants.featureSkill]       =    constants.TypeSkill  + '-' + studentDataDf['SkillId'].astype(str) 
     studentDataDf[constants.featureTask]        =    studentDataDf[constants.featureTaskId].astype(str)
     
     

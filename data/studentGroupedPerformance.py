@@ -82,7 +82,7 @@ featuresToInt = featuresToInt + hasFeatures
 
 
 dfPractice              = main.getPracticeData()
-dfPractice[constants.featureGroup]            = constants.TypeGroup + '-' + dfPractice[constants.GROUPBY_FEATURE].astype(str) 
+dfPractice[constants.featureGroup]            = constants.TypeGroup + '-' +  dfPractice[constants.GROUPBY_FEATURE].astype(str)
 
 
 

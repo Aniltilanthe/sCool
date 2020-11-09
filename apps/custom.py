@@ -123,11 +123,6 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
         return graphs
     
     
-    print('plotClassOverview')
-    print(hoverData)
-    print(str(feature1) +  '  feature2 '  + str(feature2) + '  feature3 '  + str(feature3) + '  selectedFeatureMulti '   + str(selectedFeatureMulti) + '  selectedDistribution '  + str(selectedDistribution)  )
-    print(str(schoolKey) +  '  groupBy '  + str(groupBy) + '  groupBySub '  + str(groupBySub))
-    
     groupByAll = [ ]
     if groupBySub is None :
         groupBySub = []
@@ -141,10 +136,10 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
     
     
     
-    studentDataDf[constants.featureStudent]     =    studentDataDf['Name'].astype(str) + '-' + studentDataDf['StudentId'].astype(str)
+    studentDataDf[constants.featureStudent]     =    studentDataDf['Name'].astype(str)  + ' (Id:' + studentDataDf['StudentId'].astype(str)  + ')'
 #    studentDataDf[constants.featureGroup]       =    constants.TypeGroup + '-' + studentDataDf['GroupId'].astype(str)
-    studentDataDf[constants.featureCourse]      =    constants.TypeCourse + '-' +  studentDataDf['CourseId'].astype(str)
-    studentDataDf[constants.featureSkill]       =    constants.TypeSkill + '-' +  studentDataDf['SkillId'].astype(str)
+    studentDataDf[constants.featureCourse]      =    constants.TypeCourse  + ' (Id:' +  studentDataDf['CourseId'].astype(str)  + ')'
+    studentDataDf[constants.featureSkill]       =    constants.TypeSkill  + ' (Id:' +  studentDataDf['SkillId'].astype(str)  + ')'
     studentDataDf[constants.featureTask]        =    studentDataDf[constants.featureTaskId].astype(str)
     
     
@@ -156,7 +151,6 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
         if hoverFeatureRemove in hoverData:
             hoverData.remove( hoverFeatureRemove )
             
-    print(' plotClassOverview got studentDataDf   ' )
 
     if 'studentDataDf' in locals()     and    ( studentDataDf is not None  )  :
         
@@ -171,9 +165,7 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
                                                                    groupByAll = groupByAll  , 
                                                                    hoverData = hoverData.copy()   )
             hoverName   = groupBy
-#            color       = groupBy
             
-            print('hoverData 3   ' +  str(hoverData) + '   hoverName ' + str(hoverName) + '   groupBy ' + str(groupBy))
             
         else  :
             groupByAll = [ featureGroupByDefault ]
@@ -182,7 +174,6 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
             hoverName   = featureGroupByDefault
             groupBy     = featureGroupByDefault
             
-            print('hoverData 4   ' +  str(hoverData) + '   hoverName ' + str(hoverName) + '   groupByAll ' + str(groupByAll))
                 
                 
         
@@ -201,7 +192,6 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
         marginalX   = ''
         marginalY   = ''
         
-        print('selectedFigureType   ' + str(selectedFigureType) + '   feature1   ' + str(feature1)  + '   feature2   ' + str(feature2) )
         
         rows = util.getCustomPlot(
                           df                    = studentDataDfSum, 
@@ -219,7 +209,7 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
                           groupBy               = groupBy,
                           selectedDistribution  = selectedDistribution,
                           selectedFeatureMulti  = selectedFeatureMulti,
-                          isThemeSizePlot       = False,
+                          isThemeSizePlot       = True,
             )
         
         
@@ -311,9 +301,6 @@ def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedF
                ):    
     graphs = []
     
-    print('update_bar')
-    print(selectedDistribution)
-    
     if n_clicks == 0 or groupMain is None or not int(groupMain) >= 0:
         return html.Div(graphs)
     
@@ -323,8 +310,6 @@ def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedF
     if   not ( selectedFeature3 ) :
         selectedFeature3 = ''
         
-    print('groupMain   ' + str(groupMain) + '   selectedFeature   ' + str(selectedFeature)  + '   selectedAxis   ' + str(selectedAxis) )
-    print('selectedFigureType   ' + str(selectedFigureType) + '   selectedFeature1   ' + str(selectedFeature1)  + '     selectedFeature3   ' + str(selectedFeature3) )
     
     graphs = plotClassOverview( int(groupMain), selectedFeature, selectedAxis, selectedFigureType, selectedFeature1, selectedFeature3,
                                selectedDistribution         = selectedDistribution,
@@ -334,14 +319,11 @@ def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedF
     
     if not(None is containerChildren):
         if isinstance(containerChildren, list):
-            print(' isinstance(containerChildren, list) ')
             graphs = graphs + containerChildren 
         else :
             if isinstance(containerChildren, dict) and 'props' in containerChildren.keys():
-                print(' isinstance(containerChildren, dict) and props in containerChildren.keys() ')
                 graphs = graphs + containerChildren.get('props').get('children')
 
-    print(' graphs to plot ! ')
 
     return   graphs 
 

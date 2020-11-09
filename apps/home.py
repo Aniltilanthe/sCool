@@ -254,10 +254,10 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         
     gameData = pd.concat([dfPlayerStrategyPracticeOriginal, dfPlayerStrategyTheory], ignore_index=True)
     
-    gameData[constants.featureStudent]     =    gameData['Name'].astype(str) + '-' + gameData['StudentId'].astype(str)
-    gameData[constants.featureGroup]       =    constants.TypeGroup + '-' + gameData['LearningActivityId'].astype(str)
-    gameData[constants.featureCourse]      =    constants.TypeCourse + '-' +  gameData['CourseId'].astype(str)
-    gameData[constants.featureSkill]       =    constants.TypeSkill + '-' +  gameData['SkillId'].astype(str)
+    gameData[constants.featureStudent]     =    gameData['Name'].astype(str) + ' (Id:' +  gameData['StudentId'].astype(str) + ')'
+    gameData[constants.featureGroup]       =    constants.TypeGroup  + ' (Id:' + gameData['LearningActivityId'].astype(str) + ')'
+    gameData[constants.featureCourse]      =    constants.TypeCourse  + ' (Id:' +   gameData['CourseId'].astype(str) + ')'
+    gameData[constants.featureSkill]       =    constants.TypeSkill  + ' (Id:' +  gameData['SkillId'].astype(str) + ')'
     gameData[constants.featureTask]        =    gameData[constants.featureTaskId].astype(str)
             
     
@@ -479,10 +479,6 @@ def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, s
     
     if not selectedFeature3 :
         selectedFeature3 = ''
-        
-    print('   selectedFeature2   ' + str(selectedFeature2)  + '   selectedAxis   ' + str(selectedAxis) )
-    print('selectedFigureType   ' + str(selectedFigureType) + '   selectedFeature1   ' + str(selectedFeature1)  + '     selectedFeature3   ' + str(selectedFeature3) )
-    print('selectedFeatureColorGroupByFilter   ' + str(selectedFeatureColorGroupByFilter) )
     
     
     graphs = plotGamePlots( feature1            = selectedFeature1, 
@@ -499,11 +495,9 @@ def update_bar(n_clicks, selectedFeature1, selectedFeature2, selectedFeature3, s
     
     if not(None is containerChildren):
         if isinstance(containerChildren, list):
-            print(' isinstance(containerChildren, list) ')
             graphs = graphs + containerChildren 
         else :
             if isinstance(containerChildren, dict) and 'props' in containerChildren.keys():
-                print(' isinstance(containerChildren, dict) and props in containerChildren.keys() ')
                 graphs = graphs + containerChildren.get('props').get('children')
 
     print(' graphs to plot ! ')

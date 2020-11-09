@@ -10,13 +10,11 @@ from dateutil.parser import parse
 from six.moves.urllib.parse import quote
 
 
-import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objects as go
-import plotly.figure_factory as ff
 
 import dash_table
 import math
@@ -547,14 +545,11 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
     selectedFeatures = []
     
     
-    print('getCustomPlot')
-    print('hoverData   ' + str(hoverData)  +  '    groupBy  ' +  groupBy)
     
     if df is None  or df.empty :
         return rows
     
     
-    print(df.columns)
     
     if (selectedFigureType in constants.FigureTypes  and 
             constants.keyIsMultiFeatureEnabled in constants.FigureTypes.get(selectedFigureType) and 
@@ -563,35 +558,27 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
         if ( (featureX is None    or   '' == featureX ) and  (featureY is None    or   '' == featureY ) and
             (feature3 is None    or   '' == feature3 ) and
             len(selectedFeatureMulti) == 0 ):
-            print('getCustomPlot in condition 1st 1')
             return rows.append( getMsgSelectFeature() )
         
     else:
-        print('getCustomPlot in condition 1st 2')
         if featureX is None    or   '' == featureX :
-            print('getCustomPlot in condition 1st 2 -----1')
             return rows.append( getMsgSelectFeature() )
     
         if ( '' == featureY     and    not selectedFigureType == constants.FigureTypePie ):
-            print('getCustomPlot in condition 1st 2---- 2')
             return rows.append( getMsgSelectFeature() )
     
         if not featureX in df.columns  :
-            print('getCustomPlot in condition 1st 2 ----3')
             return rows.append( getMsgFeatureNotInDF(featureY) )
     
         if not featureY in df.columns     and    not selectedFigureType == constants.FigureTypePie  :
-            print('getCustomPlot in condition 1st 2 ---4')
             return rows.append( getMsgFeatureNotInDF(featureY) )
     
     
     if ( '' == feature3     and   constants.FigureTypes.get(selectedFigureType).get(constants.keyIsFeature3Enabled) ):
-        print('getCustomPlot in condition 1st 3 ---1')
         return rows
     
     
     
-    print('getCustomPlot initialize selectedFeatures !')
     if selectedFeatureMulti is not None :
         selectedFeatures = list(set(selectedFeatures + selectedFeatureMulti))
     if  feature3 :
@@ -601,9 +588,7 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
     if  featureX :
         selectedFeatures.insert(0, featureX)
     selectedFeatures = list(set(selectedFeatures))
-    print(selectedFeatures)
     
-    print('getCustomPlot initialize variables !')
     
     featureX2Plot = featureX
     featureY2Plot = featureY
@@ -631,8 +616,7 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
         studentDataDfSumMedian      = df.median().round(decimals=2)
 
         df[featureDescription]      = getDataFeatureDescription(df, hoverData, featureTitle = groupBy)
-
-        print('Switch case for Figure types !')
+        
 
         if selectedFigureType == constants.FigureTypeScatter:
 
@@ -642,11 +626,6 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
             if checkIsFeatureNumeric(df, featureY2Plot):
                  marginalY = constants.MarginalPlotDefault
 
-            print(featureX2Plot + '   featureX    featureY2Plot  '  + featureY2Plot)
-
-            print(selectedDistribution)
-            print(groupBy)
-        
 
             if    selectedDistribution    and   len(selectedDistribution) > 0     and     featureY in numericFeatures :
                 
@@ -707,7 +686,6 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
                 figStudents.update_traces(marker    =  constants.THEME_MARKER,
                                   selector          = dict(mode='markers') )
                 figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
-                print('Scatter Chart figure   Made Success ! ' )
        
     
     
@@ -731,13 +709,12 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
             if isThemeSizePlot:
                 figStudents.update_layout(autosize  =  False,
                                           height    =   constants.graphHeight,
-                                          width     =   constants.graphWidth)                
-            print('Pie Chart figure   Made Success ' )
+                                          width     =   constants.graphWidth) 
             
             
         elif selectedFigureType == constants.FigureTypeBar :
             
-            df = df.sort_values(by=[ featureX2Plot ])
+            df = df.sort_values(by=[ featureX2Plot ], ascending=False)
             
             if isThemeSizePlot : 
                 figStudents = px.bar( df
@@ -766,7 +743,6 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
                 )
             
             figStudents.update_layout(constants.THEME_EXPRESS_LAYOUT)
-            print('Baar Chart figure   Made Success ! ' )
         
         
         elif selectedFigureType == constants.FigureTypeBubble :
@@ -892,9 +868,6 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
                     figure = figStudents
             ) ) )
         
-        print('Before Mean and Std calculation ! ' )
-        
-        print('After Mean and Std calculation ! ' )
 
 
         if 'dfOriginalMean' in locals()   and   dfOriginalMean is not None   and   not dfOriginalMean.empty :
@@ -930,10 +903,7 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
         rows.append(
             html.Span('Distribution')
         )
-        print('Before Distribution')
-        print(dfOriginal.columns)
-        print(df.columns)
-        print(dfOriginal)
+        
         for featureDist in selectedFeatures:
             try :
                 if  (  selectedDistribution  and len(selectedDistribution) > 0 and constants.PlotDistributionAll in selectedDistribution 

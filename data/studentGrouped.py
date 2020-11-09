@@ -31,24 +31,24 @@ dfUser                                                  = main.getUsers()
 
 
 dfLearningActivityDetails                               = main.getLearningActivityDetails()
-dfLearningActivityDetails[constants.featureGroup]       = constants.TypeGroup + '-' + dfLearningActivityDetails[constants.GROUPBY_FEATURE].astype(str) 
+dfLearningActivityDetails[constants.featureGroup]       = constants.TypeGroup + ' (Id:' + dfLearningActivityDetails[constants.GROUPBY_FEATURE].astype(str)   + ')'
 
 dfEnrolledDetails                                       = main.getEnrolledDetails()
-dfEnrolledDetails[constants.featureGroup]               = constants.TypeGroup + '-' + dfEnrolledDetails[constants.GROUPBY_FEATURE].astype(str) 
-dfEnrolledDetails[constants.featureStudent]             = constants.TypeStudent + '-' + dfEnrolledDetails['StudentId'].astype(str) 
+dfEnrolledDetails[constants.featureGroup]               = constants.TypeGroup + ' (Id:' + dfEnrolledDetails[constants.GROUPBY_FEATURE].astype(str)   + ')'
+dfEnrolledDetails[constants.featureStudent]             = constants.TypeStudent + ' (Id:' + dfEnrolledDetails['StudentId'].astype(str)  + ')'
 
 dfStudentDetails                                        = main.getStudentDetails()
-dfStudentDetails[constants.featureStudent]              = constants.TypeStudent + '-' + dfStudentDetails['StudentId'].astype(str) 
+dfStudentDetails[constants.featureStudent]              = constants.TypeStudent + ' (Id:' + dfStudentDetails['StudentId'].astype(str) + ')'
 
 dfCourseDetails                                         = main.getCourseDetails()
-dfCourseDetails[constants.featureCourse]                = constants.TypeCourse + '-' + dfCourseDetails['CourseId'].astype(str) 
+dfCourseDetails[constants.featureCourse]                = constants.TypeCourse + ' (Id:' + dfCourseDetails['CourseId'].astype(str) + ')' 
 dfSkillDetails                                          = main.getSkillDetails()
-dfSkillDetails[constants.featureSkill]                  = constants.TypeSkill + '-' + dfSkillDetails['SkillId'].astype(str) 
+dfSkillDetails[constants.featureSkill]                  = constants.TypeSkill + ' (Id:' + dfSkillDetails['SkillId'].astype(str) + ')'  
 dfPracticeTaskDetails                                   = main.getPracticeTaskDetails()
 dfPracticeTaskDetails[constants.featureTaskType]        = constants.TaskTypePractice
-dfPracticeTaskDetails[constants.featureTask]            = constants.TaskTypePractice + '-' + dfPracticeTaskDetails['PracticeTaskId'].astype(str) 
-dfPracticeTaskDetails[constants.featureSkill]           = constants.TypeSkill + '-' + dfPracticeTaskDetails['SkillId'].astype(str) 
-dfPracticeTaskDetails[constants.featureCourse]          = constants.TypeCourse + '-' + dfPracticeTaskDetails['CourseId'].astype(str) 
+dfPracticeTaskDetails[constants.featureTask]            = constants.TaskTypePractice + ' (Id:' + dfPracticeTaskDetails['PracticeTaskId'].astype(str)  + ')' 
+dfPracticeTaskDetails[constants.featureSkill]           = constants.TypeSkill + ' (Id:' + dfPracticeTaskDetails['SkillId'].astype(str)  + ')' 
+dfPracticeTaskDetails[constants.featureCourse]          = constants.TypeCourse + ' (Id:' + dfPracticeTaskDetails['CourseId'].astype(str)  + ')' 
 dfPracticeTaskDetails                                   = dfPracticeTaskDetails.merge(
                dfSkillDetails
                , how='inner', on=['SkillId'], left_index=False, right_index=False, suffixes = ['', 'Skill'])
@@ -57,9 +57,9 @@ dfPracticeTaskDetails                                   = dfPracticeTaskDetails.
                , how='inner', on=['CourseId'], left_index=False, right_index=False, suffixes = ['', 'Course'])
 dfTheoryTaskDetails                                     = main.getTheoryTaskDetails()
 dfTheoryTaskDetails[constants.featureTaskType]          = constants.TaskTypeTheory
-dfTheoryTaskDetails[constants.featureTask]              = constants.TaskTypeTheory + '-' + dfTheoryTaskDetails['TheoryTaskId'].astype(str)
-dfTheoryTaskDetails[constants.featureSkill]             = constants.TypeSkill + '-' + dfTheoryTaskDetails['SkillId'].astype(str) 
-dfTheoryTaskDetails[constants.featureCourse]            = constants.TypeCourse + '-' + dfTheoryTaskDetails['CourseId'].astype(str) 
+dfTheoryTaskDetails[constants.featureTask]              = constants.TaskTypeTheory + ' (Id:' + dfTheoryTaskDetails['TheoryTaskId'].astype(str)  + ')'
+dfTheoryTaskDetails[constants.featureSkill]             = constants.TypeSkill + ' (Id:' + dfTheoryTaskDetails['SkillId'].astype(str)   + ')'
+dfTheoryTaskDetails[constants.featureCourse]            = constants.TypeCourse + ' (Id:' + dfTheoryTaskDetails['CourseId'].astype(str)   + ')'
 dfTheoryTaskDetails                                     = dfTheoryTaskDetails.merge(
                dfSkillDetails
                , how='inner', on=['SkillId'], left_index=False, right_index=False, suffixes = ['', 'Skill'])
@@ -72,7 +72,7 @@ dfTaskDetails                   =   pd.concat([dfPracticeTaskDetails, dfTheoryTa
 
 dfPlayerStrategyPracticeOriginal        = studentGroupedPerformance.dfPlayerStrategyPracticeOriginal
 dfPlayerStrategyPracticeOriginal[constants.featureTaskType] = constants.TaskTypePractice
-dfPlayerStrategyPracticeOriginal[constants.featureTaskId] = constants.TaskTypePractice + '-' + dfPlayerStrategyPracticeOriginal['PracticeTaskId'].astype(str)
+dfPlayerStrategyPracticeOriginal[constants.featureTaskId] = constants.TaskTypePractice + ' (Id:' + dfPlayerStrategyPracticeOriginal['PracticeTaskId'].astype(str)  + ')'
 
 
 dfPracticeDB                            = studentGroupedPerformance.dfPractice
@@ -90,7 +90,7 @@ dfRuns[constants.featureTaskType]       = constants.TaskTypePractice
 
 dfPlayerStrategyTheory = pd.concat([studentGroupedPerformanceTheory.dfPlayerStrategyNN, studentGroupedPerformanceTheory.dfPlayerStrategyN], ignore_index=True, sort =False)
 dfPlayerStrategyTheory[constants.featureTaskType]   = constants.TaskTypeTheory
-dfPlayerStrategyTheory[constants.featureTaskId] = constants.TaskTypeTheory + '-' + dfPlayerStrategyTheory['TheoryTaskId'].astype(str)
+dfPlayerStrategyTheory[constants.featureTaskId] = constants.TaskTypeTheory + ' (Id:' + dfPlayerStrategyTheory['TheoryTaskId'].astype(str)  + ')'
 #dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrategyTheory['CreatedAt'].dt.date] )
 dfGroupedPlayerStrategyTheory = dfPlayerStrategyTheory.groupby(  [dfPlayerStrategyTheory[constants.GROUPBY_FEATURE]] )
 
@@ -130,7 +130,6 @@ def getTaskWiseSuccessFail(groupData, taskId, dfTaskDetails, featureTaskId, type
     taskTitle = ' missing '
     taskDescription = ''
     
-    print('getTaskWiseSuccessFail')
     try :
         currentTask     = dfTaskDetails[ dfTaskDetails[featureTaskId] == int(taskId) ]
         taskTitle       = currentTask['Title'].values[0]

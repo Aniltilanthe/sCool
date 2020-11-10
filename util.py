@@ -835,7 +835,7 @@ def getCustomPlot( df, dfOriginal, dfOriginalMean = None, dfOriginalMedian = Non
                 
             figStudents =  dash_table.DataTable(
                     columns=[
-                        {"name": i, "id": i, "deletable": True, "selectable": True} for i in df[selectedFeatures].columns
+                        {"name": ((constants.feature2UserNamesDict.get(i)) if i in constants.feature2UserNamesDict.keys() else i ), "id": i, "deletable": True, "selectable": True} for i in df[selectedFeatures].columns
                     ],
                     data            =   df[selectedFeatures].to_dict('records'),
                     row_deletable   =   True,

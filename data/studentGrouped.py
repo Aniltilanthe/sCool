@@ -129,18 +129,29 @@ def getTaskWiseSuccessFail(groupData, taskId, dfTaskDetails, featureTaskId, type
     
     taskTitle = ' missing '
     taskDescription = ''
+    taskSkillTitle = ''
+    taskCourseTitle = ''
     
     try :
         currentTask     = dfTaskDetails[ dfTaskDetails[featureTaskId] == int(taskId) ]
         taskTitle       = currentTask['Title'].values[0]
         taskDescription = dfTaskDetails[ dfTaskDetails[featureTaskId] == int(taskId) ][constants.featureDescription].values[0]
         
-        str(groupData['SkillId'].values[0])
+        if typeOfTask == 'Practice':
+            taskSkillTitle = dfPracticeTaskDetails[dfPracticeTaskDetails['PracticeTaskId'] == int(taskId) ]['TitleSkill'].values[0]
+            taskCourseTitle = dfPracticeTaskDetails[dfPracticeTaskDetails['PracticeTaskId'] == int(taskId) ]['TitleCourse'].values[0]
+        else:
+            taskSkillTitle = dfTheoryTaskDetails[dfTheoryTaskDetails['TheoryTaskId'] == int(taskId) ]['TitleSkill'].values[0]
+            taskCourseTitle = dfTheoryTaskDetails[dfTheoryTaskDetails['TheoryTaskId'] == int(taskId) ]['TitleCourse'].values[0]
+        
+        
     except Exception as e: 
         print(e)
-        
+    
+    
     return  [str(taskTitle)] + [str(taskDescription)] + [groupData[groupData['Result'] == 1].count()[0], 
-                                  groupData[groupData['Result'] == 0].count()[0]] +   [  groupData['SessionDuration'].sum() ] + [  str(typeOfTask) ] + [ taskId ]
+                                  groupData[groupData['Result'] == 0].count()[0]] +   [  groupData['SessionDuration'].sum() ] + [  str(typeOfTask) ] + [ taskSkillTitle ] + [ taskCourseTitle ] + [ taskId ] 
+    
 
 
 

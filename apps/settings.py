@@ -244,7 +244,7 @@ def getCourseTask():
                              children = [  
                                 html.H5("Practice Tasks"),   
                                 dbc.Table.from_dataframe(dfPracticeTaskDetails[  dfPracticeTaskDetails['User_Id'] ==  currentUserId][[
-                                        'PracticeTaskId','Title','Description','Difficulty','TitleSkill','TitleCourse']], 
+                                        'PracticeTaskId','Title','Description','Difficulty','TitleSkill','SkillId','TitleCourse','CourseId']], 
                                                          striped=True, bordered=True, hover=True)
                             ]
                         )
@@ -256,7 +256,7 @@ def getCourseTask():
                              children = [  
                                 html.H5("Theory Tasks"),      
                                 dbc.Table.from_dataframe(dfTheoryTaskDetails[  dfTheoryTaskDetails['User_Id'] ==  currentUserId][[
-                                        'TheoryTaskId','Title','Description','Difficulty','TitleSkill','TitleCourse']], 
+                                        'TheoryTaskId','Title','Description','Difficulty','TitleSkill','SkillId','TitleCourse','CourseId']], 
                                                          striped=True, bordered=True, hover=True)
                             ]
                         )

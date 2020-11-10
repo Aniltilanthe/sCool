@@ -178,7 +178,8 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                     ))
 
 #---------------------------        Datatable task wise success fail    ---------------------------
-        dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', constants.featureDescription, labelSuccess, labelFail, 'SessionDuration', 'Type', constants.featureTaskId])
+        dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', constants.featureDescription, labelSuccess, labelFail, 'SessionDuration', 'Type',
+                                             'Skill', 'Course', constants.featureTaskId])
         
         
         pieDataTaskWisePractice = groupOriginal.groupby(['PracticeTaskId', 'StudentId'], as_index=False).sum()
@@ -211,7 +212,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
         
         
         table_header = [
-            html.Thead(html.Tr([html.Th("Task"), html.Th(labelSuccess), html.Th(labelFail), html.Th('Session Duration(s)'), html.Th('Type'), html.Th('TaskId') ]))
+            html.Thead(html.Tr([html.Th("Task"), html.Th(labelSuccess), html.Th(labelFail), html.Th('Session Duration(s)'), html.Th('Type'), html.Th('Skill'), html.Th('Course'), html.Th('TaskId') ]))
         ]
         rows = []
         for index, row in dfTaskWiseSuccessFail.iterrows():

@@ -44,7 +44,8 @@ dfStudentDetails                        = studentGrouped.dfStudentDetails
 
 dfPracticeTaskDetails                   = studentGrouped.dfPracticeTaskDetails
 dfTheoryTaskDetails                     = studentGrouped.dfTheoryTaskDetails
-
+dfSkillDetails                          = studentGrouped.dfSkillDetails
+dfCourseDetails                          = studentGrouped.dfCourseDetails
 
 dfGroupedPractice                       = studentGrouped.dfGroupedPractice
 dfGroupedOriginal                       = studentGrouped.dfGroupedOriginal
@@ -135,11 +136,18 @@ def plotClassOverview(schoolKey, feature1, selectedAxis, selectedFigureType,
     studentDataDf = studentGrouped.getStudentsOfLearningActivityDF(schoolKey, isOriginal = True)
     
     
+    studentDataDf                                   = studentDataDf.merge(
+               dfSkillDetails
+               , how='inner', on=['SkillId'], left_index=False, right_index=False, suffixes = ['', 'Skill'])
+    studentDataDf                                   = studentDataDf.merge(
+               dfCourseDetails
+               , how='inner', on=['CourseId'], left_index=False, right_index=False, suffixes = ['', 'Course'])
+    
     
     studentDataDf[constants.featureStudent]     =    studentDataDf['Name'].astype(str)  + '-' + studentDataDf['StudentId'].astype(str)
 #    studentDataDf[constants.featureGroup]       =    constants.TypeGroup + '-' + studentDataDf['GroupId'].astype(str)
-    studentDataDf[constants.featureCourse]      =    constants.TypeCourse  + '-' +  studentDataDf['CourseId'].astype(str) 
-    studentDataDf[constants.featureSkill]       =    constants.TypeSkill  + '-' + studentDataDf['SkillId'].astype(str) 
+    studentDataDf[constants.featureCourse]      =    constants.TypeCourse  + ' : ' + studentDataDf['TitleCourse'].astype(str) +  '-' +  studentDataDf['CourseId'].astype(str) 
+    studentDataDf[constants.featureSkill]       =    constants.TypeSkill + ' : ' + studentDataDf['TitleSkill'].astype(str) + '-' + studentDataDf['SkillId'].astype(str) 
     studentDataDf[constants.featureTask]        =    studentDataDf[constants.featureTaskId].astype(str)
     
     

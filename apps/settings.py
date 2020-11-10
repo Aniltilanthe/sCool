@@ -110,6 +110,14 @@ layoutModalBodyCustomize = layoutModalBodyCustomize + [ html.Button(children=[
 
 
 layoutModalBodyHelp = [
+        
+    html.Iframe( src  = "https://www.youtube.com/embed/atfOw7CoJm0", width="420" , height="315" ),
+        
+    html.Br(),
+    html.Br(),
+    html.Hr(),
+    html.Br(),
+    
     html.H5( children = [ html.I(className="fas " + iconNameHome + " p-right_xx-small"),   "Game Details"  ] ),
     html.P("Information about the game data"),
     

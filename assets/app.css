@@ -336,7 +336,11 @@ html {
 .theme-app  .btn-outline-info:focus i.fas,
 .theme-app .highlight:focus  i.far, 
 .theme-app  button:not(:disabled) i.far,
-.theme-app  .btn-outline-info:focus i.far,  {
+.theme-app  .btn-outline-info:focus i.far,
+.theme-app .btn-light:hover  i.fas, 
+.theme-app .btn-light:active  i.fas, 
+.theme-app .btn-light:hover  i.far, 
+.theme-app .btn-light:active  i.far,  {
 	color: var(--theme-background-color);
 }
 .theme-app .highlight:focus, 

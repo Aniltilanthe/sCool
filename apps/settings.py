@@ -273,9 +273,9 @@ settingsLayout = [
         
     dbc.Tabs(
         [
-            dbc.Tab( layoutModalBodyCustomize , label="Customize"),
             dbc.Tab( layoutModalBodyHelp , label="Help"),
             dbc.Tab( getCourseTask() , label="Course & Tasks" , id = "tabCourseSkillTask"),
+            dbc.Tab( layoutModalBodyCustomize , label="Customize"),
         ]
     )
         

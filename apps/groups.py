@@ -749,7 +749,7 @@ def on_reset(reset_click):
 def update_bar(groupMain, groupComparision ):    
     graphs = []
 
-    if groupMain is None :
+    if  not util.isValidValueId(groupMain) :
         return html.Div(graphs)
  
     graphs = plotClassOverview( int(groupMain), groupComparision )    
@@ -768,7 +768,7 @@ def update_bar(groupMain, groupComparision ):
 def update_main_overview(groupMain):    
     graphs = []
 
-    if groupMain is None :
+    if  not util.isValidValueId(groupMain) :
         return html.Div(graphs)
  
     graphs = plotGroupOverview(groupMain)  
@@ -783,7 +783,7 @@ def update_main_overview(groupMain):
     [ Input("group-selector-main", "value"),
         Input("group-selector-comparision-overview", "value"), ])
 def update_download_link(groupMain, groupComparision):
-    if groupMain is None:
+    if  not util.isValidValueId(groupMain) :
         return ""
     
     csv_string = util.get_download_link_data_uri(getGroupData( int(groupMain), groupComparision))

@@ -309,7 +309,7 @@ def update_bar(n_clicks, groupMain, selectedFeature, selectedFeature1, selectedF
                ):    
     graphs = []
     
-    if n_clicks == 0 or groupMain is None or not int(groupMain) >= 0:
+    if n_clicks == 0 or  not util.isValidValueId(groupMain) :
         return html.Div(graphs)
     
     if   not ( selectedFeature1 ) :
@@ -403,7 +403,7 @@ def update_feature_multi_disabled(selectedFigureType, initialClass):
     [ Input("group-selector-main", "value") ],
 )
 def update_download_link_custom_group(groupMain):
-    if groupMain is None or not int(groupMain) >= 0 or groupMain == "":
+    if  not util.isValidValueId(groupMain) :
         return "", "disabled"
     
     csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(int(groupMain)) )

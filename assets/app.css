@@ -121,7 +121,7 @@ html {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 }
 .c-card .card_label {
-	font-size: 1.5rem;
+	font-size: 1.1rem;
 }
 .c-card.c-card-small .card_label {
     font-size: 1rem;
@@ -131,7 +131,7 @@ html {
 }
 .c-card .card_value {
 	font-weight: bold;
-    font-size: 3rem;
+    font-size: 2rem;
 }
 .c-card.c-card-small .card_value {
 	font-weight: bold;

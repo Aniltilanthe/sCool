@@ -401,8 +401,7 @@ layout = [
                 html.Div(
                     id="game-main-overview",
                     className="",
-                    children=  [html.H1("sCool"),
-                                html.H2("Game Overview")]  ,
+                    children=  [html.H2("Game Overview")]  ,
                 ),
         ),
     ])

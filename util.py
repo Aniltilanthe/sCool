@@ -1231,3 +1231,11 @@ def get_unique_list_feature_items(dfData, feature =    constants.featureConcepts
     return set(dfData[ dfData[feature].notnull() & (dfData[feature]  !=  u'')  ][feature].sum())
     
 
+
+
+
+def isValidValueId(valueId):
+    if valueId is not None and not (valueId == '') and (type(valueId) == int or type(valueId) == float) and  int(valueId) >= 0 :
+        return True
+ 
+    return False

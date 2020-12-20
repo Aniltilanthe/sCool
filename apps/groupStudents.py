@@ -340,27 +340,31 @@ def plotStudentOverview(StudentId, groupId):
                                 ))
     
         
-    if groupOriginal[groupOriginal['StudentId'] == StudentId] is not None  and groupOriginal[groupOriginal['StudentId'] == StudentId]['ConceptsUsedDetails'].shape[0] > 0 :
-        ConceptsUsedUnique                      = util.get_unique_list_feature_items(groupOriginal[groupOriginal['StudentId'] == StudentId], 'ConceptsUsedDetails')
-        
-        if     ConceptsUsedUnique is not None  :        
+    if groupOriginal[groupOriginal['StudentId'] == StudentId] is not None  and groupOriginal[groupOriginal['StudentId'] == StudentId]['ConceptsUsedDetails'].shape[0] > 0 :        
+        try :
+            ConceptsUsedUnique                      = util.get_unique_list_feature_items(groupOriginal[groupOriginal['StudentId'] == StudentId], 'ConceptsUsedDetails')
             
-            ConceptsUsedUniqueUserReadable = set()
-            for conceptUsed in ConceptsUsedUnique:
-                ConceptsUsedUniqueUserReadable.add(  constants.ProgramConceptsUsefull2UserNames.get(conceptUsed) if 
-                                                      conceptUsed in constants.ProgramConceptsUsefull2UserNames 
-                                                      else 
-                                                      conceptUsed  )
-            
-            plotRow.append( html.Div([
-                                        util.generateCardBase(
-                                                 [html.I(className="fas fa-code m-right-small"),   'Concepts Used', ], 
-                                                ', '.join(ConceptsUsedUniqueUserReadable) ,
-                                                classes = "c-card-small" )
-                                    ],
-                                    className="col-sm-6",
-                            ))
+            if     ConceptsUsedUnique is not None  :        
+                
+                ConceptsUsedUniqueUserReadable = set()
+                for conceptUsed in ConceptsUsedUnique:
+                    ConceptsUsedUniqueUserReadable.add(  constants.ProgramConceptsUsefull2UserNames.get(conceptUsed) if 
+                                                        conceptUsed in constants.ProgramConceptsUsefull2UserNames 
+                                                        else 
+                                                        conceptUsed  )
+                
+                plotRow.append( html.Div([
+                                            util.generateCardBase(
+                                                    [html.I(className="fas fa-code m-right-small"),   'Concepts Used', ], 
+                                                    ', '.join(ConceptsUsedUniqueUserReadable) ,
+                                                    classes = "c-card-small" )
+                                        ],
+                                        className="col-sm-6",
+                                ))
 
+        except Exception as e: 
+            print(' student overview Concepts Used Error ')
+            print(e)
     
     if studentDataDfSuccess is not None and studentDataDfSuccess.empty is False  and 'Task' in studentDataDfSuccess.columns:        
 #        get tasks unique and courses
@@ -939,12 +943,12 @@ layout = [
 #-------- Students-------------
 @app.callback(Output('student-selector-dropdown', 'options') , 
               [Input('group-selector-main', 'value')  ])
-def setStudentOptions(  schoolSelected  )  :
+def setStudentOptions(  groupSelected  )  :
         
-    if schoolSelected is None or not int(schoolSelected) >= 0:
+    if not util.isValidValueId(groupSelected) :
         return []
     
-    students = getStudentsOfLearningActivity(int(schoolSelected) )
+    students = getStudentsOfLearningActivity(int(groupSelected) )
     
     
     return [{'label': row['Name'], 'value': row['StudentId'] } for index, row  in 
@@ -960,7 +964,7 @@ def setStudentOptions(  schoolSelected  )  :
 def setStudentDateOptions(studentSelected, groupSelected ):
     defaultValue = []
     
-    if groupSelected is None   or studentSelected is None or not int(studentSelected) >= 0:
+    if  not util.isValidValueId(groupSelected)   or   not util.isValidValueId(studentSelected) :
         return defaultValue
     
     if not isStudentInGroup(studentSelected, groupSelected) :
@@ -984,7 +988,7 @@ def setStudentDateOptions(studentSelected, groupSelected ):
         state = [ State(component_id='group-selector-main', component_property='value') ] 
 )
 def setStudentDateOptionsClear(studentSelected, groupSelected):        
-    if groupSelected is None   or studentSelected is None or not int(studentSelected) >= 0:
+    if  not util.isValidValueId(groupSelected)  or   not util.isValidValueId(studentSelected)  :
         return ''   
     
     if not isStudentInGroup(studentSelected, groupSelected) :
@@ -1001,16 +1005,16 @@ def setStudentDateOptionsClear(studentSelected, groupSelected):
         state=[ State(component_id='group-selector-main', component_property='value')
                 ]             
 )
-def display_graphs_student(studentSelected, studentSelectedDate, studentGraphDirection, schoolSelected):
+def display_graphs_student(studentSelected, studentSelectedDate, studentGraphDirection, groupSelected):
     graphs = []
     
-    if schoolSelected is None or not int(schoolSelected) >= 0 or studentSelected is None or not int(studentSelected) >= 0:
+    if  not util.isValidValueId(groupSelected)  or   not util.isValidValueId(studentSelected) :
         return html.Div(graphs)
     
     if studentSelectedDate is None  or  studentSelectedDate == '':
         studentSelectedDate = ''
     
-    graphs = plotStudent( int( studentSelected ) , int(schoolSelected) , format(studentSelectedDate), studentGraphDirection  )
+    graphs = plotStudent( int( studentSelected ) , int(groupSelected) , format(studentSelectedDate), studentGraphDirection  )
     
     return html.Div(graphs)
 
@@ -1025,7 +1029,7 @@ def display_graphs_student(studentSelected, studentSelectedDate, studentGraphDir
 def display_graphs_student_overview(studentSelected, groupSelected):        
     graphs = []
     
-    if groupSelected is None  or studentSelected is None or not int(studentSelected) >= 0:
+    if  not util.isValidValueId(groupSelected)  or   not util.isValidValueId(studentSelected) :
         return html.Div(graphs)
     
     if not isStudentInGroup(studentSelected, groupSelected) :
@@ -1052,7 +1056,7 @@ def display_graphs_student_overview(studentSelected, groupSelected):
 def onSelectFeatureOverview(selectedFeatures, studentSelected, groupSelected ):
     graphs = []
 
-    if groupSelected is None     or   studentSelected is None   or not int(studentSelected) >= 0:
+    if  not util.isValidValueId(groupSelected) :
         return html.Div(graphs)
  
     graphs = plotStudentOverviewFeatures( int( studentSelected ) , int(groupSelected), selectedFeatures )    
@@ -1109,7 +1113,7 @@ def update_no_student_selectors_class_disabled(studentSelected, initialClassDate
 
 @app.callback(Output('student-selector-date', 'options'), [Input('group-selector-main', 'value')])
 def set_options_date(groupId):
-    if groupId is not None and int(groupId) >= 0:
+    if util.isValidValueId(groupId) :
 
         print('set_options_date Hey There ')
         groupDateOptions = studentGrouped.getGroupDateOptions(groupId)
@@ -1136,8 +1140,7 @@ def set_options_date(groupId):
 def update_download_link__details_student( studentSelected, studentSelectedDate, groupMain ):
     defaultValues = ["", "disabled"]
     
-    if (groupMain is None or groupMain == "" ) or ( 
-            studentSelected is None or not int(studentSelected) >= 0 or studentSelected == "" ):
+    if  not util.isValidValueId(groupMain)  or  not util.isValidValueId(studentSelected) :
         return defaultValues
     
     if studentSelectedDate is None  or  studentSelectedDate == '':

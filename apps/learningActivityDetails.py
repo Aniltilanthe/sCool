@@ -1303,7 +1303,8 @@ layout = [
                                     dcc.Dropdown(
                                         id = "groupDetails-selector-date",
 #                                        multi=True,
-                                        placeholder="Filter by date",
+                                        placeholder="Filter by date", 
+                                        className = "hidden" ,
                                     ),
                                 ]
                              )
@@ -1363,7 +1364,7 @@ layout = [
 def setClassOverview(groupMain, filterByDate):
     graphs = []
 
-    if groupMain is None or not int(groupMain) >= 0:
+    if not util.isValidValueId(groupMain) :
         return html.Div(graphs)
     
     graphs =    plotGroupOverview(int(groupMain), filterByDate = filterByDate )  
@@ -1382,7 +1383,7 @@ def setClassOverview(groupMain, filterByDate):
 def display_graphs(learningActivitySelected, filterByDate):
     graphs = []
     
-    if learningActivitySelected is None or not int(learningActivitySelected) >= 0 :
+    if  not util.isValidValueId(learningActivitySelected) :
         return html.Div(graphs)
     
     graphs = plotSingleClass('School', int(learningActivitySelected), filterByDate = filterByDate )
@@ -1397,7 +1398,7 @@ def display_graphs(learningActivitySelected, filterByDate):
 def display_class_general(learningActivitySelected, filterByDate):
     graphs = []
     
-    if learningActivitySelected is None or not int(learningActivitySelected) >= 0 :
+    if  not util.isValidValueId(learningActivitySelected)  :
         return html.Div(graphs)
     
     graphs = plotSingleClassGeneral('School', int(learningActivitySelected), filterByDate = filterByDate )
@@ -1412,7 +1413,7 @@ def display_class_general(learningActivitySelected, filterByDate):
 def display_class_concept(learningActivitySelected, filterByDate):
     graphs = []
     
-    if learningActivitySelected is None or not int(learningActivitySelected) >= 0 :
+    if  not util.isValidValueId(learningActivitySelected)  :
         return html.Div(graphs)
     
     graphs = plotGroupConceptDetails(int(learningActivitySelected), filterByDate = filterByDate )
@@ -1461,12 +1462,12 @@ def onClickDistributionCollapseButton(*args):
 
 @app.callback(Output('groupDetails-selector-date', 'options'), [Input('group-selector-main', 'value')])
 def set_options_date(groupId):
-    if groupId is not None and int(groupId) >= 0:
+    #if  util.isValidValueId(groupId) :
 
-        print('set_options_date Hey There ')
-        groupDateOptions = studentGrouped.getGroupDateOptions(groupId)
+     #   print('set_options_date Hey There ')
+      #  groupDateOptions = studentGrouped.getGroupDateOptions(groupId)
         
-        return groupDateOptions
+     #   return groupDateOptions
     
     return []
 
@@ -1482,7 +1483,7 @@ def set_options_date(groupId):
     [Input("group-selector-main", "value") ,  Input('groupDetails-selector-date', 'value') ]
 )
 def onSelectGroupSetTaskOptions(  groupId , filterByDate  ):
-    if groupId is not None and int(groupId) >= 0:
+    if util.isValidValueId(groupId) :
         return [getGroupPTaskDoneOptions(groupId , filterByDate = filterByDate) ]
     
     return [[{'label': 'Select a group', 'value' : '0'}]]
@@ -1499,7 +1500,7 @@ def onSelectGroupSetTaskOptions(  groupId , filterByDate  ):
 def onSelectTaskShowTaskWiseConcept(taskId, groupId, filterByDate):
     graphs = []
     
-    if not taskId is None and int(taskId) >= 0 and groupId is not None and int(groupId) >= 0:
+    if util.isValidValueId(taskId)  and  util.isValidValueId(groupId) :
         graphs = getGroupTaskWiseDetails(int(groupId), isGrouped = False, taskId = int(taskId), filterByDate = filterByDate )
         
     graphs = graphs + [ html.Hr() ]
@@ -1518,7 +1519,7 @@ def onSelectTaskShowTaskWiseConcept(taskId, groupId, filterByDate):
      ],
     [ Input("group-selector-main", "value"), ])
 def update_download_link__details_group(groupMain):
-    if groupMain is None or not int(groupMain) >= 0 or groupMain == "":
+    if  not util.isValidValueId(groupMain):
         return "", "hidden"
     
     csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(int(groupMain)) )

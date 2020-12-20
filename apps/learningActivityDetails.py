@@ -1306,7 +1306,8 @@ layout = [
                                         placeholder="Filter by date", 
                                         className = "hidden" ,
                                     ),
-                                ]
+                                ], 
+                                className = "hidden" 
                              )
         )]
     ) ,

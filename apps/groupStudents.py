@@ -1056,7 +1056,7 @@ def display_graphs_student_overview(studentSelected, groupSelected):
 def onSelectFeatureOverview(selectedFeatures, studentSelected, groupSelected ):
     graphs = []
 
-    if  not util.isValidValueId(groupSelected) :
+    if  not util.isValidValueId(groupSelected) or  not util.isValidValueId(studentSelected) :
         return html.Div(graphs)
  
     graphs = plotStudentOverviewFeatures( int( studentSelected ) , int(groupSelected), selectedFeatures )    

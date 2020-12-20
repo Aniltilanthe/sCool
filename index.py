@@ -167,14 +167,22 @@ def render_page_content(pathname):
 
 @app.callback( [Output("group-selector-main", "options") , Output("group-selector-main", "value") ], 
                 [Input("url", "pathname")],
-                state=[ State(component_id = "group-selector-main", component_property='options') ]
+                state=[ State(component_id = "group-selector-main", component_property='options'),
+                State(component_id = "group-selector-main", component_property='value') ]
     )
 def render_main_selector_content(pathname,
-               selectorOptions ):
+               selectorOptions, selectorValue ):
     
     if current_user.is_authenticated  :
         userOptions = getUserLAOptions()
         value = ''
+
+        print('url change group selector main')
+        print(selectorOptions)
+        print(selectorValue)
+
+        if selectorOptions and selectorValue:
+            return selectorOptions, selectorValue
         
         if len(userOptions) == 1:
             value = userOptions[0]['value']

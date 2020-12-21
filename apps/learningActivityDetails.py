@@ -1445,16 +1445,16 @@ def display_class_concept(learningActivitySelected, filterByDate):
 
 
 
-@app.callback(Output('groupDetails-selector-date', 'options'), [Input('group-selector-main', 'value')])
-def set_options_date(groupId):
-    if  util.isValidValueId(groupId) :
+# @app.callback(Output('groupDetails-selector-date', 'options'), [Input('group-selector-main', 'value')])
+# def set_options_date(groupId):
+#     if  util.isValidValueId(groupId) :
 
-       print('set_options_date Hey There ')
-       groupDateOptions = studentGrouped.getGroupDateOptions(groupId)
+#        print('set_options_date Hey There ')
+#        groupDateOptions = studentGrouped.getGroupDateOptions(groupId)
         
-       return groupDateOptions
+#        return groupDateOptions
     
-    return []
+#     return []
 
 
 

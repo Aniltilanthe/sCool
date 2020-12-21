@@ -251,21 +251,26 @@ def getGroupData(schoolKey, schoolKeys2Compare):
     if (None == schoolKeys2Compare) :
         schoolKeys2Compare = []
     
-    studentDataDf = studentGrouped.getStudentsOfLearningActivityDF(schoolKey, isOriginal = True)
+    try:
+        studentDataDf = studentGrouped.getStudentsOfLearningActivityDF(schoolKey, isOriginal = True)
     
-    for sckoolKey2Com in schoolKeys2Compare:
-        studentDataDf2Com = studentGrouped.getStudentsOfLearningActivityDF(sckoolKey2Com, isOriginal = True)
+        for sckoolKey2Com in schoolKeys2Compare:
+            studentDataDf2Com = studentGrouped.getStudentsOfLearningActivityDF(sckoolKey2Com, isOriginal = True)
+            
+            if 'studentDataDf2Com' in locals()    and    studentDataDf2Com is not None :
+                studentDataDf = pd.concat([studentDataDf, studentDataDf2Com], ignore_index=True, sort=False)
         
-        if 'studentDataDf2Com' in locals()    and    studentDataDf2Com is not None :
-            studentDataDf = pd.concat([studentDataDf, studentDataDf2Com], ignore_index=True, sort=False)
-    
 
-    if 'studentDataDf' in locals()     and    studentDataDf is not None  :
-        
-        studentDataDf[constants.GROUPBY_FEATURE]    = studentDataDf[constants.GROUPBY_FEATURE].apply(str)
-        studentDataDf[constants.GROUPBY_FEATURE]    = featureAdderGroup + studentDataDf[constants.GROUPBY_FEATURE]
-#        studentDataDf[constants.featureConceptsUsedDetailsStr]     = getPracticeConceptsUsedDetailsStr(studentDataDf)
-        
+        if 'studentDataDf' in locals()     and    studentDataDf is not None  :
+            
+            studentDataDf[constants.GROUPBY_FEATURE]    = studentDataDf[constants.GROUPBY_FEATURE].apply(str)
+            studentDataDf[constants.GROUPBY_FEATURE]    = featureAdderGroup + studentDataDf[constants.GROUPBY_FEATURE]
+    #        studentDataDf[constants.featureConceptsUsedDetailsStr]     = getPracticeConceptsUsedDetailsStr(studentDataDf)
+
+    except Exception as e: 
+        print('groups getGroupData ')
+        print(e)    
+    
     return studentDataDf
     
 
@@ -283,352 +288,357 @@ def plotClassOverview(schoolKey, schoolKeys2Compare):
     
     studentDataDf = getGroupData(schoolKey, schoolKeys2Compare)
     
-    if 'studentDataDf' in locals()     and    studentDataDf is not None  :
-                
-        studentDataDfGrouped = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index = False)
+    try:
+        if 'studentDataDf' in locals()     and    studentDataDf is not None  :
+                    
+            studentDataDfGrouped = studentDataDf.groupby([constants.GROUPBY_FEATURE], as_index = False)
 
-        
-    #   Sum of features
-        studentDataDfStudentSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.COUNT_STUDENT_FEATURE, 
-                                                  constants.STUDENT_ID_FEATURE], as_index=False).sum()
-        studentDataDfStudentSumGrouped = studentDataDfStudentSum.groupby([constants.GROUPBY_FEATURE], as_index = False)
-        studentDataDfStudentSumGrouped.fillna(0, inplace=True)  
-        
-        studentDataDfStudentTaskWiseSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.STUDENT_ID_FEATURE, 
-                                                              constants.TASK_TYPE_FEATURE], as_index=False).sum()   
-        studentDataDfStudentTaskWiseSum.fillna(0, inplace=True)  
-        
-    
-#--------------------------------Total of each Features ----------------------------------             
-        graphs.append(html.Div(id='Group-Overview-Information', children = []))   
-        
-        studentDataDfSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.COUNT_STUDENT_FEATURE], as_index=False).sum()
-#        studentDataDfSumGrouped = studentDataDfSum.groupby([constants.GROUPBY_FEATURE], as_index = False)
-        
-        studentDataDfFeaturesInterpreted = pd.DataFrame(columns = [constants.GROUPBY_FEATURE, 'PracticeSessionDuration', 'TheorySessionDuration']) 
-        for groupKey, group in studentDataDfGrouped :     
-            practiceSessionDuration = group[group[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice ]['SessionDuration'].sum()
-            theorySessionDuration =  group[group[constants.TASK_TYPE_FEATURE] == constants.TaskTypeTheory ]['SessionDuration'].sum()
-            studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.append({constants.GROUPBY_FEATURE : groupKey, 
-                                                                                        'PracticeSessionDuration' : practiceSessionDuration, 
-                                                                                        'TheorySessionDuration' : theorySessionDuration, },  
-                                                                                ignore_index = True)
-        studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.groupby([constants.GROUPBY_FEATURE],  as_index=False).sum()
-
-        studentDataDfSum = studentDataDfSum.merge(right= studentDataDfFeaturesInterpreted
-                                          , left_on = constants.GROUPBY_FEATURE, right_on = constants.GROUPBY_FEATURE
-                                            , left_index=False, right_index=False
-                                            , how='inner')
-        
-        studentDataDfFeaturesInterpreted2 = pd.DataFrame(columns = [constants.GROUPBY_FEATURE, 'ConceptsUsed'])
-        for groupKey, group in studentDataDfGrouped :    
-            conceptsUsedStr = ' '
-            if 'ConceptsUsed' in group.columns and  group[ group['ConceptsUsed'].notnull() & (group['ConceptsUsed']  !=  u'') ].shape[0] > 0 :
-                conceptsUsedStr = ', '.join(  util.get_unique_list_feature_items(group, 'ConceptsUsed' )  )
-                
-                
-                
-            studentDataDfFeaturesInterpreted2 = studentDataDfFeaturesInterpreted2.append({constants.GROUPBY_FEATURE : groupKey,
-                                                                                        'ConceptsUsed' : conceptsUsedStr },  
-                                                                                ignore_index = True)
+            
+        #   Sum of features
+            studentDataDfStudentSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.COUNT_STUDENT_FEATURE, 
+                                                    constants.STUDENT_ID_FEATURE], as_index=False).sum()
+            studentDataDfStudentSumGrouped = studentDataDfStudentSum.groupby([constants.GROUPBY_FEATURE], as_index = False)
+            studentDataDfStudentSumGrouped.fillna(0, inplace=True)  
+            
+            studentDataDfStudentTaskWiseSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.STUDENT_ID_FEATURE, 
+                                                                constants.TASK_TYPE_FEATURE], as_index=False).sum()   
+            studentDataDfStudentTaskWiseSum.fillna(0, inplace=True)  
             
         
-        studentDataDfSum = studentDataDfSum.merge(right= studentDataDfFeaturesInterpreted2
-                                          , left_on = constants.GROUPBY_FEATURE, right_on = constants.GROUPBY_FEATURE
-                                            , left_index=False, right_index=False
-                                            , how='inner')
-        
-        featuresOverviewNew = featuresOverview.copy()
-        for i in range(len(featuresOverviewNew)):
-            if featuresOverviewNew[i] == 'SessionDuration':
-                featuresOverviewNew.insert(i + 1, 'PracticeSessionDuration')
-                featuresOverviewNew.insert(i + 2, 'TheorySessionDuration')
-        
-        studentDataDfSumToPlot = studentDataDfSum[featuresOverviewNew  + [ constants.COUNT_STUDENT_FEATURE ] + ['ConceptsUsed'
-                                                                        ]].round(decimals=2)
-#        studentDataDfSumToPlot.rename(columns = featuresOverviewGeneralNames, inplace=True)
-
-        tableMean = getTable(studentDataDfSumToPlot, schoolKey, False, False, '')
-        
-        columns2 = []
-        columns2.append(dbc.Col(tableMean , align="center"))
-    
-
-        rows.append( dbc.Row( html.Div([
-                    html.H3('Overview', id='group-overview-title'), 
-                ]) ) )
-        
-        rows.append( html.Br() )
-        rows.append( dbc.Row( html.Div([
-                    html.H4('Overall Sum'), 
-                ]) ) )
-        rows.append( dbc.Row( columns2 ) )
-        rows.append( dbc.Row( html.Div([html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),
-                       "download data", ],id = "groups_download_overview_link", 
-                                               href="", target="_blank",
-                                               download='groups-overview.csv' )]) ) )
-
-#-------------------------------------------------------------------------------------
-    #   Mean of comparision features    
-        studentDataDfMean = studentDataDfStudentSum.groupby([constants.GROUPBY_FEATURE], as_index = False).mean()
-        
-        studentDataDfMeanToPlot = studentDataDfMean[ featuresOverview ].round(decimals=2)
-        
-        studentDataDfMeanTaskWise = studentDataDfStudentTaskWiseSum.groupby([constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE], 
-                                        as_index=False).mean()[[constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE,
-                                        'SessionDuration']].round(decimals=2)        
-        
-        
-        
-        studentDataDfFeaturesInterpreted = pd.DataFrame(columns = [constants.GROUPBY_FEATURE, 'PracticeSessionDuration', 'TheorySessionDuration']) 
-        for groupKey, group in studentDataDfGrouped :     
-            practiceSessionDuration = studentDataDfMeanTaskWise[ (studentDataDfMeanTaskWise[constants.GROUPBY_FEATURE ] == groupKey )   &
-                        (studentDataDfMeanTaskWise[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice )  ]['SessionDuration'].sum()
-            theorySessionDuration =  studentDataDfMeanTaskWise[ (studentDataDfMeanTaskWise[constants.GROUPBY_FEATURE ] == groupKey )   &
-                        (studentDataDfMeanTaskWise[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypeTheory )  ]['SessionDuration'].sum()
-            studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.append({constants.GROUPBY_FEATURE : groupKey, 
-                                                                                        'PracticeSessionDuration' : practiceSessionDuration, 
-                                                                                        'TheorySessionDuration' : theorySessionDuration, },  
-                                                                                ignore_index = True)
-        studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.groupby([constants.GROUPBY_FEATURE],  as_index=False).sum()
-
-        studentDataDfMeanToPlot = studentDataDfMeanToPlot.merge(right= studentDataDfFeaturesInterpreted
-                                          , left_on = constants.GROUPBY_FEATURE, right_on = constants.GROUPBY_FEATURE
-                                            , left_index=False, right_index=False
-                                            , how='inner')
-        
-#        studentDataDfMeanToPlot[featuresOverviewNew].rename(columns = featuresOverviewAvgNames, inplace=True)
-        
-#        currentColumns = studentDataDfMeanToPlot.columns
-#        for i in range(len(currentColumns)):
-#            if 'SessionDuration' in currentColumns[i] :
-#                currentColumns.insert(i + 1, 'PracticeSessionDuration')
-#                currentColumns.insert(i + 2, 'TheorySessionDuration')
-        
-        
-        tableMean = getTable(studentDataDfMeanToPlot[featuresOverviewNew], schoolKey, False, True, featureAdderAvg)
-
-        columns2 = []
-        columns2.append(dbc.Col(tableMean , align="center"))
-        rows.append( html.Br() )
-        rows.append( dbc.Row( html.Div([
-                    html.H4('Mean'), 
-                ]) ) )
-        rows.append( dbc.Row( columns2 ) )
-        
-        
-#-------------------------------------------------------------------------------------
-#    Standard Deviation of comparision features    
-        
-        studentDataDfStd = studentDataDfStudentSum[featuresOverview].groupby(
-                    [constants.GROUPBY_FEATURE], as_index = False).agg([np.std])
-        studentDataDfStd.reset_index(level=0, inplace=True)
-        studentDataDfStd = studentDataDfStd.round(decimals=2)
-        
-        studentDataDfMeanTaskWise = studentDataDfStudentTaskWiseSum.groupby([constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE], 
-                                        as_index=False).agg([np.std])
-        studentDataDfMeanTaskWise.fillna(0, inplace=True)
-        studentDataDfMeanTaskWise.reset_index(level=[0,1], inplace=True)
-        studentDataDfMeanTaskWise = studentDataDfMeanTaskWise[[constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE,
-                                        'SessionDuration']].round(decimals=2)
-        studentDataDfMeanTaskWise.columns = studentDataDfMeanTaskWise.columns.droplevel(1)
-        
-        
-        studentDataDfFeaturesInterpreted = pd.DataFrame(columns = [constants.GROUPBY_FEATURE, 'PracticeSessionDuration', 'TheorySessionDuration'])
-        for groupKey, group in studentDataDfGrouped :     
-            practiceSessionDuration = studentDataDfMeanTaskWise[ (studentDataDfMeanTaskWise[constants.GROUPBY_FEATURE ] == groupKey )   &
-                        (studentDataDfMeanTaskWise[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice )  ]['SessionDuration'].sum()
-            theorySessionDuration =  studentDataDfMeanTaskWise[ (studentDataDfMeanTaskWise[constants.GROUPBY_FEATURE ] == groupKey )   &
-                        (studentDataDfMeanTaskWise[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypeTheory )  ]['SessionDuration'].sum()
-            studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.append({constants.GROUPBY_FEATURE : groupKey, 
-                                                                                        'PracticeSessionDuration' : practiceSessionDuration, 
-                                                                                        'TheorySessionDuration' : theorySessionDuration, },  
-                                                                                ignore_index = True)
-        studentDataDfFeaturesInterpreted.columns = pd.MultiIndex.from_product([studentDataDfFeaturesInterpreted.columns, ['']])
-        studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.groupby([constants.GROUPBY_FEATURE],  as_index=False).sum()
-
-        studentDataDfStd = studentDataDfStd.merge(right= studentDataDfFeaturesInterpreted
-                                          , left_on = constants.GROUPBY_FEATURE, right_on = constants.GROUPBY_FEATURE
-                                            , left_index=False, right_index=False
-                                            , how='inner')
-        
-        studentDataDfStd = studentDataDfStd.droplevel(level=1, axis=1)
-        
-        
-        tableStd = getTable(studentDataDfStd[featuresOverviewNew], schoolKey, False, False, ' std')
-
-        columns2 = []
-        columns2.append(dbc.Col(tableStd , align="center"))
-        rows.append( html.Br() )
-        rows.append( dbc.Row( html.Div([
-                    html.H4('Standard Deviation'), 
-                ]) ) )
-        rows.append( dbc.Row( columns2 ) )
-
-
-        
-#        --------------------------------------------------------------------------
-        
-#        -------------------
-#        the Quantile Plots - distribution for each feature
-        rows.append(html.Div(id='Group-Distribution-Information', children = []))
-        rows.append( dbc.Row( html.Div([
-                    html.H3('Distributions', id='group-distribution-title'), 
-                ]) ) )
-        rows.append( html.Br() )
-
-
-        studentDataDfStudentSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.COUNT_STUDENT_FEATURE, 
-                                                         constants.STUDENT_ID_FEATURE, "Name" ], as_index=False).sum()
-        
-
-#Session duration
-        figQuantile = px.box(studentDataDfStudentSum, x=constants.GROUPBY_FEATURE, y="SessionDuration", points="all",
-                             title="Distribution of Session Duration",
-                             hover_data=[constants.STUDENT_ID_FEATURE, "Name", "SessionDuration", "Attempts", "Points"]
-#                             , marker_color = 'rgb(214,12,140)'
-                             )
-        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)
-        columns3 = []
-        columns3.append(dbc.Col(
-                
-                dcc.Graph(
-                    figure= figQuantile
-                )
+    #--------------------------------Total of each Features ----------------------------------             
+            graphs.append(html.Div(id='Group-Overview-Information', children = []))   
             
-                if  constants.languageLocal  != 'en' else
+            studentDataDfSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.COUNT_STUDENT_FEATURE], as_index=False).sum()
+    #        studentDataDfSumGrouped = studentDataDfSum.groupby([constants.GROUPBY_FEATURE], as_index = False)
             
-                dcc.Graph(
-                    figure= figQuantile
-                     
-                    , config  =  dict (locale   =  constants.languageLocal   ) 
-                )
-                
-                , align="center"))
-        rows.append( dbc.Row( columns3 ) )
-        rows.append( html.Br() )
+            studentDataDfFeaturesInterpreted = pd.DataFrame(columns = [constants.GROUPBY_FEATURE, 'PracticeSessionDuration', 'TheorySessionDuration']) 
+            for groupKey, group in studentDataDfGrouped :     
+                practiceSessionDuration = group[group[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice ]['SessionDuration'].sum()
+                theorySessionDuration =  group[group[constants.TASK_TYPE_FEATURE] == constants.TaskTypeTheory ]['SessionDuration'].sum()
+                studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.append({constants.GROUPBY_FEATURE : groupKey, 
+                                                                                            'PracticeSessionDuration' : practiceSessionDuration, 
+                                                                                            'TheorySessionDuration' : theorySessionDuration, },  
+                                                                                    ignore_index = True)
+            studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.groupby([constants.GROUPBY_FEATURE],  as_index=False).sum()
 
-#Attempts
-        figQuantile = px.box(studentDataDfStudentSum, x=constants.GROUPBY_FEATURE, y="Attempts", points="all",
-                             title="Distribution of Attempts",
-                             hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
-                             )       
-        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)            
-        columns3 = []
-        columns3.append(dbc.Col(
-                
-                
-                dcc.Graph(
-                    figure= figQuantile
-                )
+            studentDataDfSum = studentDataDfSum.merge(right= studentDataDfFeaturesInterpreted
+                                            , left_on = constants.GROUPBY_FEATURE, right_on = constants.GROUPBY_FEATURE
+                                                , left_index=False, right_index=False
+                                                , how='inner')
             
-                if  constants.languageLocal  != 'en' else
-            
-                dcc.Graph(
-                    figure= figQuantile
-                     
-                    , config  =  dict (locale   =  constants.languageLocal   ) 
-                )
-                
-                
-                
-                
-                
-                , align="center"))    
-        rows.append( dbc.Row( columns3 ) )      
-        rows.append( html.Br() )         
-        
-#Points
-        figQuantile = px.box(studentDataDfStudentSum, x=constants.GROUPBY_FEATURE, y="Points", points="all",
-                             title="Distribution of Points",
-                             hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
-                             )     
-        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)                      
-        columns3 = []
-        columns3.append(dbc.Col(
-                
-                
+            studentDataDfFeaturesInterpreted2 = pd.DataFrame(columns = [constants.GROUPBY_FEATURE, 'ConceptsUsed'])
+            for groupKey, group in studentDataDfGrouped :    
+                conceptsUsedStr = ' '
+                if 'ConceptsUsed' in group.columns and  group[ group['ConceptsUsed'].notnull() & (group['ConceptsUsed']  !=  u'') ].shape[0] > 0 :
+                    conceptsUsedStr = ', '.join(  util.get_unique_list_feature_items(group, 'ConceptsUsed' )  )
+                    
+                    
+                    
+                studentDataDfFeaturesInterpreted2 = studentDataDfFeaturesInterpreted2.append({constants.GROUPBY_FEATURE : groupKey,
+                                                                                            'ConceptsUsed' : conceptsUsedStr },  
+                                                                                    ignore_index = True)
                 
             
-                dcc.Graph(
-                    figure= figQuantile
-                )
+            studentDataDfSum = studentDataDfSum.merge(right= studentDataDfFeaturesInterpreted2
+                                            , left_on = constants.GROUPBY_FEATURE, right_on = constants.GROUPBY_FEATURE
+                                                , left_index=False, right_index=False
+                                                , how='inner')
             
-                if  constants.languageLocal  != 'en' else
+            featuresOverviewNew = featuresOverview.copy()
+            for i in range(len(featuresOverviewNew)):
+                if featuresOverviewNew[i] == 'SessionDuration':
+                    featuresOverviewNew.insert(i + 1, 'PracticeSessionDuration')
+                    featuresOverviewNew.insert(i + 2, 'TheorySessionDuration')
             
-                dcc.Graph(
-                    figure= figQuantile
-                     
-                    , config  =  dict (locale   =  constants.languageLocal   ) 
-                )
-                
-                
-                
-                , align="center"))    
-        rows.append( dbc.Row( columns3 ) )       
-        rows.append( html.Br() )           
+            studentDataDfSumToPlot = studentDataDfSum[featuresOverviewNew  + [ constants.COUNT_STUDENT_FEATURE ] + ['ConceptsUsed'
+                                                                            ]].round(decimals=2)
+    #        studentDataDfSumToPlot.rename(columns = featuresOverviewGeneralNames, inplace=True)
 
-#Items Collected
-        figQuantile = px.box(studentDataDfStudentSum, x=constants.GROUPBY_FEATURE, y="itemsCollectedCount", points="all",
-                             title="Distribution of Items Collected",
-                             hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
-                             )    
-        figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)                           
-        columns3 = []
-        columns3.append(dbc.Col(
-                
-                
-                
+            tableMean = getTable(studentDataDfSumToPlot, schoolKey, False, False, '')
             
-                dcc.Graph(
-                    figure= figQuantile
-                )
-            
-                if  constants.languageLocal  != 'en' else
-            
-                dcc.Graph(
-                    figure= figQuantile
-                     
-                    , config  =  dict (locale   =  constants.languageLocal   ) 
-                )
-                
-                
-                
-                
-                
-                , align="center"))    
-        rows.append( dbc.Row( columns3 ) )      
-        rows.append( html.Br() )             
-
-
-#        fig = go.Figure()        
-#        for groupId, group in studentDataDfStudentSum.groupby([constants.GROUPBY_FEATURE], as_index=False):
-#            groupDataStudent = getStudentWiseData(group)
-#            fig.add_trace(go.Box(
-#                y               = groupDataStudent['itemsCollectedCount'],                    
-#                marker_color    = 'rgb(214,12,140)',
-#                name            = groupId,
-#                boxpoints       = 'all',
-#                text            = groupDataStudent['Name'],
-#            ))
-#        
-#        fig.update_layout(
-#            title           ='Distribution of Items Collected',
-#            paper_bgcolor   = 'rgb(243, 243, 243)',
-#            plot_bgcolor    = 'rgb(243, 243, 243)',
-#            yaxis_title     ='Item Collected Count', 
-#            xaxis_title     = 'Group',
-#        )
-#        columns3 = []
-#        columns3.append(dbc.Col(
-#                                dcc.Graph(
-#                                        figure = fig
-#                                )  , align="center"))    
-#        rows.append( dbc.Row( columns3 ) )          
-
+            columns2 = []
+            columns2.append(dbc.Col(tableMean , align="center"))
         
-        graphs.append(html.Div(  rows,
-                     className = "width-100"  ))
+
+            rows.append( dbc.Row( html.Div([
+                        html.H3('Overview', id='group-overview-title'), 
+                    ]) ) )
+            
+            rows.append( html.Br() )
+            rows.append( dbc.Row( html.Div([
+                        html.H4('Overall Sum'), 
+                    ]) ) )
+            rows.append( dbc.Row( columns2 ) )
+            rows.append( dbc.Row( html.Div([html.A(children=[html.I(className="fas fa-download font-size_medium p_small"),
+                        "download data", ],id = "groups_download_overview_link", 
+                                                href="", target="_blank",
+                                                download='groups-overview.csv' )]) ) )
+
+    #-------------------------------------------------------------------------------------
+        #   Mean of comparision features    
+            studentDataDfMean = studentDataDfStudentSum.groupby([constants.GROUPBY_FEATURE], as_index = False).mean()
+            
+            studentDataDfMeanToPlot = studentDataDfMean[ featuresOverview ].round(decimals=2)
+            
+            studentDataDfMeanTaskWise = studentDataDfStudentTaskWiseSum.groupby([constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE], 
+                                            as_index=False).mean()[[constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE,
+                                            'SessionDuration']].round(decimals=2)        
+            
+            
+            
+            studentDataDfFeaturesInterpreted = pd.DataFrame(columns = [constants.GROUPBY_FEATURE, 'PracticeSessionDuration', 'TheorySessionDuration']) 
+            for groupKey, group in studentDataDfGrouped :     
+                practiceSessionDuration = studentDataDfMeanTaskWise[ (studentDataDfMeanTaskWise[constants.GROUPBY_FEATURE ] == groupKey )   &
+                            (studentDataDfMeanTaskWise[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice )  ]['SessionDuration'].sum()
+                theorySessionDuration =  studentDataDfMeanTaskWise[ (studentDataDfMeanTaskWise[constants.GROUPBY_FEATURE ] == groupKey )   &
+                            (studentDataDfMeanTaskWise[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypeTheory )  ]['SessionDuration'].sum()
+                studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.append({constants.GROUPBY_FEATURE : groupKey, 
+                                                                                            'PracticeSessionDuration' : practiceSessionDuration, 
+                                                                                            'TheorySessionDuration' : theorySessionDuration, },  
+                                                                                    ignore_index = True)
+            studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.groupby([constants.GROUPBY_FEATURE],  as_index=False).sum()
+
+            studentDataDfMeanToPlot = studentDataDfMeanToPlot.merge(right= studentDataDfFeaturesInterpreted
+                                            , left_on = constants.GROUPBY_FEATURE, right_on = constants.GROUPBY_FEATURE
+                                                , left_index=False, right_index=False
+                                                , how='inner')
+            
+    #        studentDataDfMeanToPlot[featuresOverviewNew].rename(columns = featuresOverviewAvgNames, inplace=True)
+            
+    #        currentColumns = studentDataDfMeanToPlot.columns
+    #        for i in range(len(currentColumns)):
+    #            if 'SessionDuration' in currentColumns[i] :
+    #                currentColumns.insert(i + 1, 'PracticeSessionDuration')
+    #                currentColumns.insert(i + 2, 'TheorySessionDuration')
+            
+            
+            tableMean = getTable(studentDataDfMeanToPlot[featuresOverviewNew], schoolKey, False, True, featureAdderAvg)
+
+            columns2 = []
+            columns2.append(dbc.Col(tableMean , align="center"))
+            rows.append( html.Br() )
+            rows.append( dbc.Row( html.Div([
+                        html.H4('Mean'), 
+                    ]) ) )
+            rows.append( dbc.Row( columns2 ) )
+            
+            
+    #-------------------------------------------------------------------------------------
+    #    Standard Deviation of comparision features    
+            
+            studentDataDfStd = studentDataDfStudentSum[featuresOverview].groupby(
+                        [constants.GROUPBY_FEATURE], as_index = False).agg([np.std])
+            studentDataDfStd.reset_index(level=0, inplace=True)
+            studentDataDfStd = studentDataDfStd.round(decimals=2)
+            
+            studentDataDfMeanTaskWise = studentDataDfStudentTaskWiseSum.groupby([constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE], 
+                                            as_index=False).agg([np.std])
+            studentDataDfMeanTaskWise.fillna(0, inplace=True)
+            studentDataDfMeanTaskWise.reset_index(level=[0,1], inplace=True)
+            studentDataDfMeanTaskWise = studentDataDfMeanTaskWise[[constants.GROUPBY_FEATURE, constants.TASK_TYPE_FEATURE,
+                                            'SessionDuration']].round(decimals=2)
+            studentDataDfMeanTaskWise.columns = studentDataDfMeanTaskWise.columns.droplevel(1)
+            
+            
+            studentDataDfFeaturesInterpreted = pd.DataFrame(columns = [constants.GROUPBY_FEATURE, 'PracticeSessionDuration', 'TheorySessionDuration'])
+            for groupKey, group in studentDataDfGrouped :     
+                practiceSessionDuration = studentDataDfMeanTaskWise[ (studentDataDfMeanTaskWise[constants.GROUPBY_FEATURE ] == groupKey )   &
+                            (studentDataDfMeanTaskWise[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice )  ]['SessionDuration'].sum()
+                theorySessionDuration =  studentDataDfMeanTaskWise[ (studentDataDfMeanTaskWise[constants.GROUPBY_FEATURE ] == groupKey )   &
+                            (studentDataDfMeanTaskWise[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypeTheory )  ]['SessionDuration'].sum()
+                studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.append({constants.GROUPBY_FEATURE : groupKey, 
+                                                                                            'PracticeSessionDuration' : practiceSessionDuration, 
+                                                                                            'TheorySessionDuration' : theorySessionDuration, },  
+                                                                                    ignore_index = True)
+            studentDataDfFeaturesInterpreted.columns = pd.MultiIndex.from_product([studentDataDfFeaturesInterpreted.columns, ['']])
+            studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.groupby([constants.GROUPBY_FEATURE],  as_index=False).sum()
+
+            studentDataDfStd = studentDataDfStd.merge(right= studentDataDfFeaturesInterpreted
+                                            , left_on = constants.GROUPBY_FEATURE, right_on = constants.GROUPBY_FEATURE
+                                                , left_index=False, right_index=False
+                                                , how='inner')
+            
+            studentDataDfStd = studentDataDfStd.droplevel(level=1, axis=1)
+            
+            
+            tableStd = getTable(studentDataDfStd[featuresOverviewNew], schoolKey, False, False, ' std')
+
+            columns2 = []
+            columns2.append(dbc.Col(tableStd , align="center"))
+            rows.append( html.Br() )
+            rows.append( dbc.Row( html.Div([
+                        html.H4('Standard Deviation'), 
+                    ]) ) )
+            rows.append( dbc.Row( columns2 ) )
+
+
+            
+    #        --------------------------------------------------------------------------
+            
+    #        -------------------
+    #        the Quantile Plots - distribution for each feature
+            rows.append(html.Div(id='Group-Distribution-Information', children = []))
+            rows.append( dbc.Row( html.Div([
+                        html.H3('Distributions', id='group-distribution-title'), 
+                    ]) ) )
+            rows.append( html.Br() )
+
+
+            studentDataDfStudentSum = studentDataDf.groupby([constants.GROUPBY_FEATURE, constants.COUNT_STUDENT_FEATURE, 
+                                                            constants.STUDENT_ID_FEATURE, "Name" ], as_index=False).sum()
+            
+
+    #Session duration
+            figQuantile = px.box(studentDataDfStudentSum, x=constants.GROUPBY_FEATURE, y="SessionDuration", points="all",
+                                title="Distribution of Session Duration",
+                                hover_data=[constants.STUDENT_ID_FEATURE, "Name", "SessionDuration", "Attempts", "Points"]
+    #                             , marker_color = 'rgb(214,12,140)'
+                                )
+            figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)
+            columns3 = []
+            columns3.append(dbc.Col(
+                    
+                    dcc.Graph(
+                        figure= figQuantile
+                    )
+                
+                    if  constants.languageLocal  != 'en' else
+                
+                    dcc.Graph(
+                        figure= figQuantile
+                        
+                        , config  =  dict (locale   =  constants.languageLocal   ) 
+                    )
+                    
+                    , align="center"))
+            rows.append( dbc.Row( columns3 ) )
+            rows.append( html.Br() )
+
+    #Attempts
+            figQuantile = px.box(studentDataDfStudentSum, x=constants.GROUPBY_FEATURE, y="Attempts", points="all",
+                                title="Distribution of Attempts",
+                                hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
+                                )       
+            figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)            
+            columns3 = []
+            columns3.append(dbc.Col(
+                    
+                    
+                    dcc.Graph(
+                        figure= figQuantile
+                    )
+                
+                    if  constants.languageLocal  != 'en' else
+                
+                    dcc.Graph(
+                        figure= figQuantile
+                        
+                        , config  =  dict (locale   =  constants.languageLocal   ) 
+                    )
+                    
+                    
+                    
+                    
+                    
+                    , align="center"))    
+            rows.append( dbc.Row( columns3 ) )      
+            rows.append( html.Br() )         
+            
+    #Points
+            figQuantile = px.box(studentDataDfStudentSum, x=constants.GROUPBY_FEATURE, y="Points", points="all",
+                                title="Distribution of Points",
+                                hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
+                                )     
+            figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)                      
+            columns3 = []
+            columns3.append(dbc.Col(
+                    
+                    
+                    
+                
+                    dcc.Graph(
+                        figure= figQuantile
+                    )
+                
+                    if  constants.languageLocal  != 'en' else
+                
+                    dcc.Graph(
+                        figure= figQuantile
+                        
+                        , config  =  dict (locale   =  constants.languageLocal   ) 
+                    )
+                    
+                    
+                    
+                    , align="center"))    
+            rows.append( dbc.Row( columns3 ) )       
+            rows.append( html.Br() )           
+
+    #Items Collected
+            figQuantile = px.box(studentDataDfStudentSum, x=constants.GROUPBY_FEATURE, y="itemsCollectedCount", points="all",
+                                title="Distribution of Items Collected",
+                                hover_data=["StudentId", "Name", "SessionDuration", "Attempts", "Points"]
+                                )    
+            figQuantile.update_layout(constants.THEME_EXPRESS_LAYOUT)                           
+            columns3 = []
+            columns3.append(dbc.Col(
+                    
+                    
+                    
+                
+                    dcc.Graph(
+                        figure= figQuantile
+                    )
+                
+                    if  constants.languageLocal  != 'en' else
+                
+                    dcc.Graph(
+                        figure= figQuantile
+                        
+                        , config  =  dict (locale   =  constants.languageLocal   ) 
+                    )
+                    
+                    
+                    
+                    
+                    
+                    , align="center"))    
+            rows.append( dbc.Row( columns3 ) )      
+            rows.append( html.Br() )             
+
+
+    #        fig = go.Figure()        
+    #        for groupId, group in studentDataDfStudentSum.groupby([constants.GROUPBY_FEATURE], as_index=False):
+    #            groupDataStudent = getStudentWiseData(group)
+    #            fig.add_trace(go.Box(
+    #                y               = groupDataStudent['itemsCollectedCount'],                    
+    #                marker_color    = 'rgb(214,12,140)',
+    #                name            = groupId,
+    #                boxpoints       = 'all',
+    #                text            = groupDataStudent['Name'],
+    #            ))
+    #        
+    #        fig.update_layout(
+    #            title           ='Distribution of Items Collected',
+    #            paper_bgcolor   = 'rgb(243, 243, 243)',
+    #            plot_bgcolor    = 'rgb(243, 243, 243)',
+    #            yaxis_title     ='Item Collected Count', 
+    #            xaxis_title     = 'Group',
+    #        )
+    #        columns3 = []
+    #        columns3.append(dbc.Col(
+    #                                dcc.Graph(
+    #                                        figure = fig
+    #                                )  , align="center"))    
+    #        rows.append( dbc.Row( columns3 ) )          
+
+            
+            graphs.append(html.Div(  rows,
+                        className = "width-100"  ))
+        
+    except Exception as e: 
+        print('groups plotClassOverview ')
+        print(e)
         
     return graphs
 
@@ -728,10 +738,14 @@ def on_reset(reset_click):
     # Find which one has been triggered
     ctx = dash.callback_context
 
-    if ctx.triggered:
-        prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
-        if prop_id == "reset-btn" and reset_click:
-            return [""]
+    try:
+        if ctx.triggered:
+            prop_id = ctx.triggered[0]["prop_id"].split(".")[0]
+            if prop_id == "reset-btn" and reset_click:
+                return [""]
+    except Exception as e: 
+        print('groups on_reset ')
+        print(e)
             
 #    return [GroupSelector_options[0]['value']]
     return [""]
@@ -752,8 +766,12 @@ def update_bar(groupMain, groupComparision ):
     if  not util.isValidValueId(groupMain) :
         return html.Div(graphs)
  
-    graphs = plotClassOverview( int(groupMain), groupComparision )    
-    
+    try:
+        graphs = plotClassOverview( int(groupMain), groupComparision )    
+    except Exception as e: 
+        print('groups update_bar ')
+        print(e)
+
     return  html.Div(graphs,
                      className = "col")
     
@@ -771,7 +789,11 @@ def update_main_overview(groupMain):
     if  not util.isValidValueId(groupMain) :
         return html.Div(graphs)
  
-    graphs = plotGroupOverview(groupMain)  
+    try:
+        graphs = plotGroupOverview(groupMain)  
+    except Exception as e: 
+        print('groups update_main_overview ')
+        print(e)
 
     return  html.Div(graphs,
 #                     className = "width-100"
@@ -786,5 +808,11 @@ def update_download_link(groupMain, groupComparision):
     if  not util.isValidValueId(groupMain) :
         return ""
     
-    csv_string = util.get_download_link_data_uri(getGroupData( int(groupMain), groupComparision))
+    csv_string = ""
+    try:
+        csv_string = util.get_download_link_data_uri(getGroupData( int(groupMain), groupComparision))
+    except Exception as e: 
+        print('groups update_download_link__details_student ')
+        print(e)
+
     return csv_string

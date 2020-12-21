@@ -285,6 +285,7 @@ feature2UserNamesDict = {
 		,"runsHasExpressionsBitwiseCount" : "Used Bitwise Operators(no. of time in all code runs)"
 		,"runsHasExpressionsDictCount" : "Used Dictionary Or Map (no. of time in all code runs)"
 		,"runsHasExpressionsDataStructureCount" : "Used Data Structure (no. of time in all code runs)"
+		,"runsHasExpressionsFunctionCall" : "Used function call (e.g. call('friend') ) (no. of time in all code runs)"
 		,"runsHasControlFlowConditionalCount" : "Used Conditional Flows (no. of time in all code runs)"
 		,"runsHasExpressionsKeywordCount" : "Used Keywords (no. of time in all code runs)"
 		,"runsHasControlFlowTryExceptionCount" : "Used Try exception (no. of time in all code runs)"        

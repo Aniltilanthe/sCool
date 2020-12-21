@@ -182,7 +182,7 @@ def render_main_selector_content(pathname,
         print(selectorValue)
 
         if selectorOptions and selectorValue:
-            return selectorOptions, selectorValue
+           return selectorOptions, selectorValue
         
         if len(userOptions) == 1:
             value = userOptions[0]['value']

@@ -529,10 +529,12 @@ def getGroupTaskWiseDetails(groupId, isGrouped = True, taskId = 0 , filterByDate
                 print('plotGroupTaskWiseConcepts 1 ')
                 print(e)
             
-    
-#    Step 2 :- add the plot - concepts used by count of students
-    graphs = graphs + plotGroupTaskWiseConcepts( groupId, isGrouped = isGrouped, taskId = taskId , filterByDate = filterByDate)
-    
+    try:    
+    #    Step 2 :- add the plot - concepts used by count of students
+        graphs = graphs + plotGroupTaskWiseConcepts( groupId, isGrouped = isGrouped, taskId = taskId , filterByDate = filterByDate)    
+    except Exception as e: 
+        print('plotGroupTaskWiseConcepts 2 ')
+        print(e)
     
     return graphs
     
@@ -1178,18 +1180,28 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
 
 
 def getPlotDistributionPlotChildrens(graphDistributions, quantileIndex = 0):
-    return [dbc.Button( [  html.I(className="fas fa-info m-right-small"),
-        "Show Distribution" ],
-        id          = "groupDetails-collapse-distribution-button-" + str(quantileIndex),
-        color       = "light",
-        n_clicks    = 0,
-        className   = "m-bottom_medium"
-    ),
-    dbc.Collapse(
-        children = graphDistributions ,
-        id = "groupDetails-collapse-distribution-" + str(quantileIndex),
-        is_open = True
-    ),]
+    return [
+        html.Details(
+            children = [
+                    html.Summary([  html.I(className="fas fa-info m-right-small"),
+                    "Show Distribution" ]),
+                    html.Div(graphDistributions),
+                ],
+        ),
+    #     dbc.Button( [  html.I(className="fas fa-info m-right-small"),
+    #     "Show Distribution" ],
+    #     id          = "groupDetails-collapse-distribution-button-" + str(quantileIndex),
+    #     color       = "light",
+    #     n_clicks    = 0,
+    #     className   = "m-bottom_medium"
+    # ),
+    # dbc.Collapse(
+    #     children = graphDistributions ,
+    #     id = "groupDetails-collapse-distribution-" + str(quantileIndex),
+    #     is_open = True
+    # ),
+    
+    ]
 
 
 #Student Interaction with Game - TIMELINE
@@ -1202,89 +1214,96 @@ def plotClassOverview(schoolKey, filterByDate = '' ):
     features2Plot = ['Name', 'SessionDuration', 'PracticeSessionDuration', 'TheorySessionDuration', 
                      'Attempts', 'Points' 
                      ]
-        
-    studentDataDf = studentGrouped.getStudentsOfLearningActivityDF(schoolKey)
-    
-    if filterByDate:
-        dateGroup = studentDataDf.groupby(  [ studentDataDf['CreatedAt'].dt.date ] )
-        studentDataDf = dateGroup.get_group(filterByDate)
 
-    
-    if studentDataDf is None    or   studentDataDf.empty :
-        graphs.append(
-                util.getNoDataMsg()
+    try:    
+        studentDataDf = studentGrouped.getStudentsOfLearningActivityDF(schoolKey)
+        
+        if filterByDate:
+            dateGroup = studentDataDf.groupby(  [ studentDataDf['CreatedAt'].dt.date ] )
+            studentDataDf = dateGroup.get_group(filterByDate)
+
+        
+        if studentDataDf is None    or   studentDataDf.empty :
+            graphs.append(
+                    util.getNoDataMsg()
+            )
+            return graphs
+        
+        
+        studentDataDfSum = studentDataDf.groupby(['StudentId', 'Name'], as_index=False).sum()
+        
+        studentDataDfSumTask = studentDataDf.groupby(['StudentId', 'Name', constants.TASK_TYPE_FEATURE
+                                                ], as_index=False)
+
+        studentDataDfFeaturesInterpreted = pd.DataFrame(columns = ['StudentId', 'PracticeSessionDuration', 'TheorySessionDuration']) 
+        for groupKey, group in studentDataDfSumTask :        
+            practiceSessionDuration = group[group[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice ]['SessionDuration'].sum()        
+            theorySessionDuration =  group[group[constants.TASK_TYPE_FEATURE] == constants.TaskTypeTheory ]['SessionDuration'].sum()            
+            studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.append({'StudentId' : groupKey[0], 
+                                                                                        'PracticeSessionDuration' : practiceSessionDuration, 
+                                                                                        'TheorySessionDuration' : theorySessionDuration},  
+                                                                                ignore_index = True)       
+        studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.groupby(['StudentId'],  as_index=False).sum()
+            
+        studentDataDfSum = studentDataDfSum.merge(right= studentDataDfFeaturesInterpreted
+                                        , left_on='StudentId', right_on='StudentId'
+                                            , left_index=False, right_index=False
+                                            , how='inner')
+        
+        rows.append( dbc.Row( html.Div([
+                    html.H3('Overview'), 
+                ]) ) )
+        fig1Table = dash_table.DataTable(
+            columns=[
+                {"name": constants.feature2UserNamesDict.get(i) if i in constants.feature2UserNamesDict.keys() else i , "id": i, "selectable": True} for i in studentDataDfSum[features2Plot].columns
+            ],
+            data            = studentDataDfSum[features2Plot].to_dict('records'),
+            filter_action       = "native",
+            sort_action         = "native",
+            sort_mode           = "multi",
+            style_data_conditional = ([ 
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': constants.THEME_TABLE_ODDROW_COLOR_STYLE
+                    },
+            ]) 
         )
-        return graphs
-    
-    
-    studentDataDfSum = studentDataDf.groupby(['StudentId', 'Name'], as_index=False).sum()
-    
-    studentDataDfSumTask = studentDataDf.groupby(['StudentId', 'Name', constants.TASK_TYPE_FEATURE
-                                               ], as_index=False)
+        columns.append(dbc.Col(
+                        fig1Table 
+                        , align ="center"                    
+                        , className = "c-table "
+        ))
+        rows.append( dbc.Row( columns ) )
+        
+    #    ---------------------------------------------
+            
+        
+        graphs.append(html.Div(  rows  ))
+    except Exception as e: 
+        print('plotClassOverview 2 ')
+        print(e)
 
-    studentDataDfFeaturesInterpreted = pd.DataFrame(columns = ['StudentId', 'PracticeSessionDuration', 'TheorySessionDuration']) 
-    for groupKey, group in studentDataDfSumTask :        
-        practiceSessionDuration = group[group[constants.TASK_TYPE_FEATURE] ==  constants.TaskTypePractice ]['SessionDuration'].sum()        
-        theorySessionDuration =  group[group[constants.TASK_TYPE_FEATURE] == constants.TaskTypeTheory ]['SessionDuration'].sum()            
-        studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.append({'StudentId' : groupKey[0], 
-                                                                                    'PracticeSessionDuration' : practiceSessionDuration, 
-                                                                                    'TheorySessionDuration' : theorySessionDuration},  
-                                                                            ignore_index = True)       
-    studentDataDfFeaturesInterpreted = studentDataDfFeaturesInterpreted.groupby(['StudentId'],  as_index=False).sum()
-        
-    studentDataDfSum = studentDataDfSum.merge(right= studentDataDfFeaturesInterpreted
-                                      , left_on='StudentId', right_on='StudentId'
-                                        , left_index=False, right_index=False
-                                        , how='inner')
-    
-    rows.append( dbc.Row( html.Div([
-                html.H3('Overview'), 
-            ]) ) )
-    fig1Table = dash_table.DataTable(
-        columns=[
-            {"name": constants.feature2UserNamesDict.get(i) if i in constants.feature2UserNamesDict.keys() else i , "id": i, "selectable": True} for i in studentDataDfSum[features2Plot].columns
-        ],
-        data            = studentDataDfSum[features2Plot].to_dict('records'),
-        filter_action       = "native",
-        sort_action         = "native",
-        sort_mode           = "multi",
-        style_data_conditional = ([ 
-                {
-                    'if': {'row_index': 'odd'},
-                    'backgroundColor': constants.THEME_TABLE_ODDROW_COLOR_STYLE
-                },
-         ]) 
-    )
-    columns.append(dbc.Col(
-                    fig1Table 
-                    , align ="center"                    
-                    , className = "c-table "
-    ))
-    rows.append( dbc.Row( columns ) )
-    
-#    ---------------------------------------------
-        
-    
-    graphs.append(html.Div(  rows  ))
     
     return graphs
 
 
 def plotGroupOverview(groupId, filterByDate = '' ):
-    
-    groupStudents     =  getStudentsOfLearningActivity(groupId)
-    studentDataDf     =  studentGrouped.getStudentsOfLearningActivityDF(groupId)
-    
-    if filterByDate:
-        dateGroup = studentDataDf.groupby(  [ studentDataDf['CreatedAt'].dt.date ] )
-        studentDataDf = dateGroup.get_group(filterByDate)
-
-
     plots               = []
-    
-#    if not studentDataDf is None and not studentDataDf.empty:
-    plots = util.plotGroupOverview(groupId, groupStudents, studentDataDf, classes = "c-card-medium")
-    
+    try:    
+        groupStudents     =  getStudentsOfLearningActivity(groupId)
+        studentDataDf     =  studentGrouped.getStudentsOfLearningActivityDF(groupId)
+        
+        if filterByDate:
+            dateGroup = studentDataDf.groupby(  [ studentDataDf['CreatedAt'].dt.date ] )
+            studentDataDf = dateGroup.get_group(filterByDate)
+
+    #    if not studentDataDf is None and not studentDataDf.empty:
+        plots = util.plotGroupOverview(groupId, groupStudents, studentDataDf, classes = "c-card-medium")
+    except Exception as e: 
+        print('plotGroupOverview ')
+        print(e)
+
+
     return plots
 
 
@@ -1425,50 +1444,15 @@ def display_class_concept(learningActivitySelected, filterByDate):
 #----------------------------------------
 
 
-# **IMPORTANT - Quantile Count must be updated when Adding Distribution Quantile Plots !!!!
-quantileCount = 9
-@app.callback(
-    [Output(f"groupDetails-collapse-distribution-{i}", "is_open") for i in range(quantileCount)],
-    [Input(f"groupDetails-collapse-distribution-button-{i}", "n_clicks") for i in range(quantileCount)],
-    [State(f"groupDetails-collapse-distribution-{i}", "is_open") for i in range(quantileCount)],
-)
-def onClickDistributionCollapseButton(*args):
-    ctx = dash.callback_context
-    
-    newToggle = [False] * (quantileCount)
-    
-    if not ctx.triggered:
-        return newToggle
-    
-    newToggle = [args[index] for index in range(quantileCount, len(args))]
-
-    
-    triggered_id = [p['prop_id'] for p in ctx.triggered][0]
-    clickedButton_id = triggered_id.split('.')[0]
-    
-    clickedButton_id_split = clickedButton_id.split('-')
-
-    clickedButton_index = int( clickedButton_id_split[  len(clickedButton_id_split) - 1 ] )
-    
-    if clickedButton_index >= 0  and  args[clickedButton_index] :
-        newToggle[clickedButton_index] = not args[quantileCount + clickedButton_index ]   # add 1 for URL pathname param
-        
-    
-    return newToggle
-
-
-
-
-
 
 @app.callback(Output('groupDetails-selector-date', 'options'), [Input('group-selector-main', 'value')])
 def set_options_date(groupId):
-    #if  util.isValidValueId(groupId) :
+    if  util.isValidValueId(groupId) :
 
-     #   print('set_options_date Hey There ')
-      #  groupDateOptions = studentGrouped.getGroupDateOptions(groupId)
+       print('set_options_date Hey There ')
+       groupDateOptions = studentGrouped.getGroupDateOptions(groupId)
         
-     #   return groupDateOptions
+       return groupDateOptions
     
     return []
 
@@ -1523,5 +1507,11 @@ def update_download_link__details_group(groupMain):
     if  not util.isValidValueId(groupMain):
         return "", "hidden"
     
-    csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(int(groupMain)) )
+    csv_string = ""
+    try:
+        csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(int(groupMain)) )
+    except Exception as e: 
+        print('update_download_link__details_group ')
+        print(e)
+    
     return csv_string, ""

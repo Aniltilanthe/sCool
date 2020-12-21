@@ -406,6 +406,12 @@ def update_download_link_custom_group(groupMain):
     if  not util.isValidValueId(groupMain) :
         return "", "disabled"
     
-    csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(int(groupMain)) )
+    csv_string = ""
+    try:
+        csv_string = util.get_download_link_data_uri( studentGrouped.getStudentsOfLearningActivityDF(int(groupMain)) )
+    except Exception as e: 
+        print('custom update_download_link_custom_group ')
+        print(e)
+    
     return csv_string, ""
 

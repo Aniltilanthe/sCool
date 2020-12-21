@@ -203,12 +203,16 @@ def getStudentData(StudentId, schoolKey, selectedDate = '' ):
 
 #Check if Student is in a Group
 def isStudentInGroup(StudentId, groupId) :
-    groupStudents = getStudentsOfLearningActivity(groupId)
-    
-    if  not StudentId in groupStudents:
-        return False
-    
-    return True
+    try:
+        groupStudents = getStudentsOfLearningActivity(groupId)
+        
+        if  not StudentId in groupStudents:
+            return False
+        
+        return True
+
+    except Exception as e: 
+        print(e)
 
 
 studentOverviewFeaturesDefault =   {
@@ -232,235 +236,246 @@ def plotStudentOverview(StudentId, groupId):
     
     graphs = []
     
-    
-#    the student is not in the group
-    if not isStudentInGroup(StudentId, groupId) :
-        return graphs
-    
-    
+    try:
 
-    studentDataDf                     = getStudentData(StudentId, groupId)
-    
-    if studentDataDf is None or studentDataDf.empty == True :
-        graphs.append(
-                util.getNoDataMsg()
-        )
-        return graphs
+    #    the student is not in the group
+        if not isStudentInGroup(StudentId, groupId) :
+            return graphs
+        
+        
 
-    
-    studentDataDf.fillna(0, inplace=True)
-    graphs = util.plotStudentOverview(studentDataDf , classes = "c-card-small" )
-    
-    
-    
-    plotRow = []
-    
-    
-    
-    groupOriginal                           = dfGroupedOriginal.get_group(groupId)
-    
-    groupOriginal['ConceptsUsed']           = groupOriginal['Code'].apply( studentGrouped.getAllNodeTypesUsefull )
-    groupOriginal["ConceptsUsedDetails"]    = groupOriginal['ConceptsUsed'].replace(
-                                                    constants.ProgramConceptsUsefull2UserNames, regex=True )
-    
-    
-    studentWiseData                         = groupOriginal.groupby(['StudentId'], as_index=False).sum()
-    studentDataDfPractice                   = studentWiseData[studentWiseData['StudentId'] == StudentId]
-    
-    
-    
-    studentDataDfSuccess                    =     studentDataDf[studentDataDf['Result'].astype('Int64') > 0 ]
-    
-    if studentDataDfSuccess is not None and studentDataDfSuccess.empty is False  and 'Task' in studentDataDfSuccess.columns:        
-        plotRow.append( html.Div([  
-                
-                                    util.generateCardDetail([html.I(className="fas fa-cubes m-right-small"),   'No. of Tasks completed'], 
-                                        '' + util.millify(len(studentDataDfSuccess['Task'].unique())), 
-                                        '' + str(  len(studentDataDfSuccess[studentDataDfSuccess[constants.featureTaskType] == constants.TaskTypePractice ]['Task'].unique()) ), 
-                                        '' + str(  len(studentDataDfSuccess[studentDataDfSuccess[constants.featureTaskType] == constants.TaskTypeTheory ]['Task'].unique()) ), 
-                                        constants.labelTotal  ,
-                                        constants.TaskTypePractice,
-                                        constants.TaskTypeTheory ,
-                                        classes = "c-card-small" 
-                                        )
-                                ],
-                                className="col-sm-4",
-                        ))   
-#        plotRow.append( html.Div([  
-#                                    util.generateCardBase([html.I(className="fas fa-cubes m-right-small"),   'Tasks completed'], 
-#                                                           
-#                                                           ', '.join(studentDataDfSuccess['Task'].unique()), 
-#                                                           
-#                                                           classes = "c-card-small"),
-#                                ],
-#                                className="col-sm-8",
-#                        ))
+        studentDataDf                     = getStudentData(StudentId, groupId)
         
-    for feature2OKey in studentOverviewFeaturesDefault.keys():
-        currentFeatureO = studentOverviewFeaturesDefault.get(feature2OKey)
+        if studentDataDf is None or studentDataDf.empty == True :
+            graphs.append(
+                    util.getNoDataMsg()
+            )
+            return graphs
+
         
-        if constants.keyHasMeanStd in currentFeatureO.keys() and   currentFeatureO.get(constants.keyHasMeanStd):
-            plotRow.append( html.Div([
-                                    util.generateCardDetail(
-                                                [html.I(className =  html.I(className=  currentFeatureO.get(constants.keyClassName)) +  " m-right-small"), 
-                                                 ((constants.feature2UserNamesDict.get(feature2OKey)) if feature2OKey in constants.feature2UserNamesDict.keys() else feature2OKey ) ], 
-                                                studentDataDf[feature2OKey].sum().round(decimals=2) ,
-                                                studentDataDf[feature2OKey].mean().round(decimals=2) , 
-                                                studentDataDf[feature2OKey].std().round(decimals=2) , 
-                                                constants.labelTotal  ,
-                                                constants.labelMean ,
-                                                constants.labelStd ,
-                                                classes = "c-card-small" )
+        studentDataDf.fillna(0, inplace=True)
+        graphs = util.plotStudentOverview(studentDataDf , classes = "c-card-small" )
+        
+        
+        
+        plotRow = []
+        
+        
+        
+        groupOriginal                           = dfGroupedOriginal.get_group(groupId)
+        
+        groupOriginal['ConceptsUsed']           = groupOriginal['Code'].apply( studentGrouped.getAllNodeTypesUsefull )
+        groupOriginal["ConceptsUsedDetails"]    = groupOriginal['ConceptsUsed'].replace(
+                                                        constants.ProgramConceptsUsefull2UserNames, regex=True )
+        
+        
+        studentWiseData                         = groupOriginal.groupby(['StudentId'], as_index=False).sum()
+        studentDataDfPractice                   = studentWiseData[studentWiseData['StudentId'] == StudentId]
+        
+        
+        
+        studentDataDfSuccess                    =     studentDataDf[studentDataDf['Result'].astype('Int64') > 0 ]
+        
+        if studentDataDfSuccess is not None and studentDataDfSuccess.empty is False  and 'Task' in studentDataDfSuccess.columns:        
+            plotRow.append( html.Div([  
+                    
+                                        util.generateCardDetail([html.I(className="fas fa-cubes m-right-small"),   'No. of Tasks completed'], 
+                                            '' + util.millify(len(studentDataDfSuccess['Task'].unique())), 
+                                            '' + str(  len(studentDataDfSuccess[studentDataDfSuccess[constants.featureTaskType] == constants.TaskTypePractice ]['Task'].unique()) ), 
+                                            '' + str(  len(studentDataDfSuccess[studentDataDfSuccess[constants.featureTaskType] == constants.TaskTypeTheory ]['Task'].unique()) ), 
+                                            constants.labelTotal  ,
+                                            constants.TaskTypePractice,
+                                            constants.TaskTypeTheory ,
+                                            classes = "c-card-small" 
+                                            )
                                     ],
                                     className="col-sm-4",
-                            ))
-
-
+                            ))   
+    #        plotRow.append( html.Div([  
+    #                                    util.generateCardBase([html.I(className="fas fa-cubes m-right-small"),   'Tasks completed'], 
+    #                                                           
+    #                                                           ', '.join(studentDataDfSuccess['Task'].unique()), 
+    #                                                           
+    #                                                           classes = "c-card-small"),
+    #                                ],
+    #                                className="col-sm-8",
+    #                        ))
             
-        else :
-            if feature2OKey in studentDataDfPractice.columns :
+        for feature2OKey in studentOverviewFeaturesDefault.keys():
+            currentFeatureO = studentOverviewFeaturesDefault.get(feature2OKey)
+            
+            if constants.keyHasMeanStd in currentFeatureO.keys() and   currentFeatureO.get(constants.keyHasMeanStd):
                 plotRow.append( html.Div([
-                                            util.generateCardBase(
-                                                    [   html.I(className=  currentFeatureO.get(constants.keyClassName) +  " m-right-small"), 
-                                                         ((constants.feature2UserNamesDict.get(feature2OKey)) if feature2OKey in constants.feature2UserNamesDict.keys() else feature2OKey ) ], 
-                                                    studentDataDfPractice[feature2OKey].sum() ,
+                                        util.generateCardDetail(
+                                                    [html.I(className =  html.I(className=  currentFeatureO.get(constants.keyClassName)) +  " m-right-small"), 
+                                                    ((constants.feature2UserNamesDict.get(feature2OKey)) if feature2OKey in constants.feature2UserNamesDict.keys() else feature2OKey ) ], 
+                                                    studentDataDf[feature2OKey].sum().round(decimals=2) ,
+                                                    studentDataDf[feature2OKey].mean().round(decimals=2) , 
+                                                    studentDataDf[feature2OKey].std().round(decimals=2) , 
+                                                    constants.labelTotal  ,
+                                                    constants.labelMean ,
+                                                    constants.labelStd ,
                                                     classes = "c-card-small" )
                                         ],
                                         className="col-sm-4",
                                 ))
-            elif feature2OKey in studentDataDf.columns :
-                plotRow.append( html.Div([
-                                            util.generateCardBase(
-                                                    [   html.I(className=  currentFeatureO.get(constants.keyClassName) +  " m-right-small"), 
-                                                         ((constants.feature2UserNamesDict.get(feature2OKey)) if feature2OKey in constants.feature2UserNamesDict.keys() else feature2OKey ) ], 
-                                                    studentDataDf[feature2OKey].sum() ,
-                                                    classes = "c-card-small" )
-                                        ],
-                                        className="col-sm-4",
-                                ))
-    
+
+
+                
+            else :
+                if feature2OKey in studentDataDfPractice.columns :
+                    plotRow.append( html.Div([
+                                                util.generateCardBase(
+                                                        [   html.I(className=  currentFeatureO.get(constants.keyClassName) +  " m-right-small"), 
+                                                            ((constants.feature2UserNamesDict.get(feature2OKey)) if feature2OKey in constants.feature2UserNamesDict.keys() else feature2OKey ) ], 
+                                                        studentDataDfPractice[feature2OKey].sum() ,
+                                                        classes = "c-card-small" )
+                                            ],
+                                            className="col-sm-4",
+                                    ))
+                elif feature2OKey in studentDataDf.columns :
+                    plotRow.append( html.Div([
+                                                util.generateCardBase(
+                                                        [   html.I(className=  currentFeatureO.get(constants.keyClassName) +  " m-right-small"), 
+                                                            ((constants.feature2UserNamesDict.get(feature2OKey)) if feature2OKey in constants.feature2UserNamesDict.keys() else feature2OKey ) ], 
+                                                        studentDataDf[feature2OKey].sum() ,
+                                                        classes = "c-card-small" )
+                                            ],
+                                            className="col-sm-4",
+                                    ))
         
-    if groupOriginal[groupOriginal['StudentId'] == StudentId] is not None  and groupOriginal[groupOriginal['StudentId'] == StudentId]['ConceptsUsedDetails'].shape[0] > 0 :        
-        try :
-            ConceptsUsedUnique                      = util.get_unique_list_feature_items(groupOriginal[groupOriginal['StudentId'] == StudentId], 'ConceptsUsedDetails')
             
-            if     ConceptsUsedUnique is not None  :        
+        if groupOriginal[groupOriginal['StudentId'] == StudentId] is not None  and groupOriginal[groupOriginal['StudentId'] == StudentId]['ConceptsUsedDetails'].shape[0] > 0 :        
+            try :
+                ConceptsUsedUnique                      = util.get_unique_list_feature_items(groupOriginal[groupOriginal['StudentId'] == StudentId], 'ConceptsUsedDetails')
                 
-                ConceptsUsedUniqueUserReadable = set()
-                for conceptUsed in ConceptsUsedUnique:
-                    ConceptsUsedUniqueUserReadable.add(  constants.ProgramConceptsUsefull2UserNames.get(conceptUsed) if 
-                                                        conceptUsed in constants.ProgramConceptsUsefull2UserNames 
-                                                        else 
-                                                        conceptUsed  )
-                
-                plotRow.append( html.Div([
-                                            util.generateCardBase(
-                                                    [html.I(className="fas fa-code m-right-small"),   'Concepts Used', ], 
-                                                    ', '.join(ConceptsUsedUniqueUserReadable) ,
-                                                    classes = "c-card-small" )
-                                        ],
-                                        className="col-sm-6",
-                                ))
+                if     ConceptsUsedUnique is not None  :        
+                    
+                    ConceptsUsedUniqueUserReadable = set()
+                    for conceptUsed in ConceptsUsedUnique:
+                        ConceptsUsedUniqueUserReadable.add(  constants.ProgramConceptsUsefull2UserNames.get(conceptUsed) if 
+                                                            conceptUsed in constants.ProgramConceptsUsefull2UserNames 
+                                                            else 
+                                                            conceptUsed  )
+                    
+                    plotRow.append( html.Div([
+                                                util.generateCardBase(
+                                                        [html.I(className="fas fa-code m-right-small"),   'Concepts Used', ], 
+                                                        ', '.join(ConceptsUsedUniqueUserReadable) ,
+                                                        classes = "c-card-small" )
+                                            ],
+                                            className="col-sm-6",
+                                    ))
 
-        except Exception as e: 
-            print(' student overview Concepts Used Error ')
-            print(e)
-    
-    if studentDataDfSuccess is not None and studentDataDfSuccess.empty is False  and 'Task' in studentDataDfSuccess.columns:        
-#        get tasks unique and courses
+            except Exception as e: 
+                print(' student overview Concepts Used Error ')
+                print(e)
         
-        print('skill studentdatadf')
+        if studentDataDfSuccess is not None and studentDataDfSuccess.empty is False  and 'Task' in studentDataDfSuccess.columns:        
+    #        get tasks unique and courses
+            
+            print('skill studentdatadf')
 
-        tasksCompleted = studentDataDfSuccess['Task'].unique()
-        dfTasksCompleted = dfTaskDetails[dfTaskDetails['Task'].isin(tasksCompleted)]        
+            tasksCompleted = studentDataDfSuccess['Task'].unique()
+            dfTasksCompleted = dfTaskDetails[dfTaskDetails['Task'].isin(tasksCompleted)]        
+            
+            for courseIdAttempt in dfTasksCompleted['CourseId'].unique():
+                plotRow.append( getCourseProgressCard(courseIdAttempt, dfTasksCompleted )  )
+
         
-        for courseIdAttempt in dfTasksCompleted['CourseId'].unique():
-            plotRow.append( getCourseProgressCard(courseIdAttempt, dfTasksCompleted )  )
+
+
+        graphs.append(
+                html.Div(children  = plotRow,                
+                        className = "row")
+        )
 
     
+    except Exception as e: 
+        print(e)
 
-
-    graphs.append(
-            html.Div(children  = plotRow,                
-                     className = "row")
-    )
 
 
     return graphs
 
 
 def getCourseProgressCard(courseId, dfTasksCompleted ):
-    courseSkillIdAttempt = dfTasksCompleted[dfTasksCompleted['CourseId'] == courseId]['SkillId'].unique()
+    try:
+        courseSkillIdAttempt = dfTasksCompleted[dfTasksCompleted['CourseId'] == courseId]['SkillId'].unique()
+                
+        skillsDiv = []
+        for skillIdAttempt in courseSkillIdAttempt:
+            skillTitle = dfTaskDetails[dfTaskDetails['SkillId'] == skillIdAttempt]['TitleSkill'].unique()
             
-    skillsDiv = []
-    for skillIdAttempt in courseSkillIdAttempt:
-        skillTitle = dfTaskDetails[dfTaskDetails['SkillId'] == skillIdAttempt]['TitleSkill'].unique()
-        
-        dfSkillTaskCompleted = dfTasksCompleted[dfTasksCompleted['SkillId'] == skillIdAttempt]
-        skillTaskCount = len(dfTaskDetails[dfTaskDetails['SkillId'] == skillIdAttempt][constants.featureTask].unique())
-        progressSkill = math.ceil(  len(dfSkillTaskCompleted[constants.featureTask].unique()) * 100 / skillTaskCount  )
-        
-        
-        tasksCompletedDetails =  []
-        
-        for taskId in dfSkillTaskCompleted[constants.featureTask].unique() :
-            currentTask = dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]
-            tasksCompletedDetails.append(html.Details(
+            dfSkillTaskCompleted = dfTasksCompleted[dfTasksCompleted['SkillId'] == skillIdAttempt]
+            skillTaskCount = len(dfTaskDetails[dfTaskDetails['SkillId'] == skillIdAttempt][constants.featureTask].unique())
+            progressSkill = math.ceil(  len(dfSkillTaskCompleted[constants.featureTask].unique()) * 100 / skillTaskCount  )
+            
+            
+            tasksCompletedDetails =  []
+            
+            for taskId in dfSkillTaskCompleted[constants.featureTask].unique() :
+                currentTask = dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]
+                tasksCompletedDetails.append(html.Details(
+                            children = [
+                                    html.Summary(currentTask['Title']),
+                                    html.P('Task:' + str(taskId) + 
+                                        ';   Description: '  + currentTask['Description']),
+                                ],
+                                className = " c-details " + (   "type-practice"  if currentTask[constants.featureTaskType].iloc[0] == constants.TaskTypePractice else "type-theory"  )
+                        ))
+            
+            skillsDiv.append(html.Div(children= [
+                html.Div(
                         children = [
-                                html.Summary(currentTask['Title']),
-                                html.P('Task:' + str(taskId) + 
-                                       ';   Description: '  + currentTask['Description']),
-                            ],
-                            className = " c-details " + (   "type-practice"  if currentTask[constants.featureTaskType].iloc[0] == constants.TaskTypePractice else "type-theory"  )
-                    ))
+                                    dbc.Progress(str(progressSkill) + "%", value = progressSkill, className= " c-progress ",
+                                                color = "success" if progressSkill == 100 else "primary", ), 
+                                    html.Div( skillTitle + '-' +  str(skillIdAttempt) ),
+                                    html.Div(
+                                            children = [ 'Skill' ],
+                                            className="card_value_label"
+                                        ) ],
+                        className=" card_value_details  col-2  "
+                    ),
+                html.Div(
+                        children =[ html.Div(
+                                            children = [ 'Tasks' ],
+                                            className="card_value_label"
+                                        ), 
+    #                    ', '.join(dfSkillTaskCompleted['Task'].unique()),
+                                    ] + tasksCompletedDetails,
+                        className=" card_value_details  col-10  align-left "
+                    ),
+            ], className= "  row  "))
         
-        skillsDiv.append(html.Div(children= [
-            html.Div(
-                    children = [
-                                dbc.Progress(str(progressSkill) + "%", value = progressSkill, className= " c-progress ",
-                                             color = "success" if progressSkill == 100 else "primary", ), 
-                                html.Div( skillTitle + '-' +  str(skillIdAttempt) ),
-                                html.Div(
-                                        children = [ 'Skill' ],
-                                        className="card_value_label"
-                                    ) ],
-                    className=" card_value_details  col-2  "
-                ),
-            html.Div(
-                    children =[ html.Div(
-                                        children = [ 'Tasks' ],
-                                        className="card_value_label"
-                                    ), 
-#                    ', '.join(dfSkillTaskCompleted['Task'].unique()),
-                                ] + tasksCompletedDetails,
-                    className=" card_value_details  col-10  align-left "
-                ),
-        ], className= "  row  "))
-    
-    courseTitle = dfTaskDetails[dfTaskDetails['CourseId'] == courseId]['TitleCourse'].unique()
-    courseTasksCount = len(dfTaskDetails[dfTaskDetails['CourseId'] == courseId]['Task'].unique())
-    courseTasksCompletedCount = len(dfTasksCompleted[dfTasksCompleted['CourseId'] == courseId]['Task'].unique())
-    progressCourse = math.ceil(  courseTasksCompletedCount * 100 / courseTasksCount  ) 
+        courseTitle = dfTaskDetails[dfTaskDetails['CourseId'] == courseId]['TitleCourse'].unique()
+        courseTasksCount = len(dfTaskDetails[dfTaskDetails['CourseId'] == courseId]['Task'].unique())
+        courseTasksCompletedCount = len(dfTasksCompleted[dfTasksCompleted['CourseId'] == courseId]['Task'].unique())
+        progressCourse = math.ceil(  courseTasksCompletedCount * 100 / courseTasksCount  ) 
 
-    return html.Div( html.Div(
-        [
-            html.Div(
-                children = [
-                            dbc.Progress(str(progressCourse) + "%", value = progressCourse, className= " c-progress ",
-                                             color = "success" if progressCourse == 100 else "primary", ), 
-                            html.Div( courseTitle + '-' +  str(courseId)  ),
-                            html.Div(
-                                    children = [ 'Course' ],
-                                    className="card_value_label"
-                                ),  ],
-                className="card_value_title col-12"
-            ),
-            html.Div(children = skillsDiv,
-                     className = "  col-12  "),
-        ],
-        className="c-card  c-card-small   row",
-    ),
-    className = "col-sm-12" )
+        return html.Div( html.Div(
+            [
+                html.Div(
+                    children = [
+                                dbc.Progress(str(progressCourse) + "%", value = progressCourse, className= " c-progress ",
+                                                color = "success" if progressCourse == 100 else "primary", ), 
+                                html.Div( courseTitle + '-' +  str(courseId)  ),
+                                html.Div(
+                                        children = [ 'Course' ],
+                                        className="card_value_label"
+                                    ),  ],
+                    className="card_value_title col-12"
+                ),
+                html.Div(children = skillsDiv,
+                        className = "  col-12  "),
+            ],
+            className="c-card  c-card-small   row",
+        ),
+        className = "col-sm-12" )
+    
+    except Exception as e: 
+        print(e)
+
 
 
 def plotStudentOverviewFeatures( StudentId, groupId, features2Overview ):
@@ -473,69 +488,74 @@ def plotStudentOverviewFeatures( StudentId, groupId, features2Overview ):
     
     graphs = []
     plotRow = []    
-    
-#    the student is not in the group
-    if not isStudentInGroup(StudentId, groupId) :
-        return graphs
-    
-    
 
-    studentDataDf                     = getStudentData(StudentId, groupId)
+    try:    
+    #    the student is not in the group
+        if not isStudentInGroup(StudentId, groupId) :
+            return graphs
+        
+        
+
+        studentDataDf                     = getStudentData(StudentId, groupId)
+        
+        if studentDataDf is None or studentDataDf.empty == True :
+            graphs.append(
+                    util.getNoDataMsg()
+            )
+            return graphs
+        
+        
+    #    studentDataDf = studentDataDf.drop_duplicates(subset=['StudentId', 'Task'], keep='last')
+        studentDataDf.fillna(0, inplace=True)
     
-    if studentDataDf is None or studentDataDf.empty == True :
-        graphs.append(
-                util.getNoDataMsg()
-        )
-        return graphs
     
-    
-#    studentDataDf = studentDataDf.drop_duplicates(subset=['StudentId', 'Task'], keep='last')
-    studentDataDf.fillna(0, inplace=True)
-    
-    try:
-#        For Mean and STD cards !!!
-#        studentDataDfMean           = studentDataDf.mean().round(decimals=2)
-#        studentDataDfStd            = studentDataDf.std().round(decimals=2)
-#        
-#        studentDataDfMean.fillna(0, inplace=True)
-#        studentDataDfStd.fillna(0, inplace=True)
-    
-        for feature2O in features2Overview :
+        try:
+    #        For Mean and STD cards !!!
+    #        studentDataDfMean           = studentDataDf.mean().round(decimals=2)
+    #        studentDataDfStd            = studentDataDf.std().round(decimals=2)
+    #        
+    #        studentDataDfMean.fillna(0, inplace=True)
+    #        studentDataDfStd.fillna(0, inplace=True)
+        
+            for feature2O in features2Overview :
+                
+                plotRow.append(
+                    html.Div([
+                            
+                            util.generateCardBase( 
+                                ((constants.feature2UserNamesDict.get(feature2O)) if feature2O in constants.feature2UserNamesDict.keys() else feature2O ) 
+                                    , 
+                                                '' + util.millify( studentDataDf[ feature2O ].sum().round(decimals=2) ), 
+                                                classes = "c-card-small"
+                                                )
+                            
+    #        For Mean and STD cards !!!
+    #                       util.generateCardDetail( 
+    #                               ((constants.feature2UserNamesDict.get(feature2O)) if feature2O in constants.feature2UserNamesDict.keys() else feature2O ) 
+    #                                , 
+    #                                            '' + util.millify( studentDataDf[ feature2O ].sum().round(decimals=2) ), 
+    #                                            '' + str( studentDataDfMean[ feature2O ] ), 
+    #                                            '' + str( studentDataDfStd[ feature2O ] ), 
+    #                                            'total',
+    #                                            'mean',
+    #                                            'std',
+    #                                            classes = "c-card-small"
+    #                                            )
+                        ],            
+                        className="col-sm-4",
+                    ))
+        except Exception as e: 
+            print(e)
             
-            plotRow.append(
-                html.Div([
-                        
-                        util.generateCardBase( 
-                               ((constants.feature2UserNamesDict.get(feature2O)) if feature2O in constants.feature2UserNamesDict.keys() else feature2O ) 
-                                , 
-                                            '' + util.millify( studentDataDf[ feature2O ].sum().round(decimals=2) ), 
-                                            classes = "c-card-small"
-                                            )
-                        
-#        For Mean and STD cards !!!
-#                       util.generateCardDetail( 
-#                               ((constants.feature2UserNamesDict.get(feature2O)) if feature2O in constants.feature2UserNamesDict.keys() else feature2O ) 
-#                                , 
-#                                            '' + util.millify( studentDataDf[ feature2O ].sum().round(decimals=2) ), 
-#                                            '' + str( studentDataDfMean[ feature2O ] ), 
-#                                            '' + str( studentDataDfStd[ feature2O ] ), 
-#                                            'total',
-#                                            'mean',
-#                                            'std',
-#                                            classes = "c-card-small"
-#                                            )
-                    ],            
-                    className="col-sm-4",
-                ))
+        
+        graphs.append(
+                html.Div(children  = plotRow,                
+                        className = "row")
+        )    
     except Exception as e: 
         print(e)
-        
-      
-    graphs.append(
-            html.Div(children  = plotRow,                
-                     className = "row")
-    )
-    
+
+
     return graphs
         
 
@@ -544,136 +564,136 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
     
     graphs = []
     
-    
-#    the student is not in the group
-    if not isStudentInGroup(StudentId, schoolKey) :
-        return graphs
-    
+    try:    
+    #    the student is not in the group
+        if not isStudentInGroup(StudentId, schoolKey) :
+            return graphs
+        
 
-    studentData                     = getStudentData(StudentId, schoolKey, studentSelectedDate)
+        studentData                     = getStudentData(StudentId, schoolKey, studentSelectedDate)
 
-    if studentData is None or studentData.empty == True :
+        if studentData is None or studentData.empty == True :
+            graphs.append(
+                    util.getNoDataMsg()
+            )
+            return graphs
+        
+            
+    #    studentData                     = studentData.sort_values(by='Start')
+            
+        isAscending = True
+        if None is not studentGraphDirection and not studentGraphDirection == '' and studentGraphDirection == sortOrderDescending :
+            isAscending = False
+            
+        studentData.sort_values(by = 'Start', inplace=True, ascending = isAscending )
+        
+        studentData.loc[studentData[constants.featureTaskType]  == constants.TaskTypePractice, 'color']      =   constants.colorPractice
+        studentData.loc[studentData[constants.featureTaskType]  == constants.TaskTypeTheory, 'color']        =   constants.colorTheory
+        studentData.loc[(studentData[constants.featureTaskType]  == constants.TaskTypePractice ) & 
+                        (studentData['Result']  == 0), 'color']                                              =   constants.colorPracticeError
+        studentData.loc[(studentData[constants.featureTaskType]  == constants.TaskTypeTheory ) & 
+                        (studentData['Result']  == 0), 'color']                                              =   constants.colorTheoryError
+
+        studentData['Task'] = studentData['IndexCol']
+        studentData['Text'] = studentData['Difference'].astype(str) + 's for ' + studentData[constants.featureTaskType].astype(str) + ' Task : ' +  studentData['Title' ]  + ' Result : ' +  studentData['Result'].astype(str)
+
+        colors  = {
+                constants.TaskTypePractice  : constants.colorPractice,
+                constants.TaskTypeTheory : constants.colorTheory,
+                constants.TaskTypePractice + '-1' : constants.colorPractice,
+                constants.TaskTypeTheory + '-1' : constants.colorTheory,
+                constants.TaskTypePractice + '-0' : constants.colorPracticeError,
+                constants.TaskTypeTheory + '-0' : constants.colorTheoryError,
+        }
+        
+        studentData['IndexSuccFail'] = studentData[constants.featureTaskType] + '-' +  studentData['Result'].astype(str)
+        
+        
+        graphHeightRows =  ( studentData.shape[0] * 40 )
+        graphHeightRows = graphHeightRows if (graphHeightRows > (constants.graphHeightMin + 100) ) else (constants.graphHeightMin + 100)
+        
+        
+        #type 2 
+        fig = go.Figure()
+        fig.add_traces(go.Bar(
+                        x               =  studentData['Difference'],
+                        y               = studentData['StartStr'] ,
+                        text            = studentData['Text'] , 
+                        textposition    = 'auto'  ,    
+                        orientation     = 'h',
+                        marker          =  dict( color = studentData['color']   ) ,
+                        customdata      = np.stack(( studentData['Title'],
+                                                studentData['Description'] 
+                                ), axis=-1) ,
+                        hovertemplate   = "<br>" +
+                                    "%{customdata[1]}<br>"     
+                                    
+                                    )
+                        )
+        fig.update_layout(
+                                            height          =   graphHeightRows , 
+                                            title_text      = 'Details of student\'s game interactions'
+                                                , yaxis = dict(
+                                                    title = 'Time',
+                                                    titlefont_size = 16,
+                                                    tickfont_size = 14,
+                                                ), xaxis = dict(
+                                                    title = 'Duration (s)',
+                                                    titlefont_size = 16,
+                                                    tickfont_size = 14,
+                                )                   
+                                    )
         graphs.append(
-                util.getNoDataMsg()
-        )
-        return graphs
-    
-        
-#    studentData                     = studentData.sort_values(by='Start')
-        
-    isAscending = True
-    if None is not studentGraphDirection and not studentGraphDirection == '' and studentGraphDirection == sortOrderDescending :
-        isAscending = False
-        
-    studentData.sort_values(by = 'Start', inplace=True, ascending = isAscending )
-    
-    studentData.loc[studentData[constants.featureTaskType]  == constants.TaskTypePractice, 'color']      =   constants.colorPractice
-    studentData.loc[studentData[constants.featureTaskType]  == constants.TaskTypeTheory, 'color']        =   constants.colorTheory
-    studentData.loc[(studentData[constants.featureTaskType]  == constants.TaskTypePractice ) & 
-                    (studentData['Result']  == 0), 'color']                                              =   constants.colorPracticeError
-    studentData.loc[(studentData[constants.featureTaskType]  == constants.TaskTypeTheory ) & 
-                    (studentData['Result']  == 0), 'color']                                              =   constants.colorTheoryError
-
-    studentData['Task'] = studentData['IndexCol']
-    studentData['Text'] = studentData['Difference'].astype(str) + 's for ' + studentData[constants.featureTaskType].astype(str) + ' Task : ' +  studentData['Title' ]  + ' Result : ' +  studentData['Result'].astype(str)
-
-    colors  = {
-            constants.TaskTypePractice  : constants.colorPractice,
-            constants.TaskTypeTheory : constants.colorTheory,
-            constants.TaskTypePractice + '-1' : constants.colorPractice,
-            constants.TaskTypeTheory + '-1' : constants.colorTheory,
-            constants.TaskTypePractice + '-0' : constants.colorPracticeError,
-            constants.TaskTypeTheory + '-0' : constants.colorTheoryError,
-    }
-    
-    studentData['IndexSuccFail'] = studentData[constants.featureTaskType] + '-' +  studentData['Result'].astype(str)
-    
-    
-    graphHeightRows =  ( studentData.shape[0] * 40 )
-    graphHeightRows = graphHeightRows if (graphHeightRows > (constants.graphHeightMin + 100) ) else (constants.graphHeightMin + 100)
-    
-    
-    #type 2 
-    fig = go.Figure()
-    fig.add_traces(go.Bar(
-                    x               =  studentData['Difference'],
-                    y               = studentData['StartStr'] ,
-                    text            = studentData['Text'] , 
-                    textposition    = 'auto'  ,    
-                    orientation     = 'h',
-                    marker          =  dict( color = studentData['color']   ) ,
-                    customdata      = np.stack(( studentData['Title'],
-                                            studentData['Description'] 
-                            ), axis=-1) ,
-                    hovertemplate   = "<br>" +
-                                  "%{customdata[1]}<br>"     
-                                  
-                                )
+                
+                    dcc.Graph(
+                        figure= fig
                     )
-    fig.update_layout(
-                                        height          =   graphHeightRows , 
-                                        title_text      = 'Details of student\'s game interactions'
-                                             , yaxis = dict(
-                                                title = 'Time',
-                                                titlefont_size = 16,
-                                                tickfont_size = 14,
-                                            ), xaxis = dict(
-                                                title = 'Duration (s)',
-                                                titlefont_size = 16,
-                                                tickfont_size = 14,
-                            )                   
-                                )
-    graphs.append(
-            
-                dcc.Graph(
-                    figure= fig
-                )
-            
-            if  constants.languageLocal  != 'en' else
-            
-                dcc.Graph(
-                    figure= fig
-                     
-                    , config  =  dict (locale   =  constants.languageLocal   ) 
-                )
-        )
-    
-    
-    
-#    gantt chart for timeline 
-#    if studentData is not None and studentData.empty == False :    
-    studentData['Task'] = studentData['GroupBy']
-    
-    graphHeightRows =  ( len(studentData['Task'].unique()) * 40 )
-    graphHeightRows = graphHeightRows if (graphHeightRows > (constants.graphHeightMin + 100) ) else (constants.graphHeightMin + 100)
+                
+                if  constants.languageLocal  != 'en' else
+                
+                    dcc.Graph(
+                        figure= fig
+                        
+                        , config  =  dict (locale   =  constants.languageLocal   ) 
+                    )
+            )
+        
+        
+        
+    #    gantt chart for timeline 
+    #    if studentData is not None and studentData.empty == False :    
+        studentData['Task'] = studentData['GroupBy']
+        
+        graphHeightRows =  ( len(studentData['Task'].unique()) * 40 )
+        graphHeightRows = graphHeightRows if (graphHeightRows > (constants.graphHeightMin + 100) ) else (constants.graphHeightMin + 100)
 
-    fig = ff.create_gantt(studentData, 
-                          title             =   constants.labelStudentTimeline , 
-                          colors            =   colors ,
-                          index_col         =   'IndexSuccFail' , 
-                          group_tasks       =   True ,
-                          show_colorbar     =   True , 
-                          bar_width         =   0.8 , 
-                          showgrid_x        =   True , 
-                          showgrid_y        =   True ,
-                          show_hover_fill   =   True ,
-                          height            =   graphHeightRows ,
-                          )
-    
-    graphs.append(
-            
-                dcc.Graph(
-                    figure= fig
-                )
-            
-            if  constants.languageLocal  != 'en' else
-            
-                dcc.Graph(
-                    figure= fig
-                     
-                    , config  =  dict (locale   =  constants.languageLocal   ) 
-                )
-    )
+        fig = ff.create_gantt(studentData, 
+                            title             =   constants.labelStudentTimeline , 
+                            colors            =   colors ,
+                            index_col         =   'IndexSuccFail' , 
+                            group_tasks       =   True ,
+                            show_colorbar     =   True , 
+                            bar_width         =   0.8 , 
+                            showgrid_x        =   True , 
+                            showgrid_y        =   True ,
+                            show_hover_fill   =   True ,
+                            height            =   graphHeightRows ,
+                            )
+        
+        graphs.append(
+                
+                    dcc.Graph(
+                        figure= fig
+                    )
+                
+                if  constants.languageLocal  != 'en' else
+                
+                    dcc.Graph(
+                        figure= fig
+                        
+                        , config  =  dict (locale   =  constants.languageLocal   ) 
+                    )
+        )
 
 # **** IMPORTANT - ff.create_gantt is deprecated -> moved to px.timeline 
 #    studentData['StartStr'] = studentData['Start'].dt.strftime('%Y-%m-%d %H:%M:%S')
@@ -690,93 +710,14 @@ def plotStudent(StudentId, schoolKey, studentSelectedDate = '', studentGraphDire
 #        ))
     
     
+    except Exception as e: 
+        print(e)
+
     
     return graphs
 
 
 
-#featureOptionsOverview = [
-#     'Result',
-#     'Points',
-#     'SessionDuration',
-#     'Attempts',
-#     'CollectedCoins',
-#     
-#     'Difficulty',
-#     
-#     'NumberOfCoins',
-#     'NumberOfHidden',
-#     'lineOfCodeCount',
-#     'runsCount',
-#     'runsErrorCount',
-#     'runsSuccessCount',
-#     'runsErrorSyntaxCount',
-#     'runsErrorNameCount',
-#     'runsErrorTypeCount',
-#     'runsErrorAttribiteCount',
-#     
-#     'hasLoop',
-#     'hasNestedLoop',
-#     'hasCondition',
-#     'hasVariable',
-#     'hasExpressions',
-#     'hasAsyncOrAwait',
-#     'hasFunctionClass',
-#     'hasControlFlow',
-#     'hasImports',
-#     'hasStatements',
-#     'hasComprehensions',
-#     'hasSubscripting',
-#     'hasExpressionsArithematic',
-#     'hasExpressionsBool',
-#     'hasExpressionsLogical',
-#     'hasExpressionsBitwise',
-#     'hasExpressionsDict',
-#     'hasExpressionsDataStructure',
-#     'hasExpressionsFunctionCall',
-#     'hasControlFlowConditional',
-#     'hasControlFlowTryException',
-#     'hasExpressionsDict',
-#     'hasVariablesNamed',
-#     'hasConstantsUseful',
-#     'hasExpressionsKeyword',
-#     'hasConstants',
-#     'hasVariables',
-#     
-#     'runsHasLoopCount',
-#     'runsHasNestedLoopCount',
-#     'runsHasConditionCount',
-#     'runsHasVariableCount',
-#     'runsHasExpressionsCount',
-#     'runsHasAsyncOrAwaitCount',
-#     'runsHasFunctionClassCount',
-#     'runsHasControlFlowCount',
-#     'runsHasImportsCount',
-#     'runsHasStatementsCount',
-#     'runsHasComprehensionsCount',
-#     'runsHasSubscriptingCount',
-#     'runsLineOfCodeCountAvg',
-#     
-#     
-#     'draggedCount',
-#     'tabsSwitchedCount',
-#     'tabsSwitchedDescriptionCount',
-#     'tabsSwitchedCodeCount',
-#     'tabsSwitchedOutputCount',
-#     'deletedCodesCount',
-#     'robotCollisionsBoxCount',
-#     'coinCollectedCount',
-#     'keyboardKeyPressedCount',
-#     'studentAttemptsTotal',
-#     'enemiesCount',
-#     'playerShootCount',
-#     'playerShootEndCount',
-#     'playerShootEndEnemyHitCount',
-#     'playerShootEndEnemyMissedHitCount',
-#     'enemysShootEndPlayerHitCount',
-#     'enemysShootEndPlayerNotHitCount',
-#     'itemsCollectedCount'
-# ]
 
 featuresToExclude = [
              'PracticeTaskId',
@@ -802,9 +743,6 @@ def getFeatureOptions():
     newFeatureOptionsList = list(set(mergedList) - set(featuresToExclude))
    
     return util.BuildOptionsFeatures( newFeatureOptionsList )
-    
-#    return util.BuildOptionsFeatures( featureOptionsOverview )
-    
     
         
 
@@ -982,17 +920,17 @@ def setStudentDateOptions(studentSelected, groupSelected ):
 
 
 
-@app.callback(
-         Output('student-date-dropdown', 'value'), 
-         [  Input('student-selector-dropdown', 'value') , ],
-        state = [ State(component_id='group-selector-main', component_property='value') ] 
-)
-def setStudentDateOptionsClear(studentSelected, groupSelected):        
-    if  not util.isValidValueId(groupSelected)  or   not util.isValidValueId(studentSelected)  :
-        return ''   
+# @app.callback(
+#          Output('student-date-dropdown', 'value'), 
+#          [  Input('student-selector-dropdown', 'value') , ],
+#         state = [ State(component_id='group-selector-main', component_property='value') ] 
+# )
+# def setStudentDateOptionsClear(studentSelected, groupSelected):        
+#     if  not util.isValidValueId(groupSelected)  or   not util.isValidValueId(studentSelected)  :
+#         return ''   
     
-    if not isStudentInGroup(studentSelected, groupSelected) :
-        return ''
+#     if not isStudentInGroup(studentSelected, groupSelected) :
+#         return ''
 
 
 
@@ -1149,7 +1087,12 @@ def update_download_link__details_student( studentSelected, studentSelectedDate,
     #    the student is not in the group
     if not isStudentInGroup(studentSelected, groupMain) :
         return defaultValues
-        
-    csv_string = util.get_download_link_data_uri( getStudentData(int(studentSelected), int(groupMain) , format(studentSelectedDate)  ))
+
+    csv_string = ""
+    try:    
+        csv_string = util.get_download_link_data_uri( getStudentData(int(studentSelected), int(groupMain) , format(studentSelectedDate)  ))
+    except Exception as e: 
+        print('groupStudents update_download_link__details_student ')
+        print(e)
     
     return csv_string, ""

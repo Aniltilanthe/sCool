@@ -326,10 +326,28 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
 
     dfOriginalMean = gameDataStudent.groupby(groupByAll, as_index = False).mean().round(decimals=2)
     dfOriginalMedian = gameDataStudent.groupby(groupByAll, as_index = False).median().round(decimals=2)
-    dfOriginalStd = gameDataStudent.groupby(groupByAll, as_index = False).agg([np.std])
-    dfOriginalStd.reset_index(level=0, inplace=True)
-    dfOriginalStd = dfOriginalStd.round(decimals=2)
-    dfOriginalStd.columns = dfOriginalStd.columns.droplevel(1)
+    
+    try:
+        dfOriginalStd = gameDataStudent.groupby(groupByAll, as_index = False).agg([np.std])
+        dfOriginalStd.reset_index(level=0, inplace=True)
+        dfOriginalStd = dfOriginalStd.round(decimals=2)
+        dfOriginalStd.columns = dfOriginalStd.columns.droplevel(1)
+    except Exception as e: 
+        try:
+            list_df = []
+            for key, group in gameDataStudent.groupby(groupByAll, as_index = False):
+                list_df.append(
+                    group.apply([np.std])
+                )
+
+            dfOriginalStd = pd.concat(list_df)
+            dfOriginalStd.reset_index(level=0, inplace=True)
+            dfOriginalStd = dfOriginalStd.round(decimals=2)
+            dfOriginalStd.columns = dfOriginalStd.columns.droplevel(1)
+        except Exception as e: 
+            print('plotGamePlots exception in second trial of creating dfOriginalStd !!!! ')
+            print(e)
+    
     
         
     if 'gameDataDfGroupedSum' in locals()     and    ( gameDataDfGroupedSum is not None  )    and   ( not  gameDataDfGroupedSum.empty )   :

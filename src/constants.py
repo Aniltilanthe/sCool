@@ -8,7 +8,7 @@ Created on Mon Jul  6 22:42:22 2020
 
 Driver = 'MySQL ODBC 8.0 Driver'
 Server = 'codislabgraz.org'
-DatabaseName = 'theseswebTest'
+DatabaseName = 'thesesweb'
 Uid = 'scool'
 Pwd = '6R45gynw429wCIXO'
 Port = '3306'

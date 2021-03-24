@@ -1,1 +1,4 @@
-# sCoolLa-app
+# sCool Learning Analytics application
+
+
+

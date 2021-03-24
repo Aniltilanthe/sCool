@@ -333,6 +333,8 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         dfOriginalStd = dfOriginalStd.round(decimals=2)
         dfOriginalStd.columns = dfOriginalStd.columns.droplevel(1)
     except Exception as e: 
+        
+        print(e)
         try:
             list_df = []
             for key, group in gameDataStudent.groupby(groupByAll, as_index = False):
@@ -347,7 +349,6 @@ def plotGamePlots (feature1 = '',  feature2 = '', feature3 = '',
         except Exception as e: 
             print('plotGamePlots exception in second trial of creating dfOriginalStd !!!! ')
             print(e)
-    
     
         
     if 'gameDataDfGroupedSum' in locals()     and    ( gameDataDfGroupedSum is not None  )    and   ( not  gameDataDfGroupedSum.empty )   :

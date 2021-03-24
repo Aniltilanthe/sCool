@@ -1,15 +1,21 @@
-pip install numpy
-pip install panda
-pip install pyodbc 
-pip install Flask
-pip install flask_login
-pip install dash
-pip install plotly
-pip install dash_html_components
-pip install dash_core_components
-pip install sklearn
-pip install seaborn
-pip install scipy
-pip install statsmodels
-pip install dash-auth
-pip install dash_bootstrap_components
+numpy==1.20.1
+panda==0.3.1
+dash==1.18.1
+dash-auth==1.4.1
+dash-bootstrap-components==0.11.1
+dash-core-components==1.14.1
+dash-html-components==1.1.1
+dash-renderer==1.8.3
+dash-table==4.11.1
+Flask==1.1.2
+Flask-Compress==1.8.0
+Flask-Login==0.5.0
+Flask-SeaSurf==0.3.0
+panda==0.3.1
+plotly==4.14.2
+pyodbc
+python-dateutil==2.8.1
+scikit-image==0.17.2
+sklearn==0.0
+statsmodels
+mysql-connector-python==8.0.23

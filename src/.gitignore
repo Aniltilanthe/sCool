@@ -1,0 +1,4 @@
+__pycache__/
+apps/__pycache__/
+data/__pycache__/
+*.cpython-37

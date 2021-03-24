@@ -38,11 +38,24 @@ import constants
 imputer = impu.SimpleImputer(missing_values = "NaN", strategy = "mean")
 
 
-DatabaseName = constants.DatabaseName
+Driver          = constants.Driver
+Server          = constants.Server
+DatabaseName    = constants.DatabaseName
+Uid             = constants.Uid
+Pwd             = constants.Pwd
+Port            = constants.Port
 
-conn = pyodbc.connect('Driver={SQL Server};'
-                      'Server=localhost\SQLEXPRESS;'
-                      'Database='+ DatabaseName +';'
+
+print('Hello Anil ')
+
+print(pyodbc.drivers() )
+
+conn = pyodbc.connect('Driver={' + Driver +'};'
+                      'Server=' + Server + ';'
+                      'Database=' + DatabaseName + ';'
+                      'Uid=' + Uid + ';'
+                      'Pwd=' + Pwd + ';'
+                      'Port=' + Port + ';'
                       'Trusted_Connection=yes;')
 
 
@@ -455,14 +468,14 @@ def getTheoryData():
      + ' , en.EnrolledId, en.LearningActivity_LearningActivityId '
 
     
-     + '  FROM [' + DatabaseName +'].[dbo].[Students] s ' 
+     + '  FROM Students s ' 
      
      
-     + '  JOIN [' + DatabaseName +'].[dbo].[TheoryStatistics] tstat ON tstat.Student_StudentId = s.studentId ' 
-     + '  JOIN [' + DatabaseName +'].[dbo].[TheoryTasks] ttask ON ttask.TheoryTaskId = tstat.TheoryTask_TheoryTaskId ' 
-     + '  JOIN [' + DatabaseName +'].[dbo].[Skills] skill ON skill.SkillId = ttask.Skill_SkillId ' 
-     + '  JOIN [' + DatabaseName +'].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
-     + '  JOIN [' + DatabaseName +'].[dbo].[Enrolleds] en ON en.Course_CourseId = c.CourseId AND en.Student_StudentId = s.StudentId'  
+     + '  JOIN TheoryStatistics tstat ON tstat.Student_StudentId = s.studentId ' 
+     + '  JOIN TheoryTasks ttask ON ttask.TheoryTaskId = tstat.TheoryTask_TheoryTaskId ' 
+     + '  JOIN Skills skill ON skill.SkillId = ttask.Skill_SkillId ' 
+     + '  JOIN Courses c ON c.CourseId = skill.Course_CourseId ' 
+     + '  JOIN Enrolleds en ON en.Course_CourseId = c.CourseId AND en.Student_StudentId = s.StudentId'  
     
      + '  WHERE s.IsConsentGiven = 1 '
      , conn)
@@ -519,10 +532,10 @@ def getTheoryTaskDetails():
      + ' , skill.SkillId '
      + ' , c.CourseId , c.isVisible '
     
-     + '  FROM [' + DatabaseName +'].[dbo].[TheoryTasks] ttask  ' 
+     + '  FROM TheoryTasks ttask  ' 
      
-     + '  JOIN [' + DatabaseName +'].[dbo].[Skills] skill ON skill.SkillId = ttask.Skill_SkillId ' 
-     + '  JOIN [' + DatabaseName +'].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
+     + '  JOIN Skills skill ON skill.SkillId = ttask.Skill_SkillId ' 
+     + '  JOIN Courses c ON c.CourseId = skill.Course_CourseId ' 
      , conn)
                     
     return dfTheoryTaskDetails
@@ -557,14 +570,14 @@ def getPracticeData():
      
      + ' , en.EnrolledId, en.LearningActivity_LearningActivityId '
     
-     + '  FROM [' + DatabaseName +'].[dbo].[Students] s ' 
+     + '  FROM Students s ' 
      
      
-     + '  JOIN [' + DatabaseName +'].[dbo].[PracticeStatistics] pstat ON pstat.Student_StudentId = s.studentId ' 
-     + '  JOIN [' + DatabaseName +'].[dbo].[PracticeTasks] ptask ON ptask.PracticeTaskId = pstat.PracticeTask_PracticeTaskId ' 
-     + '  JOIN [' + DatabaseName +'].[dbo].[Skills] skill ON skill.SkillId = ptask.Skill_SkillId ' 
-     + '  JOIN [' + DatabaseName +'].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
-     + '  JOIN [' + DatabaseName +'].[dbo].[Enrolleds] en ON en.Course_CourseId = c.CourseId AND en.Student_StudentId = s.StudentId'  
+     + '  JOIN PracticeStatistics pstat ON pstat.Student_StudentId = s.studentId ' 
+     + '  JOIN PracticeTasks ptask ON ptask.PracticeTaskId = pstat.PracticeTask_PracticeTaskId ' 
+     + '  JOIN Skills skill ON skill.SkillId = ptask.Skill_SkillId ' 
+     + '  JOIN Courses c ON c.CourseId = skill.Course_CourseId ' 
+     + '  JOIN Enrolleds en ON en.Course_CourseId = c.CourseId AND en.Student_StudentId = s.StudentId'  
     
      + '  WHERE s.IsConsentGiven = 1 '
      , conn)
@@ -609,10 +622,10 @@ def getPracticeTaskDetails():
      + ' , skill.SkillId '
      + ' , c.CourseId, c.isVisible '
      
-     + '  FROM [' + DatabaseName +'].[dbo].[PracticeTasks] ptask ' 
+     + '  FROM PracticeTasks ptask ' 
      
-     + '  JOIN [' + DatabaseName +'].[dbo].[Skills] skill ON skill.SkillId = ptask.Skill_SkillId ' 
-     + '  JOIN [' + DatabaseName +'].[dbo].[Courses] c ON c.CourseId = skill.Course_CourseId ' 
+     + '  JOIN Skills skill ON skill.SkillId = ptask.Skill_SkillId ' 
+     + '  JOIN Courses c ON c.CourseId = skill.Course_CourseId ' 
 
      , conn)
                     
@@ -628,9 +641,9 @@ def getSkillDetails():
  
      + ', course.CourseId, course.User_Id , course.isVisible '
 
-     + '  FROM [' + DatabaseName +'].[dbo].[Skills] skill ' 
+     + '  FROM Skills skill ' 
  
-     + '  JOIN [' + DatabaseName +'].[dbo].[Courses] course ON course.CourseId = skill.Course_CourseId ' 
+     + '  JOIN Courses course ON course.CourseId = skill.Course_CourseId ' 
      , conn)
                 
     return dfSkillDetails
@@ -641,7 +654,7 @@ def getCourseDetails():
 
      + ' course.CourseId, course.Title, course.Description, course.User_Id , course.isVisible, course.CreatedAt , course.UpdatedAt  '
     
-     + '  FROM [' + DatabaseName +'].[dbo].[Courses] course ' 
+     + '  FROM Courses course ' 
      , conn)
                     
     return dfCourseDetails
@@ -656,10 +669,10 @@ def getEnrolledDetails():
  
      + ', s.StudentId, s.Name '
     
-     + '  FROM [' + DatabaseName +'].[dbo].[Enrolleds] enrol ' 
+     + '  FROM Enrolleds enrol ' 
  
-     + '  JOIN [' + DatabaseName +'].[dbo].[Courses] course  ON course.CourseId = enrol.Course_CourseId ' 
-     + '  JOIN [' + DatabaseName +'].[dbo].[Students] s   ON s.StudentId = enrol.Student_StudentId ' 
+     + '  JOIN Courses course  ON course.CourseId = enrol.Course_CourseId ' 
+     + '  JOIN Students s   ON s.StudentId = enrol.Student_StudentId ' 
      
      + '  WHERE s.IsConsentGiven = 1 '
      , conn)
@@ -681,9 +694,9 @@ def getStudentDetails():
      + ' , en.EnrolledId, en.LearningActivity_LearningActivityId, en.Course_CourseId '
      
      
-     + '  FROM [' + DatabaseName +'].[dbo].[Students] s ' 
+     + '  FROM Students s ' 
      
-     + '  JOIN [' + DatabaseName +'].[dbo].[Enrolleds] en ON  en.Student_StudentId = s.StudentId'  
+     + '  JOIN Enrolleds en ON  en.Student_StudentId = s.StudentId'  
      
      + '  WHERE s.IsConsentGiven = 1 '
      , conn)
@@ -705,7 +718,7 @@ def getUsers():
                                    
      + ' u.Id, u.IsAdmin, u.Email, u.PasswordHash, u.UserName, u.SecurityStamp  ' 
     
-     + '  FROM [' + DatabaseName +'].[dbo].[AspNetUsers] u ' 
+     + '  FROM AspNetUsers u ' 
      , conn)
                     
     return dfUserDetails
@@ -716,7 +729,7 @@ def getUserDetails(usernameOrId):
                                    
      + ' u.Id, u.IsAdmin, u.Email, u.PasswordHash, u.UserName, u.SecurityStamp  ' 
     
-     + '  FROM [' + DatabaseName +'].[dbo].[AspNetUsers] u ' 
+     + '  FROM AspNetUsers u ' 
      
      + '  WHERE u.Email = \'' + usernameOrId + '\'   OR   u.UserName = \'' + usernameOrId + '\'  OR   u.Id = \'' + usernameOrId + '\''
      , conn)
@@ -734,9 +747,9 @@ def getLearningActivityDetails():
      + ', u.Id, u.IsAdmin , u.Email '
      + ', u.UserName , u.PasswordHash '
     
-     + '  FROM [' + DatabaseName +'].[dbo].[LearningActivity] la ' 
+     + '  FROM LearningActivity la ' 
  
-     + '  JOIN [' + DatabaseName +'].[dbo].[AspNetUsers] u ON u.Id = la.User_Id ' 
+     + '  JOIN AspNetUsers u ON u.Id = la.User_Id ' 
      , conn)
                     
     return dfLearningActivityDetails

@@ -5,21 +5,18 @@ Run me :
 
 ```
 docker run -p 5000:5000 aniltilanthe/scool-la-app
-
 ```
 
 Build me: 
 
 ```
 docker build -t aniltilanthe/scool-la-app .
-
 ```
 
 Clone me from docker hub :  
 
 ```
 docker pull aniltilanthe/scool-la-app
-
 ```
 
 Docker hub repo :  

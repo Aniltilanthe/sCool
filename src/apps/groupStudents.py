@@ -731,6 +731,11 @@ featuresToExclude = [
              'TheoryStatisticsId',  
              'EnrolledId', 'SkillId', 'TheoryTaskId', 
              'LearningActivityId', 'CourseId', 'studentAttemptsTotal'
+             
+
+             # because complicated to explain
+             ,'runsHasVariablesNamedCount' , 'runsHasVariablesCount'
+             ,'hasVariablesNamed', 'hasVariables', 'hasVariable'
 ]
 
 def getFeatureOptions():

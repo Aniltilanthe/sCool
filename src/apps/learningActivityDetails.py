@@ -178,6 +178,9 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                     ))
 
 #---------------------------        Datatable task wise success fail    ---------------------------
+        
+        
+        graphTitle = '(Practice)  No. of students completing a Task '
         dfTaskWiseSuccessFail = pd.DataFrame(index=np.arange(0, 1), columns=['Task', constants.featureDescription, labelSuccess, labelFail, 'SessionDuration', 'Type',
                                              'Skill', 'Course', constants.featureTaskId])
         
@@ -191,7 +194,8 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
         for groupKeyTaskId, groupTask in pieDataTaskWisePracticeGrouped:
             dfTaskWiseSuccessFail.loc[index_dfTaskWiseSuccessFail] =  getTaskWiseSuccessFail(groupTask, groupKeyTaskId,  dfPracticeTaskDetails, 'PracticeTaskId', 'Practice')
             index_dfTaskWiseSuccessFail += 1
-                
+
+        '''       
         try :        
             pieDataTaskWiseTheory = groupOriginalTheory.groupby(['TheoryTaskId', 'StudentId'], as_index=False).sum()
             pieDataTaskWiseTheory.loc[pieDataTaskWiseTheory['Result'] > 0, 'Result'] = 1   
@@ -204,7 +208,8 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
         except Exception as e: 
             print('in the theory exception ')
             print(e)
-        
+        '''
+
         # convert column of DataFrame to Numeric Int
         dfTaskWiseSuccessFail[labelSuccess] = pd.to_numeric(dfTaskWiseSuccessFail[labelSuccess], downcast='integer')
         dfTaskWiseSuccessFail[labelFail] = pd.to_numeric(dfTaskWiseSuccessFail[labelFail], downcast='integer')
@@ -232,6 +237,9 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
         
         table = dbc.Table(table_header + table_body, bordered=True)
         
+        graphs.append(html.Div( graphTitle,
+                                className= "heading-sub practice"
+                    )) 
         graphs.append(html.Div(table ,
                          className = "c-table c-table-oddeven font-size_small"
                     ))
@@ -266,7 +274,14 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             
             graphs.append(
                     html.Div(
-                        children = figStudents
+                        children = html.Details(
+                                    children = [
+                                            html.Summary([  html.I(className="fas fa-info m-right-small"),
+                                            "Show plot of (Practice) No. of students completing a Task " ]),
+                                            html.Div(figStudents),
+                                        ],
+                                            className = " c-container "
+                                )
                 ))
             graphIndex = graphIndex + 1
         except Exception as e: 
@@ -274,6 +289,65 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                 print(e)
                 
         try :
+            
+            graphTitle = '(Theory)  No. of students completing a Task '
+
+            dfTaskWiseSuccessFailTheory = pd.DataFrame(index=np.arange(0, 1), columns=['Task', constants.featureDescription, labelSuccess, labelFail, 'SessionDuration', 'Type',
+                                                'Skill', 'Course', constants.featureTaskId])
+            
+            index_dfTaskWiseSuccessFailTheory = 0
+                    
+            try :        
+                pieDataTaskWiseTheory = groupOriginalTheory.groupby(['TheoryTaskId', 'StudentId'], as_index=False).sum()
+                pieDataTaskWiseTheory.loc[pieDataTaskWiseTheory['Result'] > 0, 'Result'] = 1   
+                pieDataTaskWiseTheoryGrouped = pieDataTaskWiseTheory.groupby(['TheoryTaskId'])
+            
+                for groupKeyTaskId, groupTask in pieDataTaskWiseTheoryGrouped:
+                    dfTaskWiseSuccessFailTheory.loc[index_dfTaskWiseSuccessFailTheory] =  getTaskWiseSuccessFail(groupTask, groupKeyTaskId,  dfTheoryTaskDetails, 'TheoryTaskId', 'Theory')
+                    index_dfTaskWiseSuccessFailTheory += 1
+
+            except Exception as e: 
+                print('in the theory exception ')
+                print(e)
+            
+            # convert column of DataFrame to Numeric Int
+            dfTaskWiseSuccessFailTheory[labelSuccess] = pd.to_numeric(dfTaskWiseSuccessFailTheory[labelSuccess], downcast='integer')
+            dfTaskWiseSuccessFailTheory[labelFail] = pd.to_numeric(dfTaskWiseSuccessFailTheory[labelFail], downcast='integer')
+            
+            
+            
+            table_header = [
+                html.Thead(html.Tr([html.Th("Task"), html.Th(labelSuccess), html.Th(labelFail), html.Th('Session Duration(s)'), html.Th('Type'), html.Th('Skill'), html.Th('Course'), html.Th('TaskId') ]))
+            ]
+            rows = []
+            for index, row in dfTaskWiseSuccessFailTheory.iterrows():
+
+                tds = []
+                for feature in dfTaskWiseSuccessFailTheory.columns:
+                    if not feature == constants.featureDescription :
+                        tds.append( html.Td(  str(  row[feature]  )  ) )
+
+                rows.append(  html.Tr(  tds ,
+                                    className =  (   "type-practice"  if row['Type'] == constants.TaskTypePractice else "type-theory"  )
+                                    ) )
+                rows.append( html.Tr([ html.Td(  row[constants.featureDescription]  , colSpan  = len(dfTaskWiseSuccessFailTheory.columns) - 1   )  ]) )
+                
+            
+            table_body = [html.Tbody(  rows   )]
+            
+            table = dbc.Table(table_header + table_body, bordered=True)
+            
+            graphs.append(html.Div( graphTitle,
+                                   className= "heading-sub theory p-top_large"
+                        )) 
+            graphs.append(html.Div(table ,
+                            className = "c-table c-table-oddeven font-size_small"
+                        ))
+            
+
+
+#       Plot 
+
             pieDataTheory = groupOriginalTheory.groupby(['TheoryTaskId', 'StudentId'], as_index=False).sum()
         
             pieDataTheory.loc[pieDataTheory['Result'] > 0, 'Result'] = 1
@@ -296,11 +370,17 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                            ['Title', 'TheoryTaskId'], 
                            isColored = True, hasMeanStd = False, hoverName = featureTheoryTaskDesc )
                      
-            
-            
+           
             graphs.append(
                     html.Div(
-                        children = figStudents
+                        children = html.Details(
+                                    children = [
+                                            html.Summary([  html.I(className="fas fa-info m-right-small"),
+                                            "Show plot of (Theory) no. of students completing a Task " ]),
+                                            html.Div(figStudents),
+                                        ],
+                                            className = " c-container "
+                                ) 
                 ))
             graphIndex = graphIndex + 1
         
@@ -344,12 +424,11 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                                 html.Details(
                                         children = [
                                                 html.Summary(dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['Title']),
-                                                html.P('Task:' + str(taskId) + 
-                                                       ';   Description: '  + dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['Description']),
+                                                html.P('Description: '  + dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['Description'] + '; Task:' + str(taskId) ),
                                                 html.P('Skill: '  + dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['TitleSkill']),
                                                 html.P('Course: '  + dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['TitleCourse']),
                                             ],
-                                            className = " c-details "
+                                            className = " c-details practice "
                                     )
                                   for taskId in 
                                                                   list(row[feature]) ] ), 
@@ -366,12 +445,30 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             
             table = dbc.Table(table_header + table_body, bordered=True)
             
+            
             graphs.append(html.Div( graphTitle,
-                                   className= "heading-sub practice"
+                                   className= "heading-sub practice  p-top_xx-large"
                         )) 
+            '''
             graphs.append(html.Div(table ,
                              className = "c-table c-table-oddeven font-size_small"
                         ))
+            '''
+
+            graphs.append(
+                html.Div(
+                        html.Details(
+                            children = [
+                                    html.Summary([  html.I(className="fas fa-info m-right-small"),
+                                    "Show data : " + graphTitle ]),
+                                    html.Div(table ,
+                                            className = "c-table c-table-oddeven font-size_small"
+                                        ),
+                                ],
+                                className = "  c-container  "
+                        ),
+                    className = " p-top_small "))  
+
         except Exception as e:             
             print( 'ERROR - ' + graphTitle )
             print(e)
@@ -411,11 +508,10 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                                         html.Details(
                                                 children = [
                                                         html.Summary(dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['Title']),
-                                                        html.P('Task:' + str(taskId) + 
-                                                               ';   Description: '  + dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['Description']),
+                                                        html.P( ' Description: '  + dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['Description'] + '; Task:' + str(taskId)  ),
                                                         html.P('Skill: '  + dfTaskDetails[dfTaskDetails[constants.featureTask] == taskId]['TitleSkill']),
                                                     ],
-                                                    className = " c-details "
+                                                    className = " c-details theory "
                                             )
                                           for taskId in 
                                                                   list(row[feature]) ] ), 
@@ -432,12 +528,27 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             
             table = dbc.Table(table_header + table_body, bordered=True)
             
+            
             graphs.append(html.Div( graphTitle,
-                                   className= "heading-sub theory"
+                                   className= "heading-sub theory p-top_xx-large"
                         )) 
+            '''
             graphs.append(html.Div(table ,
                              className = "c-table c-table-oddeven font-size_small"
-                        ))            
+                        ))     
+            '''
+
+            graphs.append(html.Div(html.Details(
+                        children = [
+                                html.Summary([  html.I(className="fas fa-info m-right-small"),
+                                "Show data : " + graphTitle ]),
+                                html.Div(table ,
+                                        className = "c-table c-table-oddeven font-size_small"
+                                ),
+                            ],
+                            className = " c-container  "
+                    ),
+                    className = " p-top_small  p-bottom_x-large "))           
             
         except Exception as e: 
             print( 'ERROR - ' + graphTitle )  
@@ -764,23 +875,29 @@ def plotGroupConceptDetails(groupId, filterByDate = '' ):
 #        Task wise concepts used - grouped together
         try :
             figBar = plotGroupTaskWiseConcepts(groupId, isGrouped = True, taskId = 0, filterByDate = filterByDate )
+            
             graphs.append(
-                    
-            
-                dcc.Graph(
-                    figure= figBar
-                )
-            
-                if  constants.languageLocal  != 'en' else
-            
-                dcc.Graph(
-                    figure= figBar
-                     
-                    , config  =  dict (locale   =  constants.languageLocal   ) 
-                )
-                    
-                
-                )
+                html.Div(html.Details(
+                            children = [
+                                    html.Summary([  html.I(className="fas fa-info m-right-small"),
+                                    "Show data : Concepts used by students in each task"  ]),
+                                    html.Div(
+                                        dcc.Graph(
+                                            figure= figBar
+                                        )
+                                    
+                                        if  constants.languageLocal  != 'en' else
+                                    
+                                        dcc.Graph(
+                                            figure= figBar
+                                            
+                                            , config  =  dict (locale   =  constants.languageLocal   ) 
+                                        )
+                                    ),
+                            ],
+                            className = " c-container p-top_xx-large  p-bottom_large  "
+            )))     
+
         except Exception as e: 
                 print('Task Concepts used')
                 print(e)                
@@ -971,8 +1088,9 @@ def getFeaturePlot(df, featureX, featureY, title, hoverData, isColored = False, 
 def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
     
     graphs = []
+    graphsMain = []
     
-    graphs.append(html.Div(id='General-Information',
+    graphsMain.append(html.Div(id='General-Information',
                        children = [html.H2('General Information')], 
                        className = "c-container p_medium p-top_xx-large", 
             ))
@@ -1176,7 +1294,21 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
         print(e)
 
 
-    return graphs        
+
+    graphsMain.append(
+        html.Div(html.Details(
+                    children = [
+                            html.Summary([  html.I(className="fas fa-info m-right-small"),
+                            "Show General Information "  ]),
+                            html.Div(
+                                graphs
+                            ),
+                    ],
+                    className = "c-container "
+    )))     
+    
+
+    return graphsMain      
 
 
 def getPlotDistributionPlotChildrens(graphDistributions, quantileIndex = 0):
@@ -1354,11 +1486,21 @@ layout = [
                     
     , dbc.Row([
             dbc.Col( 
-                dcc.Dropdown(
-                    id = "groupDetails-taskId-selector",
-                    placeholder = "Select Task to see details",
-                    options = [ {'label': 'Select a group', 'value' : '0'}  ]
+                html.Div(children=[
+                        html.Div( 'Task wise code submission and concept details',
+                                    className= "heading-sub practice  p-bottom_small"
+                        ),
+                        dcc.Dropdown(
+                            id = "groupDetails-taskId-selector",
+                            placeholder = "Select Task to see details",
+                            options = [ {'label': 'Select a group', 'value' : '0'}  ],
+                            className = " "
+                        )
+                    ],
+                    className = "  p-top_xx-large  p-bottom_large "
                 )
+
+                
        )])
     , dbc.Row([
           dbc.Col( 
@@ -1422,7 +1564,7 @@ def display_class_general(learningActivitySelected, filterByDate):
         return html.Div(graphs)
     
     graphs = plotSingleClassGeneral('School', int(learningActivitySelected), filterByDate = filterByDate )
-    
+
     graphs = graphs + [ html.Hr() ]
     
     return html.Div(graphs)

@@ -293,10 +293,10 @@ feature2UserNamesDict = {
 		,"runsHasControlFlowConditionalCount" : "Used Conditional Flows (no. of time in all code runs)"
 		,"runsHasExpressionsKeywordCount" : "Used Keywords (no. of time in all code runs)"
 		,"runsHasControlFlowTryExceptionCount" : "Used Try exception (no. of time in all code runs)"        
-		,"runsHasVariablesNamedCount" : "Used Variables (no. of time in all code runs)"
+		,"runsHasVariablesNamedCount" : "Used Variables (no. of time in all code runs) (Name, Name constant, Starred)"
 		,"runsHasConstantsUsefulCount" : "Used Constants (e.g. 3 or 'a') (no. of time in all code runs)"
 		,"runsHasConstantsCount" : "Used Constants (no. of time in all code runs)"
-		,"runsHasVariablesCount" : "Used Variables (Load, Store, Del, Name, Starred) (no. of time in all code runs)"
+		,"runsHasVariablesCount" : "Used Variables - Load, Store, Del, Name, Starred (no. of time in all code runs)"
 
 		,"hasLoop" : "Used Loop"
 		,"hasNestedLoop" : "Used Nested Loop"

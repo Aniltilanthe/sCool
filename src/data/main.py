@@ -45,9 +45,6 @@ Uid             = constants.Uid
 Pwd             = constants.Pwd
 Port            = constants.Port
 
-
-print('Hello Anil ')
-
 print(pyodbc.drivers() )
 
 conn = pyodbc.connect('Driver={' + Driver +'};'

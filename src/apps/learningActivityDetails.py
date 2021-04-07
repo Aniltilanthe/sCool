@@ -278,7 +278,8 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                                     children = [
                                             html.Summary([  html.I(className="fas fa-info m-right-small"),
                                             "Show plot of (Practice) No. of students completing a Task " ]),
-                                            html.Div(figStudents),
+                                            html.Div(figStudents ,
+                                            className = " p-top_medium "),
                                         ],
                                             className = " c-container "
                                 )
@@ -377,7 +378,8 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                                     children = [
                                             html.Summary([  html.I(className="fas fa-info m-right-small"),
                                             "Show plot of (Theory) no. of students completing a Task " ]),
-                                            html.Div(figStudents),
+                                            html.Div(figStudents,
+                                                    className = " p-top_medium "),
                                         ],
                                             className = " c-container "
                                 ) 
@@ -462,7 +464,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                                     html.Summary([  html.I(className="fas fa-info m-right-small"),
                                     "Show data : " + graphTitle ]),
                                     html.Div(table ,
-                                            className = "c-table c-table-oddeven font-size_small"
+                                            className = "c-table c-table-oddeven font-size_small p-top_medium"
                                         ),
                                 ],
                                 className = "  c-container  "
@@ -543,7 +545,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                                 html.Summary([  html.I(className="fas fa-info m-right-small"),
                                 "Show data : " + graphTitle ]),
                                 html.Div(table ,
-                                        className = "c-table c-table-oddeven font-size_small"
+                                        className = "c-table c-table-oddeven font-size_small p-top_medium"
                                 ),
                             ],
                             className = " c-container  "
@@ -1301,7 +1303,8 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
                             html.Summary([  html.I(className="fas fa-info m-right-small"),
                             "Show General Information "  ]),
                             html.Div(
-                                graphs
+                                graphs,
+                                className = " p-top_medium "
                             ),
                     ],
                     className = "c-container "
@@ -1400,8 +1403,17 @@ def plotClassOverview(schoolKey, filterByDate = '' ):
                     },
             ]) 
         )
+
         columns.append(dbc.Col(
-                        fig1Table 
+                        html.Details(
+                                    children = [
+                                            html.Summary([  html.I(className="fas fa-info m-right-small"),
+                                            "Show overview data " ]),
+                                            html.Div(fig1Table, 
+                                                    className = " p-top_medium  "),
+                                        ],
+                                            className = " c-container  p-top_medium  p-bottom_medium  "
+                                )  
                         , align ="center"                    
                         , className = "c-table "
         ))

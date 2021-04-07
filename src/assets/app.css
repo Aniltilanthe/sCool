@@ -427,6 +427,13 @@ html {
 }
 
 
+.theme-app details.c-container > summary {
+	background-color: #eef9fb;
+    padding: 0.5em 1em;
+}
+
+
+
 /* GLOBAL LOADING */
 ._dash-loading-callback {
   font-family: sans-serif;

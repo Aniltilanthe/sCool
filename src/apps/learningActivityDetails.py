@@ -277,7 +277,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                         children = html.Details(
                                     children = [
                                             html.Summary([  html.I(className="fas fa-info m-right-small"),
-                                            "Show plot of (Practice) No. of students completing a Task " ]),
+                                            "Plot of (Practice) No. of students completing a Task " ]),
                                             html.Div(figStudents ,
                                             className = " p-top_medium "),
                                         ],
@@ -377,7 +377,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                         children = html.Details(
                                     children = [
                                             html.Summary([  html.I(className="fas fa-info m-right-small"),
-                                            "Show plot of (Theory) no. of students completing a Task " ]),
+                                            "Plot of (Theory) no. of students completing a Task " ]),
                                             html.Div(figStudents,
                                                     className = " p-top_medium "),
                                         ],
@@ -462,7 +462,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
                         html.Details(
                             children = [
                                     html.Summary([  html.I(className="fas fa-info m-right-small"),
-                                    "Show data : " + graphTitle ]),
+                                    "Data : " + graphTitle ]),
                                     html.Div(table ,
                                             className = "c-table c-table-oddeven font-size_small p-top_medium"
                                         ),
@@ -543,7 +543,7 @@ def plotSingleClass( titleTextAdd, school, filterByDate = '' ):
             graphs.append(html.Div(html.Details(
                         children = [
                                 html.Summary([  html.I(className="fas fa-info m-right-small"),
-                                "Show data : " + graphTitle ]),
+                                "Data : " + graphTitle ]),
                                 html.Div(table ,
                                         className = "c-table c-table-oddeven font-size_small p-top_medium"
                                 ),
@@ -882,7 +882,7 @@ def plotGroupConceptDetails(groupId, filterByDate = '' ):
                 html.Div(html.Details(
                             children = [
                                     html.Summary([  html.I(className="fas fa-info m-right-small"),
-                                    "Show data : Concepts used by students in each task"  ]),
+                                    "Concepts used by students in each task"  ]),
                                     html.Div(
                                         dcc.Graph(
                                             figure= figBar
@@ -1301,7 +1301,7 @@ def plotSingleClassGeneral( titleTextAdd, school, filterByDate = '' ):
         html.Div(html.Details(
                     children = [
                             html.Summary([  html.I(className="fas fa-info m-right-small"),
-                            "Show General Information "  ]),
+                            "General Information "  ]),
                             html.Div(
                                 graphs,
                                 className = " p-top_medium "
@@ -1319,7 +1319,7 @@ def getPlotDistributionPlotChildrens(graphDistributions, quantileIndex = 0):
         html.Details(
             children = [
                     html.Summary([  html.I(className="fas fa-info m-right-small"),
-                    "Show Distribution" ]),
+                    "Distribution" ]),
                     html.Div(graphDistributions),
                 ],
         ),
@@ -1408,7 +1408,7 @@ def plotClassOverview(schoolKey, filterByDate = '' ):
                         html.Details(
                                     children = [
                                             html.Summary([  html.I(className="fas fa-info m-right-small"),
-                                            "Show overview data " ]),
+                                            "Overview data " ]),
                                             html.Div(fig1Table, 
                                                     className = " p-top_medium  "),
                                         ],

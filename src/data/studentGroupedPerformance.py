@@ -18,7 +18,7 @@ import plotly.express as px
 #main library
 from data import main
 import constants
-#from main import PythonParser
+#from main import PythonCodeParser
 
 
 # Fixing random state for reproducibility
@@ -253,7 +253,7 @@ keyboardKeyPressedCount = dfKeyboard.PracticeStatisticsId.value_counts()
 
 
 
-#The new Dataframe - to be used for Clustering algorithms !!! Yaay
+#The new Dataframe - to be used for Clustering algorithms
 dfPlayerStrategyPractice = dfPractice
 
 #---Code -----------

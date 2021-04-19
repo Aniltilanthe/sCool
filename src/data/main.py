@@ -45,7 +45,7 @@ Uid             = constants.Uid
 Pwd             = constants.Pwd
 Port            = constants.Port
 
-print(pyodbc.drivers() )
+#print(pyodbc.drivers() )
 
 conn = pyodbc.connect('Driver={' + Driver +'};'
                       'Server=' + Server + ';'
@@ -59,7 +59,9 @@ conn = pyodbc.connect('Driver={' + Driver +'};'
 
 
 
+#---------------------------------------------------------------------------------------------
 #------------------------------------Library functions Start----------------------------
+#---------------------------------------------------------------------------------------------
 
 positionFeature     = 'Position'
 positionFeatureX    = 'PositionX'
@@ -71,11 +73,6 @@ PlayerShootEndEnemyTypeDict = {'Bear': True, 'bear': True, 'BEAR': True,'Ground'
 
 
 
-def executeSQL(sqlQuery):    
-    df = pd.read_sql_query(sqlQuery, conn)
-    return df
-
-
 def read_json(json_data): 
     if (type(json_data) == str):  # For strings 
         return json.loads(json_data) 
@@ -85,41 +82,9 @@ def read_json(json_data):
         return json.loads(json.dumps(json_data))
 
 
-
-
-
-#Clean a Dataframe - removing null columns, rows, formatting etc...
-def cleanDfForClustering(df):
-    
-#    clustering algo only accepts numerical, boolean features !
-#    df = df.select_dtypes([np.number, np.bool])
-    df = df.select_dtypes([np.number])
-    
-#    drop columns with all null values
-    df = df.dropna(axis=1, how='all')
-    
-#    drop rows with null values
-    df = df.dropna()
-    
-    
-#    df = normalizeData(df)
-    
-    return df
-
-
-def normalizeData(df):
-#    normalize only numerical features
-    num_cols = df.columns[df.dtypes.apply(lambda c: np.issubdtype(c, np.number))]
-    return   ( df[num_cols] - df[num_cols].min() )  /  (df[num_cols].max() - df[num_cols].min())
-
-
-
 def get_group(g, key):
      if key in g.groups: return g.get_group(key)
      return pd.DataFrame()
-
-
-
 
 
 
@@ -169,7 +134,7 @@ def getConceptFeaturesFromCodeLines(df, featureCode):
         columnsFeatures = []
             
         try:
-            codeString = PythonParser( j[featureCode] )
+            codeString = PythonCodeParser( j[featureCode] )
         
             newFeaturesArrForThisRow.append(j['PracticeStatisticsId'])
             columnsFeatures.append('PracticeStatisticsId')
@@ -219,7 +184,7 @@ def getConceptFeaturesFromCode(df, featureCode, featureError, featureOutput):
         if j[featureError] == False :
             
             try:
-                codeString = PythonParser( j[featureCode] )
+                codeString = PythonCodeParser( j[featureCode] )
 
                 
                 for featureName in conceptFeaturesMap:
@@ -272,7 +237,7 @@ def getDfFromJsonFeature(jsonFeature, df, idFeatures):
 #    formatting 
     for idFeature in idFeatures:
         dfFeature.astype({idFeature: int})
-        toFormatNumeric(dfFeature, idFeature)        
+        toFormatNumeric(dfFeature, idFeature)
     if 'TheoryStatisticsId' in dfFeature.columns:
         dfFeature.astype({"TheoryStatisticsId": int})
         toFormatNumeric(dfFeature, 'TheoryStatisticsId')
@@ -367,48 +332,6 @@ def getPositionFeatures(df, featureName):
 
 
 
-def removeCorrelatedFeatures(data):
-    corr = data.corr()
-    columns = np.full((corr.shape[0],), True, dtype=bool)
-    for i in range(corr.shape[0]):
-        for j in range(i+1, corr.shape[0]):
-            if corr.iloc[i,j] >= 0.9:
-                if columns[j]:
-                    columns[j] = False
-    selected_columns = data.columns[columns]
-#    data = data[selected_columns]
-    return selected_columns
-
-
-def backwardElimination(x, Y, sl, columns):
-    numVars = len(x[0])
-    for i in range(0, numVars):
-        regressor_OLS = sm.OLS(Y, x).fit()
-        maxVar = max(regressor_OLS.pvalues).astype(float)
-        if maxVar > sl:
-            for j in range(0, numVars - i):
-                if (regressor_OLS.pvalues[j].astype(float) == maxVar):
-                    x = np.delete(x, j, 1)
-                    columns = np.delete(columns, j)
-                    
-    regressor_OLS.summary()
-    return x, columns
-
-
-def calculateConceptComplexityPoints(df, featureCode, featureError, featureOutput):
-    pointsLoop = 2
-    pointsLogic = 1
-    
-    df[featureOutput] = 0
-    df[featureOutput] = df[df[featureCode].str.contains("for ") & (df[featureError] == False ) ][featureOutput] + pointsLoop
-    df[featureOutput].fillna(0, inplace=True)
-    df[featureOutput] = df[df[featureCode].str.contains("if ") & (df[featureError] == False ) ][featureOutput] + pointsLogic
-    df[featureOutput].fillna(0, inplace=True)
-    
-    return df    
-
-
-
 
 #-------------------------Panda s function
 def convert_list_column_tostr(val):
@@ -429,12 +352,17 @@ def getColorMarkers():
     return colors, markers, markerfacecolors
 
 
+#---------------------------------------------------------------------------------------------
 #------------------------------------Library functions End------------------------
+#---------------------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------------
 #------------------------------------ DB Queries -------------------------------------
+#---------------------------------------------------------------------------------------------
 
+#---------------------------------------------------------------------------------------------
 #----------------------------------Theroy Part Start-----------------------------------
+#---------------------------------------------------------------------------------------------
 
 
 #
@@ -538,10 +466,14 @@ def getTheoryTaskDetails():
     return dfTheoryTaskDetails
 
 
+#---------------------------------------------------------------------------------------------
 #----------------------------------Practice Part Start-----------------------------------
+#---------------------------------------------------------------------------------------------
     
     
+#---------------------------------------------------------------------------------------------
 #------------------------------------ DB Queries -------------------------------------
+#---------------------------------------------------------------------------------------------
 def getPracticeData():
     
     dfPractice = pd.read_sql_query('SELECT  '
@@ -751,7 +683,9 @@ def getLearningActivityDetails():
                     
     return dfLearningActivityDetails
 
+#---------------------------------------------------------------------------------------------
 #------------------------------------ General Dataframe functions ----------------------------
+#---------------------------------------------------------------------------------------------
 
 GROUPBY_FEATURE     = constants.GROUPBY_FEATURE
 
@@ -763,8 +697,13 @@ def getGroupedData(df):
     return df.groupby(  [df[GROUPBY_FEATURE]] )
   
     
+
+
+
+
 #---------------------------------------------------------------------------------------------
 #---------------------------------- Code Parser ----------------------------------------------
+#---------------------------------------------------------------------------------------------
 
 def hasRecursion(expr):
     tree = ast.parse(expr, mode="exec")
@@ -821,14 +760,14 @@ def countOfLines(stringExpr):
 
 def getAllNodeTypes(expr):    
     try:
-      parser = PythonParser(expr)
+      parser = PythonCodeParser(expr)
       return parser.nodeTypes
     except:
       return ''
 
 def getAllNodeTypesUsefull(expr):    
     try:
-      parser = PythonParser(expr)
+      parser = PythonCodeParser(expr)
       return parser.nodeTypesUsefull
     except:
       return ''
@@ -937,7 +876,7 @@ ProgramConceptsUsefull = list(ProgramConceptsUsefull)
 #-----------------------------------------------------------------------------------------
 # PYTHON CODE PARSER
 #----------------------------------------------------------------------------------------
-class PythonParser:
+class PythonCodeParser:
     def __init__(self, expr):
         self.expr = expr
         self.tree = ast.parse(self.expr, mode="exec")

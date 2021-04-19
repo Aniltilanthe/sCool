@@ -65,8 +65,8 @@ RUN pip3 install -r requirements.txt
 COPY ./src .
 
 
-EXPOSE 5000
+EXPOSE 8090
 
 
 # command to run on container start
-CMD [ "python", "./index.py", "--host=0.0.0.0", "-p", "5000" ]
+CMD [ "python", "./index.py", "--host=0.0.0.0", "-p", "8090" ]

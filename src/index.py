@@ -246,7 +246,7 @@ def show_hide_sidebar(pathname, currentClasses):
 
 
 #if __name__ == "__main__":
-#    app.run_server(port=8888, debug=True)
+#    app.run_server(port=8090, debug=True)
 
 if __name__ == "__main__":
-    app.run_server(port=5000, host="0.0.0.0", debug=False)
+    app.run_server(port=8090, host="0.0.0.0", debug=False)

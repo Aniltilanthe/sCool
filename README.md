@@ -5,8 +5,9 @@ Run me :
 
 ```
 docker run -p 8090:8090 aniltilanthe/scool-la-app
-
-#  OR in detached mode with -d
+```
+Run me in detached mode with -d
+```
 docker run -d -p 8090:8090 aniltilanthe/scool-la-app
 ```
 

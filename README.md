@@ -4,7 +4,37 @@
 Run me : 
 
 ```
-docker run -p 5000:5000 aniltilanthe/scool-la-app
+docker run -p 8090:8090 aniltilanthe/scool-la-app
+```
+
+
+also further options try these:-
+
+```
+#map localhost:8090 to the container 8090        -    127.0.0.1 is the localhost
+docker run -d -p 127.0.0.1:8090:8090 aniltilanthe/scool-la-app
+```
+
+OR
+
+```
+#1 Automatically publish all ports exposed by container and binds them to random port on the host machine
+docker container run -P -d aniltilanthe/scool-la-app
+
+#2.a Find the host machine port using container_uuid
+docker container port *insert container_uuid*
+
+#2.b Or using netstat
+netstat -ntlp
+```
+
+check localhost
+
+```
+curl -I 0.0.0.0:8090
+
+#or
+curl -v 0.0.0.0:8090
 ```
 
 Build me: 

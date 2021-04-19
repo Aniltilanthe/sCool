@@ -1,18 +1,18 @@
 # sCool Learning Analytics application
 
 
-Run me : 
+(1) Run me 
 
 ```
 docker run -p 8090:8090 aniltilanthe/scool-la-app
 ```
-Run me in detached mode with -d
+(2) Run me in detached mode with -d  
 ```
 docker run -d -p 8090:8090 aniltilanthe/scool-la-app
 ```
 
 
-also further options try these:-
+(3) also further options try these  
 
 ```
 #map localhost:8090 to the container 8090        -    127.0.0.1 is the localhost
@@ -21,6 +21,7 @@ docker run -d -p 127.0.0.1:8090:8090 aniltilanthe/scool-la-app
 
 OR
 
+(4) -P Automatically publish all ports exposed by container and binds them to random port on the host machine
 ```
 #1 Automatically publish all ports exposed by container and binds them to random port on the host machine
 docker container run -P -d aniltilanthe/scool-la-app

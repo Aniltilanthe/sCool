@@ -19,6 +19,15 @@ docker run -d -p 8090:8090 aniltilanthe/scool-la-app
 docker run -d -p 127.0.0.1:8090:8090 aniltilanthe/scool-la-app
 ```
 
+
+(*) also   
+
+```
+#map localhost:8090 to the container 8090        -    127.0.0.1 is the localhost
+docker run -d -p 0.0.0.0:8090:8090 aniltilanthe/scool-la-app
+```
+
+
 OR
 
 (*) -P Automatically publish all ports exposed by container and binds them to random port on the host machine

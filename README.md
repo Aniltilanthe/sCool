@@ -118,6 +118,12 @@ pip install -r requirements.txt
 
 * To push and CI CD to Docker hub - push with tag
 ```
-git tag -a v1.0.2
+# lightweight
+git tag v1.0.2
+
+#  OR annotated   -  Annotated tags are stored as full objects in the Git database.
+git tag -a v1.0.2   -m "my version 1.0.2"
+
+
 git push origin v1.0.2
 ```

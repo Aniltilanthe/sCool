@@ -6,17 +6,13 @@ Created on Mon Mar  9 23:08:32 2020
 """
 
 
-#import pyodbc
 import numpy as np
 import pandas as pd
-#import xlwt as xls_write
-#import time
 
 from plotly.offline import plot
 import plotly.express as px
 
 
-#main library
 from data import main
 import constants
 #from main import PythonCodeParser
@@ -25,8 +21,6 @@ import constants
 
 # visual libraries
 from matplotlib import pyplot as plt
-#import seaborn as sns
-#from mpl_toolkits.mplot3d import Axes3D 
 plt.style.use('ggplot')
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go

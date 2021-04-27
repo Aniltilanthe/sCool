@@ -68,7 +68,7 @@ def getUserLAOptions():
 
 def generateControlCard():
     """
-    :return: A Div containing controls for graphs.
+    :return: A Div containing Learning Analytics Selection.
     """
     return html.Div(
         id="control-card-index",
@@ -177,10 +177,6 @@ def render_main_selector_content(pathname,
         userOptions = getUserLAOptions()
         value = ''
 
-        print('url change group selector main')
-        print(selectorOptions)
-        print(selectorValue)
-
         if selectorOptions and selectorValue:
            return selectorOptions, selectorValue
         
@@ -244,9 +240,10 @@ def show_hide_sidebar(pathname, currentClasses):
 
 
 
-
+# For Debug Mode
 #if __name__ == "__main__":
 #    app.run_server(port=8090, debug=True)
 
+# For deployment
 if __name__ == "__main__":
     app.run_server(port=8090, host="0.0.0.0", debug=False)

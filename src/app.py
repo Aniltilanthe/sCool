@@ -24,7 +24,6 @@ from flask_login import LoginManager, UserMixin
 
 import numpy as np
 import pandas as pd
-#from data import studentGrouped
 
 
 FA = "https://use.fontawesome.com/releases/v5.8.1/css/all.css"
@@ -76,17 +75,3 @@ class User(UserMixin):
 
     def is_admin(self):
         return self.isAdmin
-
-
-
-#VALID_USERNAME_PASSWORD_PAIRS = {
-#    'peter.lerchbacher@schule.at': 'peter.lerchbacher@schule.at',
-#    'a.kojic@live.com' : 'a.kojic@live.com'
-#}
-#
-#
-#
-#auth = dash_auth.BasicAuth(
-#    app,
-#    VALID_USERNAME_PASSWORD_PAIRS
-#)

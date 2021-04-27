@@ -221,7 +221,7 @@ sidebar = html.Div(
         , html.Div(
             [
                 html.Button(children=[
-                        html.I(className="fas fa-cogs font-size_medium p-right_xx-small"),
+                        html.I(className="fas fa-info font-size_medium p-right_xx-small"),
 #                        html.Span( 'Help', className = "menu-modal-help-button-text"  ) 
                         ],
                         id='menu-modal-setting-open', 

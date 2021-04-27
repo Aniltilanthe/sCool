@@ -92,7 +92,32 @@ pip install -r requirements.txt
 * Login Redirect form
 
 ```
-<form action="http://127.0.0.1:8888/login?securityStamp=<'securityStampString'>" method="post">
-  <input type="submit" value="sCool Data Visualization">
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login Page</title>
+</head>
+<body>
+<form action="http://codislabgraz.org:8090/login?securityStamp=<'securityStampString'>" method="post">
+  <input type="submit" value="Click to Login" style="height: 300px;
+    width: 300px;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    left: 40%;
+	font-size: 30px;">
 </form>
+</body>
+</html>
+```
+
+
+
+
+* To push and CI CD to Docker hub - push with tag
+```
+git tag -a v1.0.2
+git push origin v1.0.2
 ```

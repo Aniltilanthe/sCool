@@ -42,6 +42,8 @@ iconNameCustom      = constants.iconNameCustom
 
 
 
+# Used to generate Menu Links
+# provide href, where navigate to on click on the Menu Section
 menuLink = {
      "menu-link-0" : { keyLabel : 'Game Data', keyHref : '/Home',
                   keySubmenu : [ 
@@ -67,16 +69,18 @@ menuLink = {
                           ],  keyClassName : 'fas ' + iconNameCustom + ' m-right-small',
                           keyOnlyForAdmin : False    }
 }
+# Used to generate Menu Sub Links
+# provide Scroll to domElementId -> scroll to this domElement on click
 menuSubLink2Scroll = {
-		"menu-sub-link-0"  :  {keyLabel : "Overview", keyScrollTo: ''}
-		,"menu-sub-link-1" :  {keyLabel : "Compare Groups", keyScrollTo: 'row-control-main-overview'}
-		,"menu-sub-link-2" :  {keyLabel : "Distribution", keyScrollTo: "Group-Distribution-Information"}
-		,"menu-sub-link-3" :  {keyLabel : "Tasks Info", keyScrollTo: 'Task-Information'}
-		,"menu-sub-link-4" :  {keyLabel : "General Info", keyScrollTo: 'General-Information'}
-		,"menu-sub-link-7" :  {keyLabel : "Concept Info", keyScrollTo: 'Concept-Information'}
-		,"menu-sub-link-5" :  {keyLabel : "Student Info", keyScrollTo: 'student-information'}
-		,"menu-sub-link-6" :  {keyLabel : "Custom", keyScrollTo: ''}
-	}
+    "menu-sub-link-0"  :  {keyLabel : "Overview", keyScrollTo: ''}
+    ,"menu-sub-link-1" :  {keyLabel : "Compare Groups", keyScrollTo: 'row-control-main-overview'}
+    ,"menu-sub-link-2" :  {keyLabel : "Distribution", keyScrollTo: "Group-Distribution-Information"}
+    ,"menu-sub-link-3" :  {keyLabel : "Tasks Info", keyScrollTo: 'Task-Information'}
+    ,"menu-sub-link-4" :  {keyLabel : "General Info", keyScrollTo: 'General-Information'}
+    ,"menu-sub-link-7" :  {keyLabel : "Concept Info", keyScrollTo: 'Concept-Information'}
+    ,"menu-sub-link-5" :  {keyLabel : "Student Info", keyScrollTo: 'student-information'}
+    ,"menu-sub-link-6" :  {keyLabel : "Custom", keyScrollTo: ''}
+}
 
 
 spacer = [html.Div(className = "  m-bottom_x-small ")]
@@ -98,14 +102,10 @@ def getSubmenuButtons(menuKey):
 def getMenu():
     menus = []
     
-    print('getMenu ')
-    
     countMenuLink = 0
     countMenuSubLink = 0
     
-    isUserAdmin = False    
-    
-    print(current_user)
+    isUserAdmin = False  
     
     if current_user and current_user is not None   and   not isinstance(current_user, type(None))  and    current_user.is_authenticated:
         userDB = studentGrouped.getUserFromUserId(current_user.id)
@@ -116,9 +116,6 @@ def getMenu():
                 isUserAdmin = True
 
     
-    print('getMenu check isUserAdmin')
-    print(isUserAdmin)
-
     for menuKey in menuLink.keys():
         currentMenu = menuLink.get(menuKey)
         

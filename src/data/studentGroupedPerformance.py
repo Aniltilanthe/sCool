@@ -173,23 +173,21 @@ runsLineOfCodeCountAvg = dfRuns.groupby('PracticeStatisticsId')['lineOfCodeCount
 
 
 
-#lines of code
+#Code Concepts Used
 conceptFeaturesLines = main.getConceptFeaturesFromCodeLines(dfPractice, 'Code')
-#dfPractice = dfPractice.join(conceptFeaturesLines) 
 dfPractice = dfPractice.merge(conceptFeaturesLines, how='left')
 
 
 
 
-#remove all features which have no meaning -
-#which do not affect a student performance e.g. StudentId !!!
+#remove all features which are duplicates or have no meaning -
+#which do not affect a student performance e.g. Student_StudentId !!!
 to_drop2After = [           
 #           if these columns are still present - duplicate columns
            'Skill_SkillId', 'Course_CourseId', 'Student_StudentId', 'PracticeTask_PracticeTaskId'
            
            ]
-
-
+           
 dfPractice.drop(to_drop2After, inplace=True, axis=1)
 dfPractice.fillna(0, inplace=True)
 

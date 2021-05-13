@@ -173,7 +173,7 @@ def render_page_content(pathname):
 def render_main_selector_content(pathname,
                selectorOptions, selectorValue ):
     
-    if current_user.is_authenticated  :
+    if current_user and current_user.is_authenticated  :
         userOptions = getUserLAOptions()
         value = ''
 

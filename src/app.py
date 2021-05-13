@@ -22,9 +22,6 @@ from dash.dependencies import Input, Output, State
 from flask_login import LoginManager, UserMixin
 
 
-import numpy as np
-import pandas as pd
-
 
 FA = "https://use.fontawesome.com/releases/v5.8.1/css/all.css"
 
@@ -60,18 +57,21 @@ server.config.update(
 
 
 class User(UserMixin):
-    def __init__(self, name, Id, active=True, isAdmin = False, securityStamp = ''):
+    def __init__(self, name, Id, active=True, isAdmin = False, securityStamp = '', isAuthenticated = False):
         self.name = name
         self.id = Id
         self.active = active
         self.isAdmin = isAdmin
         self.securityStamp = securityStamp
+        self.authenticated = isAuthenticated
 
     def is_active(self):
         return self.active
 
     def is_authenticated(self):
-        return True
+        """Return True if the user is authenticated."""
+        return self.authenticated
+        #return True
 
     def is_admin(self):
         return self.isAdmin

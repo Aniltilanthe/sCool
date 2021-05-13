@@ -69,7 +69,8 @@ def login():
             userDB = studentGrouped.getUserFromSecurityStamp( str(request.args.get('securityStamp'))  )
                     
             if  userDB is not None:
-                user = User(userDB['UserName'], userDB['Id'], active = True, isAdmin = userDB['IsAdmin'], securityStamp = userDB['SecurityStamp'] )
+                user = User(userDB['UserName'], userDB['Id'], active = True, isAdmin = userDB['IsAdmin'], securityStamp = userDB['SecurityStamp'], 
+                        isAuthenticated = True )
                 if user:
                     login_user(user)
                     return redirect(constants.loginRedirect)

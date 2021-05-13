@@ -115,7 +115,6 @@ pip install -r requirements.txt
 
 
 
-
 * To push and CI CD to Docker hub - push with tag
 ```
 # lightweight
